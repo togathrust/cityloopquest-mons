@@ -338,26 +338,7 @@
         cursor: not-allowed;
         opacity: 0.7;
     }
-    
-    /* Badge CLQ LITE/FULL au coin supérieur droit de la photo, juste au-dessus des flèches */
-    #clq-version-badge {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        width: 75px;
-        height: 75px;
-        transform: translateY(-10mm) rotate(30deg);
-        z-index: 999; /* Sous les flèches (z-index: 1000) */
-        pointer-events: none;
-        opacity: 0.9;
-        object-fit: contain;
-    }
-    /* Android uniquement : badge sous les flèches pour ne jamais cacher les boutons */
-    html.android #clq-version-badge {
-        z-index: 999;
-    }
-
-    #main-geo-activation-overlay {
+#main-geo-activation-overlay {
         position: fixed;
         inset: 0;
         background: rgba(0, 0, 0, 0.72);
@@ -696,9 +677,7 @@
         <div class="legal-mention">© Toga Thrust SNC - 2025</div>
         <div style="position: relative; display: inline-block; width: 100%;">
           <img id="point-image" src="images/grand-place.jpg" alt="Photo du lieu" style="max-width: 100%; height: auto;" />
-          <!-- Badge CLQ LITE/FULL au coin supérieur droit de la photo -->
-          <img id="clq-version-badge" src="" alt="Version badge" style="position: absolute; top: 10px; right: 10px; display: none;" />
-        </div>
+</div>
         <div id="media-display" style="display: none; padding: 15px; white-space: pre-line; font-size: 1rem; line-height: 1.4; text-align: justify;"></div>
       </div>
     </section>
@@ -732,6 +711,7 @@
     <button id="uber-btn" class="footer-btn" data-translate="transit_open_uber">Uber</button>
     <button id="poi-interest-btn" class="footer-btn" title="Points d'intérêt">📍</button>
     <button id="culture-btn" title="Culture montoise">🎭</button>
+    <button id="quiz-resume-btn" class="footer-btn" style="display: none;" data-translate="quiz_footer_btn" title="Quiz">Quiz</button>
     <button id="doudou-btn" data-translate="doudou_song">🎶 Doudou</button>
     <button id="selfie-btn" style="display: none;" title="Prendre un selfie avec Saint Georges">📸 Selfie</button>
     <button id="instructions-btn" class="small-btn" title="Instructions">❓</button>
@@ -813,7 +793,7 @@
 <script src="js/clq-open-external.js"></script>
 <script src="js/clq-maps-launch.js?v=maps-same-tab"></script>
 <script src="js/main-geo-prompt.js"></script>
-<script defer src="app.js?v=15"></script>
+<script defer src="app.js?v=16"></script>
 
 <script>
 window.addEventListener("load", function () {
@@ -839,204 +819,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Afficher le popup d'instructions pour le premier point
     showFirstPointPopup();
-    
-    // Afficher le badge CLQ LITE/FULL (avec un petit délai pour s'assurer que tout est chargé)
-    setTimeout(function() {
-        updateCLQVersionBadge();
-        // Réessayer après le chargement complet de la page
-        window.addEventListener('load', updateCLQVersionBadge);
-    }, 100);
 });
 
-// Fonction pour afficher le badge CLQ LITE/FULL
-function updateCLQVersionBadge() {
-    const badge = document.getElementById('clq-version-badge');
-    if (!badge) {
-        console.warn('⚠️ Badge CLQ non trouvé dans le DOM');
-        return;
-    }
-    
-    // Récupérer la version depuis localStorage
-    const userVersion = localStorage.getItem('user_version');
-    
-    // Essayer aussi d'autres clés possibles
-    const clqHasAccess = localStorage.getItem('clq_has_access');
-    const entitlements = localStorage.getItem('entitlements');
-    
-    let versionToUse = userVersion;
-    
-    // Si pas de user_version, essayer de déterminer depuis entitlements
-    if (!versionToUse && entitlements) {
-        try {
-            const ents = JSON.parse(entitlements);
-            if (ents.plan === 'lite' || ents.plan === 'LITE') {
-                versionToUse = 'LITE';
-            } else if (ents.plan === 'full' || ents.plan === 'FULL') {
-                versionToUse = 'FULL';
-            }
-        } catch (e) {
-            console.error('Erreur parsing entitlements:', e);
-        }
-    }
-    
-    if (versionToUse === 'LITE' || versionToUse === 'lite') {
-        badge.src = 'images/cityLoopQuest_Mons_Lite_192.png';
-        badge.style.display = 'block';
-        badge.style.visibility = 'visible';
-        badge.alt = 'CLQ LITE';
-    } else if (versionToUse === 'FULL' || versionToUse === 'full') {
-        badge.src = 'images/cityLoopQuest_Mons_Full_192.png';
-        badge.style.display = 'block';
-        badge.style.visibility = 'visible';
-        badge.alt = 'CLQ FULL';
-    } else {
-        // Si pas de version définie, ne pas afficher le badge
-        badge.style.display = 'none';
-        badge.style.visibility = 'hidden';
-    }
-}
-
-// Fonction pour initialiser les flèches de guidage
-function initGuideArrows() {
-    // Ne pas afficher les flèches en mode musée
-    const isMuseumMode = localStorage.getItem('museumMode') === 'true';
-    if (isMuseumMode) {
-        const arrow1 = document.getElementById('guide-arrow-1');
-        const arrow2 = document.getElementById('guide-arrow-2');
-        if (arrow1) arrow1.style.display = 'none';
-        if (arrow2) arrow2.style.display = 'none';
-        return;
-    }
-    
-    const currentIndex = parseInt(localStorage.getItem('mons_currentIndex') || '0');
-    const audioClicked = localStorage.getItem('guide_audio_clicked') === 'true';
-    const nextClicked = localStorage.getItem('guide_next_clicked') === 'true';
-    
-    // Afficher les flèches seulement si on est au premier point (index 0)
-    if (currentIndex === 0) {
-        const arrow1 = document.getElementById('guide-arrow-1');
-        const arrow2 = document.getElementById('guide-arrow-2');
-        
-        // Masquer les deux flèches d'abord
-        if (arrow1) arrow1.style.display = 'none';
-        if (arrow2) arrow2.style.display = 'none';
-        
-        // Afficher la flèche 1 seulement si l'audio n'a pas été cliqué
-        if (arrow1 && !audioClicked) {
-            arrow1.style.display = 'flex';
-        }
-        
-        // Afficher la flèche 2 seulement si l'audio a été cliqué ET que suivant n'a pas été cliqué
-        if (arrow2 && audioClicked && !nextClicked) {
-            arrow2.style.display = 'flex';
-        }
-    } else {
-        // Si on n'est pas au premier point, masquer toutes les flèches
-        const arrow1 = document.getElementById('guide-arrow-1');
-        const arrow2 = document.getElementById('guide-arrow-2');
-        if (arrow1) arrow1.style.display = 'none';
-        if (arrow2) arrow2.style.display = 'none';
-    }
-}
-
-// Fonction pour masquer la flèche 1 (audio)
-function hideGuideArrow1() {
-    // Ne rien faire en mode musée
-    const isMuseumMode = localStorage.getItem('museumMode') === 'true';
-    if (isMuseumMode) return;
-    
-    const currentIndex = parseInt(localStorage.getItem('mons_currentIndex') || '0');
-    const arrow1 = document.getElementById('guide-arrow-1');
-    const arrow2 = document.getElementById('guide-arrow-2');
-    
-    if (arrow1) {
-        arrow1.style.display = 'none';
-        localStorage.setItem('guide_audio_clicked', 'true');
-    }
-    
-    // Afficher la flèche 2 seulement si on est au premier point ET que suivant n'a pas été cliqué
-    if (arrow2 && currentIndex === 0 && localStorage.getItem('guide_next_clicked') !== 'true') {
-        arrow2.style.display = 'flex';
-    }
-}
-
-// Fonction pour masquer la flèche 2 (suivant)
-function hideGuideArrow2() {
-    // Ne rien faire en mode musée
-    const isMuseumMode = localStorage.getItem('museumMode') === 'true';
-    if (isMuseumMode) return;
-    
-    const arrow2 = document.getElementById('guide-arrow-2');
-    if (arrow2) {
-        arrow2.style.display = 'none';
-        localStorage.setItem('guide_next_clicked', 'true');
-    }
-}
-
-// Fonction pour réinitialiser les flèches de guidage
-function resetGuideArrows() {
-    localStorage.removeItem('guide_audio_clicked');
-    localStorage.removeItem('guide_next_clicked');
-    const arrow1 = document.getElementById('guide-arrow-1');
-    const arrow2 = document.getElementById('guide-arrow-2');
-    if (arrow1) arrow1.style.display = 'none';
-    if (arrow2) arrow2.style.display = 'none';
-}
-
-// Fonction pour afficher le popup d'instructions du premier point
-function showFirstPointPopup() {
-    // Ne pas afficher en mode musée
-    const isMuseumMode = localStorage.getItem('museumMode') === 'true';
-    if (isMuseumMode) return;
-    
-    // Vérifier si on est au premier point
-    const currentIndex = parseInt(localStorage.getItem('mons_currentIndex') || '0');
-    if (currentIndex !== 0) return;
-    
-    // Vérifier si l'utilisateur a déjà vu le popup
-    const popupSeen = localStorage.getItem('first_point_popup_seen') === 'true';
-    if (popupSeen) return;
-    
-    // Attendre que le translationManager soit chargé
-    const checkTranslationManager = () => {
-        if (window.translationManager && window.translationManager.isLoaded) {
-            const popup = document.getElementById('first-point-popup');
-            const titleEl = document.getElementById('first-point-popup-title');
-            const messageEl = document.getElementById('first-point-popup-message');
-            
-            if (popup && titleEl && messageEl) {
-                // Récupérer la langue actuelle
-                const currentLang = window.translationManager.getCurrentLanguage() || 
-                                   localStorage.getItem('selectedLanguage') || 
-                                   'fr';
-                
-                // Traduire le titre et le message
-                const title = window.translationManager.translate('first_point_popup_title') || 
-                             'Instructions pour le premier point';
-                const message = window.translationManager.translate('first_point_popup_message') || 
-                               'Pour une utilisation optimale, en arrivant au point d\'intérêt montré sur la photo, cliquer sur le symbole des écouteurs (1) pour écouter les explications touristiques. Lorsque les explications sont terminées ou lorsque vous désirez passer au point suivant, appuyez sur la flèche vers la droite (2). Cliquer sur ce popup pour le faire disparaître.';
-                
-                titleEl.textContent = title;
-                messageEl.textContent = message;
-                
-                // Afficher le popup
-                popup.style.display = 'flex';
-                
-                // Fermer le popup au clic
-                popup.addEventListener('click', function closePopup() {
-                    popup.style.display = 'none';
-                    localStorage.setItem('first_point_popup_seen', 'true');
-                    popup.removeEventListener('click', closePopup);
-                });
-            }
-        } else {
-            // Réessayer dans 100ms
-            setTimeout(checkTranslationManager, 100);
-        }
-    };
-    
-    checkTranslationManager();
-}
 </script>
 
 <script>

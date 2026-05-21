@@ -49,7 +49,69 @@ if (window.__APP_JS_DISABLED__) {
     // Code normal de app.js
 }
 
-let nextButton, prevButton, homeButton, cultureButton, audioBtn, poiInterestBtn, doudouBtn, pauseBtn, stopBtn, restartBtn;
+let nextButton, prevButton, homeButton, cultureButton, audioBtn, poiInterestBtn, doudouBtn, pauseBtn, stopBtn, restartBtn, quizResumeBtn;
+
+let quizSessionUiButtons = null;
+let quizResumeAwaitingAudio = false;
+const QUIZ_OVERLAY_ID = 'quiz-question-overlay';
+
+function getQuizQuestionFields(q) {
+  if (!q || typeof q !== 'object') return { question: '', options: [], answer: 0 };
+  return {
+    question: String(q['question'] || ''),
+    options: Array.isArray(q['options']) ? q['options'] : [],
+    answer: Number(q['answer'])
+  };
+}
+
+function showQuizQuestionPopup({ title, question, options, stopLabel, onStop, onOptionClick }) {
+  const existing = document.getElementById(QUIZ_OVERLAY_ID);
+  if (existing) existing.remove();
+  const overlay = document.createElement('div');
+  overlay.id = QUIZ_OVERLAY_ID;
+  overlay.className = 'quiz-question-overlay-root';
+  const box = document.createElement('div');
+  box.className = 'quiz-question-box';
+  const header = document.createElement('div');
+  header.className = 'quiz-question-header';
+  if (typeof onStop === 'function') {
+    const stopBtn = document.createElement('button');
+    stopBtn.type = 'button';
+    stopBtn.className = 'quiz-question-stop-btn';
+    stopBtn.textContent = stopLabel || translateClq('quiz_stop_short', 'Stop');
+    stopBtn.addEventListener('click', () => onStop());
+    header.appendChild(stopBtn);
+  }
+  const icons = document.createElement('div');
+  icons.className = 'quiz-question-icons';
+  icons.textContent = '\u2694\ufe0f \ud83d\udc09';
+  header.appendChild(icons);
+  box.appendChild(header);
+  const titleElem = document.createElement('div');
+  titleElem.className = 'quiz-question-title';
+  titleElem.textContent = title;
+  box.appendChild(titleElem);
+  const msgElem = document.createElement('div');
+  msgElem.className = 'quiz-question-text';
+  msgElem.textContent = question;
+  box.appendChild(msgElem);
+  const answersWrap = document.createElement('div');
+  answersWrap.className = 'quiz-question-answers';
+  (options || []).forEach((opt, idx) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'quiz-answer-btn';
+    button.textContent = String(opt);
+    button.addEventListener('click', () => {
+      overlay.remove();
+      if (onOptionClick) onOptionClick(idx);
+    });
+    answersWrap.appendChild(button);
+  });
+  box.appendChild(answersWrap);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+}
 let activeQuizContainer = null;
 let splashAlreadyHidden = false;
 let distanceStack = [];  // Stack des distances
@@ -2043,6 +2105,114 @@ async function handleResetWithCodeCheck() {
     window.location.href = "language-selection.html";
 }
 
+
+function translateClq(key, fallback) {
+  if (window.translationManager && window.translationManager.isLoaded) {
+    const v = window.translationManager.translate(key);
+    if (v && v !== key) return v;
+  }
+  return fallback;
+}
+
+function getLocationAtIndex(idx) {
+  if (idx === 0) return startPoint;
+  return filteredLocations[idx];
+}
+
+function isPointUnlockedForNext(idx) {
+  const audioIdx = localStorage.getItem('mons_audio_clicked_index');
+  return String(audioIdx) === String(idx);
+}
+
+function canStartQuizAtCurrentPoint() {
+  return isPointUnlockedForNext(currentIndex);
+}
+
+function showQuizListenBeforePopup(onClose) {
+  showStyledPopup(
+    translateClq('quiz_listen_before_title', 'Descriptif audio'),
+    translateClq('quiz_listen_before_message', 'Appuyez sur le bouton audio pour demarrer le descriptif de ce point avant de poursuivre avec le quiz.'),
+    onClose || null
+  );
+}
+
+function clearQuizCompletionFromIndex(fromIdx) {
+  for (let i = fromIdx; i < filteredLocations.length; i++) {
+    const loc = getLocationAtIndex(i);
+    if (loc && loc.name) delete completedQuizQuestions[loc.name];
+  }
+  localStorage.setItem('mons_completedQuizQuestions', JSON.stringify(completedQuizQuestions));
+}
+
+function updateQuizFooterButton() {
+  if (!quizResumeBtn) quizResumeBtn = document.getElementById('quiz-resume-btn');
+  if (!quizResumeBtn) return;
+  const show = localStorage.getItem('mons_quizEnabled') === 'false';
+  quizResumeBtn.style.display = show ? '' : 'none';
+}
+
+function setQuizEnabledRuntime(enabled) {
+  quizEnabled = enabled;
+  localStorage.setItem('mons_quizEnabled', enabled ? 'true' : 'false');
+  if (enabled) localStorage.removeItem('mons_quizStopped');
+  updateQuizFooterButton();
+  updateCurrentDisplay();
+}
+
+function releaseQuizSessionUi() {
+  currentQuizInProgress = false;
+  if (quizSessionUiButtons) {
+    quizSessionUiButtons.forEach(btn => { if (btn) btn.disabled = false; });
+    quizSessionUiButtons = null;
+  }
+  const overlay = document.getElementById(QUIZ_OVERLAY_ID);
+  if (overlay) overlay.remove();
+  syncNextButtonState();
+}
+
+function stopQuizPermanently() {
+  quizResumeAwaitingAudio = false;
+  setQuizEnabledRuntime(false);
+  localStorage.setItem('mons_quizStopped', 'true');
+  releaseQuizSessionUi();
+}
+
+function confirmStopQuizPermanently() {
+  showUniversalPopup({
+    title: translateClq('quiz_stop_confirm_title', 'Arreter le quiz ?'),
+    message: translateClq('quiz_stop_confirm_message', "Le quiz ne vous sera plus propose pendant le parcours.<br><br>Vous pourrez le reactiver a tout moment en appuyant sur le bouton <b>Quiz</b> dans la barre de menu en bas de l'ecran."),
+    buttons: [
+      { label: translateClq('no', 'Non'), color: '#888', onClick: null },
+      { label: translateClq('yes', 'Oui'), color: '#b30000', onClick: () => stopQuizPermanently() }
+    ]
+  });
+}
+
+function resumeQuizFromFooter() {
+  showUniversalPopup({
+    title: translateClq('quiz_resume_confirm_title', 'Reprendre le quiz ?'),
+    message: translateClq('quiz_resume_confirm_message', 'Voulez-vous reprendre le quiz a ce point ? Les questions seront proposees pour ce lieu et les points suivants.'),
+    buttons: [
+      { label: translateClq('no', 'Non'), color: '#888', onClick: null },
+      {
+        label: translateClq('yes', 'Oui'),
+        color: '#2ecc40',
+        onClick: () => {
+          setQuizEnabledRuntime(true);
+          clearQuizCompletionFromIndex(currentIndex);
+          if (!isPointUnlockedForNext(currentIndex)) {
+            quizResumeAwaitingAudio = true;
+            showQuizListenBeforePopup();
+            return;
+          }
+          quizResumeAwaitingAudio = false;
+          showQuizForCurrentPoint(() => {});
+        }
+      }
+    ]
+  });
+}
+
 // === Ajout : fonction showQuizPrompt ===
 function showQuizPrompt(callback) {
   if (localStorage.getItem("mons_quizEnabled") !== null) {
@@ -2102,6 +2272,7 @@ function showQuizPrompt(callback) {
   btnYes.addEventListener('click', () => {
     localStorage.setItem("mons_quizEnabled", "true");
     document.body.removeChild(overlay);
+    updateQuizFooterButton();
     callback(true);
   });
 
@@ -2121,6 +2292,7 @@ function showQuizPrompt(callback) {
   btnNo.addEventListener('click', () => {
     localStorage.setItem("mons_quizEnabled", "false");
     document.body.removeChild(overlay);
+    updateQuizFooterButton();
     callback(false);
   });
 
@@ -2134,165 +2306,89 @@ function showQuizPrompt(callback) {
 
 // === Ajout : gestion du quiz par point ===
 function showQuizForCurrentPoint(callback) {
-  // Vérifier si le quiz est activé
   if (!quizEnabled) {
     callback();
     return;
   }
 
+  if (!canStartQuizAtCurrentPoint()) {
+    showQuizListenBeforePopup();
+    return;
+  }
+
   const currentLocation = currentIndex === 0 ? startPoint : filteredLocations[currentIndex];
   const pointName = currentLocation.name;
-  
-  
-  // Log de la langue sélectionnée dans le localStorage
-  
-  
-  // S'assurer que le gestionnaire de traductions est prêt
+
   if (!window.translationManager) {
     setTimeout(() => showQuizForCurrentPoint(callback), 100);
     return;
   }
-  
-  // Utiliser le fichier de traductions du quiz
+
   const currentLang = window.translationManager.getCurrentLanguage();
   const quizTranslations = window.quizTranslations || {};
   const langData = quizTranslations[currentLang] || quizTranslations['fr'] || {};
   let questions = langData[pointName];
-  
-  // Fallback vers l'ancien système si les traductions ne sont pas disponibles
-  if (!questions || questions.length === 0) {
-    questions = window.quizData ? window.quizData[pointName] : null;
-  }
-  
-  
-  if (!questions || questions.length === 0) {
-    callback();
-    return;
-  }
-  if (completedQuizQuestions[pointName]) {
-    callback();
-    return;
-  }
-  
-  
-  // Marquer qu'un quiz est en cours
+  if (!questions || questions.length === 0) questions = window.quizData ? window.quizData[pointName] : null;
+  if (!questions || questions.length === 0) { callback(); return; }
+  if (completedQuizQuestions[pointName]) { callback(); return; }
+
   currentQuizInProgress = true;
-  
-  // Mettre à jour l'affichage pour refléter le nouveau maxScore
   updateCurrentDisplay();
-  
-  // Désactiver tous les boutons sauf quiz
-  const btns = [nextButton, prevButton, homeButton, cultureButton, audioBtn, doudouBtn, pauseBtn, stopBtn, restartBtn];
+  const btns = [nextButton, prevButton, homeButton, cultureButton, audioBtn, poiInterestBtn, doudouBtn, pauseBtn, stopBtn, restartBtn];
+  quizSessionUiButtons = btns;
   btns.forEach(btn => { if (btn) btn.disabled = true; });
   let questionIndex = 0;
   let localScore = 0;
-  function showQuestion() {
-    const q = questions[questionIndex];
-    showUniversalPopup({
-      title: `Question ${questionIndex + 1} / 3`,
-      message: q.question,
-      buttons: q.options.map((opt, idx) => ({
-        label: opt,
-        color: '#b30000',
-        onClick: () => {
-          const isGood = idx === q.answer;
-          if (isGood) localScore += 10;
-          
-          // Jouer le son de feedback
-          let feedbackAudio;
-          if (isGood) {
-            feedbackAudio = new Audio('audio/correct.mp3');
-          } else {
-            feedbackAudio = new Audio('audio/incorrect.mp3');
-          }
-          feedbackAudio.play();
 
-          // Afficher l'icône de feedback centrée avec fond transparent (comme avant)
-          const feedbackImg = document.createElement('img');
-          feedbackImg.src = `images/${isGood ? 'correct' : 'incorrect'}.png`;
-          feedbackImg.alt = isGood ? 'Bonne réponse' : 'Mauvaise réponse';
-          feedbackImg.style.position = 'fixed';
-          feedbackImg.style.top = '50%';
-          feedbackImg.style.left = '50%';
-          feedbackImg.style.transform = 'translate(-50%, -50%)';
-          feedbackImg.style.width = '120px';
-          feedbackImg.style.height = '120px';
-          feedbackImg.style.zIndex = '10000';
-          document.body.appendChild(feedbackImg);
-          
-          // Si mauvaise réponse, afficher la bonne réponse dans un conteneur stylisé
-          if (!isGood) {
-            const correctAnswerContainer = document.createElement('div');
-            correctAnswerContainer.style.position = 'fixed';
-            correctAnswerContainer.style.top = 'calc(50% + 80px)'; // Positionner sous l'icône
-            correctAnswerContainer.style.left = '50%';
-            correctAnswerContainer.style.transform = 'translate(-50%, -50%)';
-            correctAnswerContainer.style.zIndex = '10000';
-            correctAnswerContainer.style.textAlign = 'center';
-            correctAnswerContainer.style.background = 'rgba(0, 0, 0, 0.8)';
-            correctAnswerContainer.style.borderRadius = '15px';
-            correctAnswerContainer.style.padding = '15px';
-            correctAnswerContainer.style.color = 'white';
-            correctAnswerContainer.style.fontFamily = 'MedievalSharp, Arial, serif';
-            correctAnswerContainer.style.fontSize = '16px';
-            correctAnswerContainer.style.minWidth = '280px';
-            correctAnswerContainer.style.fontWeight = 'bold';
-            correctAnswerContainer.style.color = '#FFD700'; // Couleur dorée
-            const correctAnswerText = window.translationManager ? window.translationManager.translate('correct_answer') : 'Bonne réponse :';
-            correctAnswerContainer.innerHTML = `${correctAnswerText} <br>${q.options[q.answer]}`;
-            document.body.appendChild(correctAnswerContainer);
-            
-            // Supprimer les deux éléments après 3 secondes
-            setTimeout(() => {
-              document.body.removeChild(feedbackImg);
-              document.body.removeChild(correctAnswerContainer);
-              questionIndex++;
-              // Mettre à jour l'affichage après chaque question
-              updateCurrentDisplay();
-              if (questionIndex < 3) {
-                showQuestion();
-              } else {
-                // Fin du quiz pour ce point
-                score += localScore;
-                completedQuizQuestions[pointName] = true;
-                currentQuizInProgress = false; // Quiz terminé
-                localStorage.setItem('mons_score', score);
-                localStorage.setItem('mons_completedQuizQuestions', JSON.stringify(completedQuizQuestions));
-                // Mettre à jour l'affichage pour refléter le nouveau score
-                updateCurrentDisplay();
-                // Réactiver les boutons
-                btns.forEach(btn => { if (btn) btn.disabled = false; });
-                callback();
-              }
-            }, 3000);
-          } else {
-            // Si bonne réponse, supprimer seulement l'icône après 1 seconde
-            setTimeout(() => {
-              document.body.removeChild(feedbackImg);
-              questionIndex++;
-              // Mettre à jour l'affichage après chaque question
-              updateCurrentDisplay();
-              if (questionIndex < 3) {
-                showQuestion();
-              } else {
-                // Fin du quiz pour ce point
-                score += localScore;
-                completedQuizQuestions[pointName] = true;
-                currentQuizInProgress = false; // Quiz terminé
-                localStorage.setItem('mons_score', score);
-                localStorage.setItem('mons_completedQuizQuestions', JSON.stringify(completedQuizQuestions));
-                // Mettre à jour l'affichage pour refléter le nouveau score
-                updateCurrentDisplay();
-                // Réactiver les boutons
-                btns.forEach(btn => { if (btn) btn.disabled = false; });
-                callback();
-              }
-            }, 1000);
-          }
-        }
-      })),
-      icon1: '⚔️',
-      icon2: '🐉',
+  function finishQuizPoint() {
+    score += localScore;
+    completedQuizQuestions[pointName] = true;
+    currentQuizInProgress = false;
+    localStorage.setItem('mons_score', score);
+    localStorage.setItem('mons_completedQuizQuestions', JSON.stringify(completedQuizQuestions));
+    updateCurrentDisplay();
+    quizSessionUiButtons = null;
+    btns.forEach(btn => { if (btn) btn.disabled = false; });
+    syncNextButtonState();
+    callback();
+  }
+
+  function afterAnswerFeedback(isGood, fields) {
+    if (isGood) localScore += 10;
+    new Audio(isGood ? 'audio/correct.mp3' : 'audio/incorrect.mp3').play();
+    const feedbackImg = document.createElement('img');
+    feedbackImg.src = 'images/' + (isGood ? 'correct' : 'incorrect') + '.png';
+    feedbackImg.alt = isGood ? 'Bonne reponse' : 'Mauvaise reponse';
+    feedbackImg.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:120px;height:120px;z-index:10000';
+    document.body.appendChild(feedbackImg);
+    let correctAnswerContainer = null;
+    if (!isGood) {
+      correctAnswerContainer = document.createElement('div');
+      correctAnswerContainer.style.cssText = 'position:fixed;top:calc(50% + 80px);left:50%;transform:translate(-50%,-50%);z-index:10000;text-align:center;background:rgba(0,0,0,0.8);border-radius:15px;padding:15px;color:#FFD700;font-family:MedievalSharp,Arial,serif;font-size:16px;font-weight:bold;min-width:280px';
+      const correctAnswerText = window.translationManager ? window.translationManager.translate('correct_answer') : 'Bonne reponse :';
+      correctAnswerContainer.innerHTML = correctAnswerText + ' <br>' + (fields.options[fields.answer] || '');
+      document.body.appendChild(correctAnswerContainer);
+    }
+    const delay = isGood ? 1000 : 3000;
+    setTimeout(() => {
+      if (feedbackImg.parentNode) feedbackImg.remove();
+      if (correctAnswerContainer && correctAnswerContainer.parentNode) correctAnswerContainer.remove();
+      questionIndex++;
+      updateCurrentDisplay();
+      if (questionIndex < 3) showQuestion();
+      else finishQuizPoint();
+    }, delay);
+  }
+
+  function showQuestion() {
+    const fields = getQuizQuestionFields(questions[questionIndex]);
+    showQuizQuestionPopup({
+      title: 'Question ' + (questionIndex + 1) + ' / 3',
+      question: fields.question,
+      options: fields.options,
+      stopLabel: translateClq('quiz_stop_short', 'Stop'),
+      onStop: () => confirmStopQuizPermanently(),
+      onOptionClick: (idx) => afterAnswerFeedback(idx === fields.answer, fields)
     });
   }
   showQuestion();
@@ -2382,6 +2478,8 @@ function initializeMainLogic() {
     if (savedQuizEnabled !== null) {
         quizEnabled = savedQuizEnabled === 'true';
     }
+
+    updateQuizFooterButton();
     
     // Restaurer les questions de quiz déjà traitées
     if (savedCompletedQuizQuestions !== null && Object.keys(completedQuizQuestions).length === 0) {
@@ -3702,6 +3800,11 @@ document.addEventListener("DOMContentLoaded", () => {
     pauseBtn = document.getElementById('pause-btn');
     stopBtn = document.getElementById('stop-btn');
     restartBtn = document.getElementById('restart-btn');
+    quizResumeBtn = document.getElementById('quiz-resume-btn');
+    if (quizResumeBtn) {
+        quizResumeBtn.addEventListener('click', () => resumeQuizFromFooter());
+    }
+    updateQuizFooterButton();
     const selfieBtn = document.getElementById('selfie-btn');
     const pwaInstallBtn = document.getElementById('pwa-install-btn');
 
