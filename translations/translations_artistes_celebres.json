@@ -1,0 +1,52 @@
+{
+  "fr": {
+    "mainTitle": "CityLoop Quest Mons - La Chevauchée de Saint Georges",
+    "pageTitle": "🎨 Artistes célèbres",
+    "backButton": "RETOUR"
+  },
+  "en": {
+    "mainTitle": "CityLoop Quest Mons - The Ride of Saint George",
+    "pageTitle": "🎨 Famous Artists",
+    "backButton": "BACK"
+  },
+  "nl": {
+    "mainTitle": "CityLoop Quest Mons - De Ruiterstoet van Sint Georges",
+    "pageTitle": "🎨 Beroemde kunstenaars",
+    "backButton": "TERUG"
+  },
+  "de": {
+    "mainTitle": "CityLoop Quest Mons - Der Ritt des heiligen Georg",
+    "pageTitle": "🎨 Berühmte Künstler",
+    "backButton": "ZURÜCK"
+  },
+  "it": {
+"mainTitle": "CityLoop Quest Mons - La Cavalcata di San Giorgio",
+"pageTitle": "🎨 Artisti celebri",
+"backButton": "INDIETRO"
+},
+"es": {
+  "mainTitle": "CityLoop Quest Mons - La Cabalgata de San Jorge",
+  "pageTitle": "🎨 Artistas célebres",
+  "backButton": "VOLVER"
+},
+"pl": {
+  "mainTitle": "CityLoop Quest Mons - Szarża świętego Jerzego",
+  "pageTitle": "🎨 Słynni artyści",
+  "backButton": "POWRÓT"
+},
+"ar": {
+"mainTitle": "سيتي لووب كويست مُونس – ملحمة القديس جرجس",
+"pageTitle": "🎨 فنّانون مشهورون",
+"backButton": "رجوع"
+},
+"cn": {
+"mainTitle": "CityLoop Quest Mons - 圣乔治的骑行",
+"pageTitle": "🎨 著名艺术家",
+"backButton": "返回"
+},
+"jp": {
+    "mainTitle": "CityLoop Quest Mons - サン＝ジョルジュの騎行",
+    "pageTitle": "🎨 著名なアーティスト",
+    "backButton": "戻る"
+  }
+} 

@@ -1,0 +1,972 @@
+{
+  "fr": {
+    "mainTitle": "CityLoop Quest Mons - La Chevauchée de Saint Georges",
+    "title": "🏛️ Musées à visiter à Mons",
+    "artHeritage": "Musées d'art et patrimoine",
+    "historyMemory": "Musées d'histoire et mémoire",
+    "scienceTech": "Musées sciences et techniques",
+    "industrialHeritage": "Musées patrimoine industriel et technique",
+    "bam": {
+      "name": "Musée des Beaux-Arts (BAM)",
+      "address": "Adresse : Rue Neuve 8, 7000 Mons",
+      "description": "Le BAM (Beaux-Arts Mons) est un musée d'art moderne et contemporain proposant des expositions temporaires prestigieuses dans un cadre architectural contemporain.",
+      "button": "Y aller ?"
+    },
+    "cap": {
+      "name": "Musée des Collections (CAP)",
+      "address": "Adresse : Rue Neuve 8, 7000 Mons",
+      "description": "Le Musée des Collections (CAP) de Mons présente les riches collections permanentes de la ville, mêlant arts anciens, modernes et contemporains dans un parcours thématique.",
+      "button": "Y aller ?"
+    },
+    "maisonLosseau": {
+      "name": "Maison Losseau",
+      "address": "Adresse : Rue de Nimy 37, 7000 Mons",
+      "description": "La Maison Losseau à Mons est un joyau de l'Art nouveau, abritant un centre littéraire et une maison-musée dédiée à l'œuvre du bibliophile Léon Losseau.",
+      "button": "Y aller ?"
+    },
+    "museeDoudou": {
+      "name": "Musée du Doudou",
+      "address": "Adresse : Jardin du Mayeur, 7000 Mons",
+      "description": "Le Musée du Doudou à Mons est consacré à la Ducasse rituelle, mettant en valeur son histoire, ses traditions et son inscription au patrimoine immatériel de l'UNESCO.",
+      "button": "Y aller ?"
+    },
+    "anciensAbattoirs": {
+      "name": "Anciens abattoirs",
+      "address": "Adresse : Rue de la Trouille 17, 7000 Mons",
+      "description": "Le musée des Anciens Abattoirs de Mons est un espace d'art contemporain installé dans un remarquable site industriel du XIXe siècle rénové.",
+      "button": "Y aller ?"
+    },
+    "artotheque": {
+      "name": "Artothèque",
+      "address": "Adresse :  Rue Claude de Bettignies 1, 7000 Mons",
+      "description": "L'Artothèque de Mons est un centre de conservation et de recherche dédié aux collections muséales de la ville, situé dans une ancienne chapelle rénovée.",
+      "button": "Y aller ?"
+    },
+    "mmm": {
+      "name": "Mons Memorial Museum (MMM)",
+      "address": "Adresse :  Boulevard Dolez 51, 7000 Mons",
+      "description": "Le Mons Memorial Museum retrace l'histoire militaire de Mons à travers les conflits du XXe siècle, en mettant l'accent sur les expériences humaines des civils et des soldats.",
+      "button": "Y aller ?"
+    },
+    "maisonVanGogh": {
+      "name": "Maison Van Gogh",
+      "address": "Adresse :  Rue du Pavillon 3, 7033 Cuesmes (Voiture nécessaire)",
+      "description": "La Maison Van Gogh à Mons évoque le séjour du peintre à Cuesmes et présente son évolution artistique à travers une scénographie immersive.",
+      "button": "Y aller ?"
+    },
+    "mundaneum": {
+      "name": "Mundaneum",
+      "address": "Adresse : Rue de Nimy 76, 7000 Mons",
+      "description": "Archives de la connaissance mondiale, musée et centre d'exposition autour des utopies documentaires.",
+      "button": "Y aller ?"
+    },
+    "maisonLescart": {
+      "name": "Maison Jean Lescart",
+      "address": "Adresse : Rue Neuve 8, 7000 Mons",
+      "description": "La Maison Jean Lescart à Mons est un musée du folklore local retraçant la vie montoise à travers objets, traditions et scènes reconstituées. Hélas fermé définitivement.",
+      "button": "Y aller ?"
+    },
+    "mumons": {
+      "name": "MUMONS",
+      "address": "Adresse : Place du Parc 24, 7000 Mons",
+      "description": "Le Musée MUMONS est le musée universitaire de l'UMONS, explorant les liens entre science, art et société à travers des expositions originales.",
+      "button": "Y aller ?"
+    },
+    "scitechlab": {
+      "name": "SciTechLab",
+      "address": "Adresse : Rue de Houdain 9, 7000 Mons",
+      "description": "Le SciTechLab est un espace muséal interactif de l'UMONS dédié à la découverte des sciences et des technologies de manière ludique et immersive.",
+      "button": "Y aller ?"
+    },
+    "sciencesNaturelles": {
+      "name": "Muséum régional des Sciences naturelles de Mons",
+      "address": "Adresse : Rue des Gailliers 7, 7000 Mons",
+      "description": "Le Musée régional des Sciences naturelles de Mons présente une riche collection de spécimens zoologiques, botaniques et géologiques pour explorer la biodiversité.",
+      "button": "Y aller ?"
+    },
+    "museeRoute": {
+      "name": "Musée de la Route de Mons",
+      "address": "Adresse : Rue des Canonniers (Place Nervienne), Casemates 3, 4 et 5, 7000 Mons",
+      "description": "Le Musée de la Route de Mons retrace l'histoire des infrastructures routières et des métiers liés à la voirie en Wallonie. Hélas fermé définitievement.",
+      "button": "Y aller ?"
+    },
+    "backButton": "RETOUR",
+    "popupTitle": "Avertissement !",
+    "popupMessage": "ATTENTION, cette action va entraîner l'arrêt du parcours touristique que vous avez choisi. Etes-vous sûr de vouloir aller vers ce musée ? Le guidage va vous y emmener !",
+    "popupYes": "OUI",
+    "popupNo": "NON"
+  },
+  "en": {
+    "mainTitle": "CityLoop Quest Mons - The Ride of Saint George",
+    "title": "🏛️ Museums to visit in Mons",
+    "artHeritage": "Art and heritage museums",
+    "historyMemory": "History and memory museums",
+    "scienceTech": "Science and technology museums",
+    "industrialHeritage": "Industrial and technical heritage museums",
+    "bam": {
+      "name": "Fine Arts Museum (BAM)",
+      "address": "Address: Rue Neuve 8, 7000 Mons",
+      "description": "The BAM (Beaux-Arts Mons) is a modern and contemporary art museum offering prestigious temporary exhibitions in a contemporary architectural setting.",
+      "button": "Go there?"
+    },
+    "cap": {
+      "name": "Collections Museum (CAP)",
+      "address": "Address: Rue Neuve 8, 7000 Mons",
+      "description": "The Collections Museum (CAP) in Mons presents the city's rich permanent collections, mixing ancient, modern and contemporary arts in a thematic journey.",
+      "button": "Go there?"
+    },
+    "maisonLosseau": {
+      "name": "Maison Losseau",
+      "address": "Address: Rue de Nimy 37, 7000 Mons",
+      "description": "The Maison Losseau in Mons is a jewel of Art Nouveau, housing a literary center and a house-museum dedicated to the work of bibliophile Léon Losseau.",
+      "button": "Go there?"
+    },
+    "museeDoudou": {
+      "name": "Doudou Museum",
+      "address": "Address: Jardin du Mayeur, 7000 Mons",
+      "description": "The Doudou Museum in Mons is dedicated to the ritual Ducasse, highlighting its history, traditions and inscription on UNESCO's intangible heritage.",
+      "button": "Go there?"
+    },
+    "anciensAbattoirs": {
+      "name": "Old Slaughterhouses",
+      "address": "Address: Rue de la Trouille 17, 7000 Mons",
+      "description": "The Old Slaughterhouses Museum in Mons is a contemporary art space installed in a remarkable renovated 19th century industrial site.",
+      "button": "Go there?"
+    },
+    "artotheque": {
+      "name": "Artothèque",
+      "address": "Address: Rue Claude de Bettignies 1, 7000 Mons",
+      "description": "The Artothèque in Mons is a conservation and research center dedicated to the city's museum collections, located in a renovated old chapel.",
+      "button": "Go there?"
+    },
+    "mmm": {
+      "name": "Mons Memorial Museum (MMM)",
+      "address": "Address: Boulevard Dolez 51, 7000 Mons",
+      "description": "The Mons Memorial Museum traces the military history of Mons through the conflicts of the 20th century, focusing on the human experiences of civilians and soldiers.",
+      "button": "Go there?"
+    },
+    "maisonVanGogh": {
+      "name": "Van Gogh House",
+      "address": "Address: Rue du Pavillon 3, 7033 Cuesmes (Car required)",
+      "description": "The Van Gogh House in Mons evokes the painter's stay in Cuesmes and presents his artistic evolution through an immersive scenography.",
+      "button": "Go there?"
+    },
+    "mundaneum": {
+      "name": "Mundaneum",
+      "address": "Address: Rue de Nimy 76, 7000 Mons",
+      "description": "Archives of world knowledge, museum and exhibition center around documentary utopias.",
+      "button": "Go there?"
+    },
+    "maisonLescart": {
+      "name": "Jean Lescart House",
+      "address": "Address: Rue Neuve 8, 7000 Mons",
+      "description": "The Jean Lescart House in Mons is a local folklore museum tracing Mons life through objects, traditions and reconstructed scenes. Sadly permanently closed.",
+      "button": "Go there?"
+    },
+    "mumons": {
+      "name": "MUMONS",
+      "address": "Address: Place du Parc 24, 7000 Mons",
+      "description": "The MUMONS Museum is the university museum of UMONS, exploring the links between science, art and society through original exhibitions.",
+      "button": "Go there?"
+    },
+    "scitechlab": {
+      "name": "SciTechLab",
+      "address": "Address: Rue de Houdain 9, 7000 Mons",
+      "description": "The SciTechLab is an interactive museum space of UMONS dedicated to discovering sciences and technologies in a fun and immersive way.",
+      "button": "Go there?"
+    },
+    "sciencesNaturelles": {
+      "name": "Regional Museum of Natural Sciences of Mons",
+      "address": "Address: Rue des Gailliers 7, 7000 Mons",
+      "description": "The Regional Museum of Natural Sciences of Mons presents a rich collection of zoological, botanical and geological specimens to explore biodiversity.",
+      "button": "Go there?"
+    },
+    "museeRoute": {
+      "name": "Mons Road Museum",
+      "address": "Address: Rue des Canonniers (Place Nervienne), Casemates 3, 4 and 5, 7000 Mons",
+      "description": "The Mons Road Museum traces the history of road infrastructure and road-related trades in Wallonia. Sadly permanently closed.",
+      "button": "Go there?"
+    },
+    "backButton": "BACK",
+    "popupTitle": "Warning!",
+    "popupMessage": "ATTENTION, this action will permanently stop the tourist route you have chosen. Are you sure you want to go to this museum? The guidance will take you there!",
+    "popupYes": "YES",
+    "popupNo": "NO"
+  },
+  "nl": {
+    "mainTitle": "CityLoop Quest Mons - De Ruiterstoet van Sint Georges",
+    "title": "🏛️ Musea om te bezoeken in Bergen",
+  "artHeritage": "Kunst- en erfgoedmusea",
+  "historyMemory": "Geschiedenis- en herinneringsmusea",
+  "scienceTech": "Wetenschaps- en technologiemusea",
+  "industrialHeritage": "Musea voor industrieel en technisch erfgoed",
+  "bam": {
+    "name": "Museum voor Schone Kunsten (BAM)",
+    "address": "Adres: Rue Neuve 8, 7000 Bergen",
+    "description": "Het BAM (Beaux-Arts Mons) is een museum voor moderne en hedendaagse kunst dat prestigieuze tijdelijke tentoonstellingen presenteert in een hedendaags architecturaal kader.",
+    "button": "Gaan?"
+  },
+  "cap": {
+    "name": "Museum van de Collecties (CAP)",
+    "address": "Adres: Rue Neuve 8, 7000 Bergen",
+    "description": "Het Museum van de Collecties (CAP) van Bergen toont de rijke permanente collecties van de stad, met een thematisch parcours door oude, moderne en hedendaagse kunst.",
+    "button": "Gaan?"
+  },
+  "maisonLosseau": {
+    "name": "Huis Losseau",
+    "address": "Adres: Rue de Nimy 37, 7000 Bergen",
+    "description": "Het Huis Losseau in Bergen is een parel van de art nouveau, met een literair centrum en een museumwoning gewijd aan het werk van bibliofiel Léon Losseau.",
+    "button": "Gaan?"
+  },
+  "museeDoudou": {
+    "name": "Doudoumuseum",
+    "address": "Adres: Jardin du Mayeur, 7000 Bergen",
+    "description": "Het Doudoumuseum in Bergen is gewijd aan de rituele Ducasse en belicht de geschiedenis, tradities en de opname op de lijst van immaterieel UNESCO-erfgoed.",
+    "button": "Gaan?"
+  },
+  "anciensAbattoirs": {
+    "name": "Voormalige slachthuizen",
+    "address": "Adres: Rue de la Trouille 17, 7000 Bergen",
+    "description": "Het museum van de Voormalige Slachthuizen van Bergen is een centrum voor hedendaagse kunst, gevestigd in een prachtig gerenoveerde industriële site uit de 19e eeuw.",
+    "button": "Gaan?"
+  },
+  "artotheque": {
+    "name": "Artotheek",
+    "address": "Adres: Rue Claude de Bettignies 1, 7000 Bergen",
+    "description": "De Artotheek van Bergen is een centrum voor behoud en onderzoek van de museale collecties van de stad, gevestigd in een gerenoveerde voormalige kapel.",
+    "button": "Gaan?"
+  },
+  "mmm": {
+    "name": "Mons Memorial Museum (MMM)",
+    "address": "Adres: Boulevard Dolez 51, 7000 Bergen",
+    "description": "Het Mons Memorial Museum vertelt de militaire geschiedenis van Bergen tijdens de conflicten van de 20e eeuw, met nadruk op de menselijke ervaringen van burgers en soldaten.",
+    "button": "Gaan?"
+  },
+  "maisonVanGogh": {
+    "name": "Huis van Van Gogh",
+    "address": "Adres: Rue du Pavillon 3, 7033 Cuesmes (Auto vereist)",
+    "description": "Het Huis van Van Gogh in Bergen belicht het verblijf van de schilder in Cuesmes en toont zijn artistieke evolutie via een meeslepende scenografie.",
+    "button": "Gaan?"
+  },
+  "mundaneum": {
+    "name": "Mundaneum",
+    "address": "Adres: Rue de Nimy 76, 7000 Bergen",
+    "description": "Archieven van wereldkennis, museum en tentoonstellingscentrum rond documentaire utopieën.",
+    "button": "Gaan?"
+  },
+  "maisonLescart": {
+    "name": "Huis Jean Lescart",
+    "address": "Adres: Rue Neuve 8, 7000 Bergen",
+    "description": "Het Huis Jean Lescart in Bergen is een museum over lokale folklore dat het leven in Bergen toont via objecten, tradities en gereconstrueerde taferelen. Helaas definitief gesloten.",
+    "button": "Gaan?"
+  },
+  "mumons": {
+    "name": "MUMONS",
+    "address": "Adres: Place du Parc 24, 7000 Bergen",
+    "description": "Het MUMONS-museum is het universitaire museum van de UMONS, dat de verbindingen tussen wetenschap, kunst en maatschappij onderzoekt via originele tentoonstellingen.",
+    "button": "Gaan?"
+  },
+  "scitechlab": {
+    "name": "SciTechLab",
+    "address": "Adres: Rue de Houdain 9, 7000 Bergen",
+    "description": "Het SciTechLab is een interactief museumruimte van de UMONS die op een speelse en meeslepende manier wetenschappen en technologieën laat ontdekken.",
+    "button": "Gaan?"
+  },
+  "sciencesNaturelles": {
+    "name": "Regionaal Museum voor Natuurwetenschappen van Bergen",
+    "address": "Adres: Rue des Gailliers 7, 7000 Bergen",
+    "description": "Het Regionaal Museum voor Natuurwetenschappen van Bergen toont een rijke verzameling zoölogische, botanische en geologische specimens ter ontdekking van de biodiversiteit.",
+    "button": "Gaan?"
+  },
+  "museeRoute": {
+    "name": "Museum van de Weg van Bergen",
+    "address": "Adres: Rue des Canonniers (Place Nervienne), Casemates 3, 4 en 5, 7000 Bergen",
+    "description": "Het Museum van de Weg van Bergen vertelt de geschiedenis van weginfrastructuren en beroepen in verband met wegenbouw in Wallonië. Helaas definitief gesloten.",
+    "button": "Gaan?"
+  },
+  "backButton": "TERUG",
+  "popupTitle": "Waarschuwing!",
+  "popupMessage": "OPGELET, deze actie zal de toeristische route die u gekozen hebt onderbreken. Weet u zeker dat u naar dit museum wilt gaan? De navigatie zal u daarheen leiden!",
+  "popupYes": "JA",
+  "popupNo": "NEE"
+  },
+  "de": {
+"mainTitle": "CityLoop Quest Mons – Der Ritt des heiligen Georg",
+"title": "🏛️ Museen in Mons",
+"artHeritage": "Kunst- und Kulturerbemuseen",
+"historyMemory": "Geschichts- und Erinnerungsmuseen",
+"scienceTech": "Museen für Wissenschaft und Technik",
+"industrialHeritage": "Museen des industriellen und technischen Erbes",
+"bam": {
+"name": "Musée des Beaux-Arts (BAM)",
+"address": "Adresse: Rue Neuve 8, 7000 Mons",
+"description": "Das BAM (Beaux-Arts Mons) ist ein Museum für moderne und zeitgenössische Kunst, das in zeitgenössischer Architektur hochkarätige Wechselausstellungen präsentiert.",
+"button": "Dorthin?"
+},
+"cap": {
+"name": "Musée des Collections (CAP)",
+"address": "Adresse: Rue Neuve 8, 7000 Mons",
+"description": "Das Musée des Collections (CAP) in Mons zeigt die reichen ständigen Sammlungen der Stadt und verbindet alte, moderne und zeitgenössische Kunst in einem thematischen Rundgang.",
+"button": "Dorthin?"
+},
+"maisonLosseau": {
+"name": "Maison Losseau",
+"address": "Adresse: Rue de Nimy 37, 7000 Mons",
+"description": "Das Maison Losseau in Mons ist ein Juwel des Jugendstils und beherbergt ein Literaturzentrum sowie ein Hausmuseum, das dem Werk des Bibliophilen Léon Losseau gewidmet ist.",
+"button": "Dorthin?"
+},
+"museeDoudou": {
+"name": "Musée du Doudou",
+"address": "Adresse: Jardin du Mayeur, 7000 Mons",
+"description": "Das Musée du Doudou in Mons ist der rituellen Ducasse gewidmet und beleuchtet ihre Geschichte, ihre Traditionen sowie ihre Anerkennung als immaterielles Kulturerbe der UNESCO.",
+"button": "Dorthin?"
+},
+"anciensAbattoirs": {
+"name": "Anciens abattoirs",
+"address": "Adresse: Rue de la Trouille 17, 7000 Mons",
+"description": "Das Museum der Anciens Abattoirs in Mons ist ein Zentrum für zeitgenössische Kunst in einem renovierten, bemerkenswerten Industrieensemble des 19. Jahrhunderts.",
+"button": "Dorthin?"
+},
+"artotheque": {
+"name": "Artothèque",
+"address": "Adresse: Rue Claude de Bettignies 1, 7000 Mons",
+"description": "Die Artothèque von Mons ist ein Zentrum für Konservierung und Forschung zu den Museumssammlungen der Stadt und befindet sich in einer renovierten ehemaligen Kapelle.",
+"button": "Dorthin?"
+},
+"mmm": {
+"name": "Mons Memorial Museum (MMM)",
+"address": "Adresse: Boulevard Dolez 51, 7000 Mons",
+"description": "Das Mons Memorial Museum zeichnet die Militärgeschichte von Mons durch die Konflikte des 20. Jahrhunderts nach und legt den Schwerpunkt auf die menschlichen Erfahrungen von Zivilisten und Soldaten.",
+"button": "Dorthin?"
+},
+"maisonVanGogh": {
+"name": "Maison Van Gogh",
+"address": "Adresse: Rue du Pavillon 3, 7033 Cuesmes (Auto erforderlich)",
+"description": "Das Maison Van Gogh in Mons erinnert an den Aufenthalt des Malers in Cuesmes und zeigt seine künstlerische Entwicklung in einer immersiven Szenografie.",
+"button": "Dorthin?"
+},
+"mundaneum": {
+"name": "Mundaneum",
+"address": "Adresse: Rue de Nimy 76, 7000 Mons",
+"description": "Archive des Weltwissens, Museum und Ausstellungszentrum zu dokumentarischen Utopien.",
+"button": "Dorthin?"
+},
+"maisonLescart": {
+"name": "Maison Jean Lescart",
+"address": "Adresse: Rue Neuve 8, 7000 Mons",
+"description": "Das Maison Jean Lescart in Mons ist ein Museum des lokalen Volkstums, das das Montoiser Leben durch Objekte, Traditionen und nachgestellte Szenen nachzeichnet. Leider dauerhaft geschlossen.",
+"button": "Dorthin?"
+},
+"mumons": {
+"name": "MUMONS",
+"address": "Adresse: Place du Parc 24, 7000 Mons",
+"description": "Das MUMONS ist das Universitätsmuseum der UMons und erforscht die Verbindungen zwischen Wissenschaft, Kunst und Gesellschaft durch originelle Ausstellungen.",
+"button": "Dorthin?"
+},
+"scitechlab": {
+"name": "SciTechLab",
+"address": "Adresse: Rue de Houdain 9, 7000 Mons",
+"description": "Das SciTechLab ist ein interaktiver Museumsraum der UMons, der Wissenschaft und Technik spielerisch und immersiv vermittelt.",
+"button": "Dorthin?"
+},
+"sciencesNaturelles": {
+"name": "Muséum régional des Sciences naturelles de Mons",
+"address": "Adresse: Rue des Gailliers 7, 7000 Mons",
+"description": "Das Regionale Museum für Naturwissenschaften in Mons präsentiert eine reiche Sammlung zoologischer, botanischer und geologischer Exponate zur Erkundung der Biodiversität.",
+"button": "Dorthin?"
+},
+"museeRoute": {
+"name": "Musée de la Route de Mons",
+"address": "Adresse: Rue des Canonniers (Place Nervienne), Kasematten 3, 4 und 5, 7000 Mons",
+"description": "Das Straßenmuseum von Mons zeichnet die Geschichte der Straßeninfrastruktur und der damit verbundenen Berufe in Wallonien nach. Leider endgültig geschlossen.",
+"button": "Dorthin?"
+},
+"backButton": "ZURÜCK",
+"popupTitle": "Warnung!",
+"popupMessage": "ACHTUNG, diese Aktion beendet die von Ihnen gewählte Tour. Sind Sie sicher, dass Sie zu diesem Museum wechseln möchten? Die Navigation führt Sie dorthin!",
+"popupYes": "JA",
+"popupNo": "NEIN"
+},
+"it": {
+  "mainTitle": "CityLoop Quest Mons - La Cavalcata di San Giorgio",
+  "title": "🏛️ Musei da visitare a Mons",
+  "artHeritage": "Musei d'arte e patrimonio",
+  "historyMemory": "Musei di storia e memoria",
+  "scienceTech": "Musei di scienze e tecniche",
+  "industrialHeritage": "Musei di patrimonio industriale e tecnico",
+  "bam": {
+    "name": "Museo delle Belle Arti (BAM)",
+    "address": "Indirizzo: Rue Neuve 8, 7000 Mons",
+    "description": "Il BAM (Beaux-Arts Mons) è un museo di arte moderna e contemporanea che propone prestigiose mostre temporanee in un contesto architettonico contemporaneo.",
+    "button": "Andarci?"
+  },
+  "cap": {
+    "name": "Museo delle Collezioni (CAP)",
+    "address": "Indirizzo: Rue Neuve 8, 7000 Mons",
+    "description": "Il Museo delle Collezioni (CAP) di Mons presenta le ricche collezioni permanenti della città, mescolando arti antiche, moderne e contemporanee in un percorso tematico.",
+    "button": "Andarci?"
+  },
+  "maisonLosseau": {
+    "name": "Maison Losseau",
+    "address": "Indirizzo: Rue de Nimy 37, 7000 Mons",
+    "description": "La Maison Losseau a Mons è un gioiello dell'Art nouveau, che ospita un centro letterario e una casa-museo dedicata all'opera del bibliofilo Léon Losseau.",
+    "button": "Andarci?"
+  },
+  "museeDoudou": {
+    "name": "Museo del Doudou",
+    "address": "Indirizzo: Jardin du Mayeur, 7000 Mons",
+    "description": "Il Museo del Doudou a Mons è dedicato alla Ducasse rituale, mettendo in risalto la sua storia, le sue tradizioni e la sua iscrizione al patrimonio immateriale dell'UNESCO.",
+    "button": "Andarci?"
+  },
+  "anciensAbattoirs": {
+    "name": "Antichi Macelli",
+    "address": "Indirizzo: Rue de la Trouille 17, 7000 Mons",
+    "description": "Il museo degli Antichi Macelli di Mons è uno spazio di arte contemporanea situato in un notevole sito industriale del XIX secolo rinnovato.",
+    "button": "Andarci?"
+  },
+  "artotheque": {
+    "name": "Artoteca",
+    "address": "Indirizzo: Rue Claude de Bettignies 1, 7000 Mons",
+    "description": "L'Artoteca di Mons è un centro di conservazione e ricerca dedicato alle collezioni museali della città, situato in un'antica cappella rinnovata.",
+    "button": "Andarci?"
+  },
+  "mmm": {
+    "name": "Mons Memorial Museum (MMM)",
+    "address": "Indirizzo: Boulevard Dolez 51, 7000 Mons",
+    "description": "Il Mons Memorial Museum ripercorre la storia militare di Mons attraverso i conflitti del XX secolo, mettendo in risalto le esperienze umane dei civili e dei soldati.",
+    "button": "Andarci?"
+  },
+  "maisonVanGogh": {
+    "name": "Maison Van Gogh",
+    "address": "Indirizzo: Rue du Pavillon 3, 7033 Cuesmes (Auto necessaria)",
+    "description": "La Maison Van Gogh a Mons evoca il soggiorno del pittore a Cuesmes e presenta la sua evoluzione artistica attraverso una scenografia immersiva.",
+    "button": "Andarci?"
+  },
+  "mundaneum": {
+    "name": "Mundaneum",
+    "address": "Indirizzo: Rue de Nimy 76, 7000 Mons",
+    "description": "Archivi della conoscenza mondiale, museo e centro espositivo dedicato alle utopie documentarie.",
+    "button": "Andarci?"
+  },
+  "maisonLescart": {
+    "name": "Maison Jean Lescart",
+    "address": "Indirizzo: Rue Neuve 8, 7000 Mons",
+    "description": "La Maison Jean Lescart a Mons è un museo del folklore locale che ripercorre la vita di Mons attraverso oggetti, tradizioni e scene ricostruite. Purtroppo chiuso definitivamente.",
+    "button": "Andarci?"
+  },
+  "mumons": {
+    "name": "MUMONS",
+    "address": "Indirizzo: Place du Parc 24, 7000 Mons",
+    "description": "Il Museo MUMONS è il museo universitario dell'UMONS, che esplora i legami tra scienza, arte e società attraverso mostre originali.",
+    "button": "Andarci?"
+  },
+  "scitechlab": {
+    "name": "SciTechLab",
+    "address": "Indirizzo: Rue de Houdain 9, 7000 Mons",
+    "description": "Lo SciTechLab è uno spazio museale interattivo dell'UMONS dedicato alla scoperta delle scienze e delle tecnologie in modo ludico e immersivo.",
+    "button": "Andarci?"
+  },
+  "sciencesNaturelles": {
+    "name": "Museo regionale delle Scienze naturali di Mons",
+    "address": "Indirizzo: Rue des Gailliers 7, 7000 Mons",
+    "description": "Il Museo regionale delle Scienze naturali di Mons presenta una ricca collezione di esemplari zoologici, botanici e geologici per esplorare la biodiversità.",
+    "button": "Andarci?"
+  },
+  "museeRoute": {
+    "name": "Museo della Strada di Mons",
+    "address": "Indirizzo: Rue des Canonniers (Place Nervienne), Casemates 3, 4 et 5, 7000 Mons",
+    "description": "Il Museo della Strada di Mons ripercorre la storia delle infrastrutture stradali e dei mestieri legati alla viabilità in Vallonia. Purtroppo chiuso definitivamente.",
+    "button": "Andarci?"
+  },
+  "backButton": "INDIETRO",
+  "popupTitle": "Avvertimento!",
+  "popupMessage": "ATTENZIONE, questa azione comporterà l'interruzione del percorso turistico che avete scelto. Siete sicuri di voler andare a questo museo? La guida vi porterà lì!",
+  "popupYes": "SÌ",
+  "popupNo": "NO"
+},
+"es": {
+  "mainTitle": "CityLoop Quest Mons - La Cabalgata de San Jorge",
+  "title": "🏛️ Museos para visitar en Mons",
+  "artHeritage": "Museos de arte y patrimonio",
+  "historyMemory": "Museos de historia y memoria",
+  "scienceTech": "Museos de ciencias y técnicas",
+  "industrialHeritage": "Museos de patrimonio industrial y técnico",
+  "bam": {
+    "name": "Museo de Bellas Artes (BAM)",
+    "address": "Dirección: Rue Neuve 8, 7000 Mons",
+    "description": "El BAM (Beaux-Arts Mons) es un museo de arte moderno y contemporáneo que ofrece prestigiosas exposiciones temporales en un entorno arquitectónico contemporáneo.",
+    "button": "¿Ir allí?"
+  },
+  "cap": {
+    "name": "Museo de las Colecciones (CAP)",
+    "address": "Dirección: Rue Neuve 8, 7000 Mons",
+    "description": "El Museo de las Colecciones (CAP) de Mons presenta las ricas colecciones permanentes de la ciudad, combinando artes antiguas, modernas y contemporáneas en un recorrido temático.",
+    "button": "¿Ir allí?"
+  },
+  "maisonLosseau": {
+    "name": "Casa Losseau",
+    "address": "Dirección: Rue de Nimy 37, 7000 Mons",
+    "description": "La Casa Losseau en Mons es una joya del Art Nouveau que alberga un centro literario y una casa-museo dedicada a la obra del bibliófilo Léon Losseau.",
+    "button": "¿Ir allí?"
+  },
+  "museeDoudou": {
+    "name": "Museo del Doudou",
+    "address": "Dirección: Jardin du Mayeur, 7000 Mons",
+    "description": "El Museo del Doudou en Mons está dedicado a la Ducasse ritual, destacando su historia, tradiciones y su inscripción en el patrimonio inmaterial de la UNESCO.",
+    "button": "¿Ir allí?"
+  },
+  "anciensAbattoirs": {
+    "name": "Antiguos Mataderos",
+    "address": "Dirección: Rue de la Trouille 17, 7000 Mons",
+    "description": "El museo de los Antiguos Mataderos de Mons es un espacio de arte contemporáneo ubicado en un notable sitio industrial renovado del siglo XIX.",
+    "button": "¿Ir allí?"
+  },
+  "artotheque": {
+    "name": "Artoteca",
+    "address": "Dirección: Rue Claude de Bettignies 1, 7000 Mons",
+    "description": "La Artoteca de Mons es un centro de conservación e investigación dedicado a las colecciones museísticas de la ciudad, situado en una antigua capilla renovada.",
+    "button": "¿Ir allí?"
+  },
+  "mmm": {
+    "name": "Museo Memorial de Mons (MMM)",
+    "address": "Dirección: Boulevard Dolez 51, 7000 Mons",
+    "description": "El Museo Memorial de Mons narra la historia militar de la ciudad a través de los conflictos del siglo XX, destacando las experiencias humanas de civiles y soldados.",
+    "button": "¿Ir allí?"
+  },
+  "maisonVanGogh": {
+    "name": "Casa Van Gogh",
+    "address": "Dirección: Rue du Pavillon 3, 7033 Cuesmes (Se necesita coche)",
+    "description": "La Casa Van Gogh en Mons evoca la estancia del pintor en Cuesmes y presenta su evolución artística a través de una escenografía inmersiva.",
+    "button": "¿Ir allí?"
+  },
+  "mundaneum": {
+    "name": "Mundaneum",
+    "address": "Dirección: Rue de Nimy 76, 7000 Mons",
+    "description": "Archivo del conocimiento mundial, museo y centro de exposiciones sobre las utopías documentales.",
+    "button": "¿Ir allí?"
+  },
+  "maisonLescart": {
+    "name": "Casa Jean Lescart",
+    "address": "Dirección: Rue Neuve 8, 7000 Mons",
+    "description": "La Casa Jean Lescart en Mons es un museo del folclore local que muestra la vida de Mons a través de objetos, tradiciones y escenas reconstruidas. Lamentablemente cerrado definitivamente.",
+    "button": "¿Ir allí?"
+  },
+  "mumons": {
+    "name": "MUMONS",
+    "address": "Dirección: Place du Parc 24, 7000 Mons",
+    "description": "El Museo MUMONS es el museo universitario de la UMONS, que explora los vínculos entre ciencia, arte y sociedad a través de exposiciones originales.",
+    "button": "¿Ir allí?"
+  },
+  "scitechlab": {
+    "name": "SciTechLab",
+    "address": "Dirección: Rue de Houdain 9, 7000 Mons",
+    "description": "El SciTechLab es un espacio museístico interactivo de la UMONS dedicado al descubrimiento de las ciencias y las tecnologías de forma lúdica e inmersiva.",
+    "button": "¿Ir allí?"
+  },
+  "sciencesNaturelles": {
+    "name": "Museo Regional de Ciencias Naturales de Mons",
+    "address": "Dirección: Rue des Gailliers 7, 7000 Mons",
+    "description": "El Museo Regional de Ciencias Naturales de Mons presenta una rica colección de especímenes zoológicos, botánicos y geológicos para explorar la biodiversidad.",
+    "button": "¿Ir allí?"
+  },
+  "museeRoute": {
+    "name": "Museo de la Carretera de Mons",
+    "address": "Dirección: Rue des Canonniers (Place Nervienne), Casemates 3, 4 y 5, 7000 Mons",
+    "description": "El Museo de la Carretera de Mons relata la historia de las infraestructuras viales y de los oficios relacionados con la carretera en Valonia. Lamentablemente cerrado definitivamente.",
+    "button": "¿Ir allí?"
+  },
+  "backButton": "VOLVER",
+  "popupTitle": "¡Advertencia!",
+  "popupMessage": "ATENCIÓN, esta acción provocará la interrupción del recorrido turístico que ha elegido. ¿Está seguro de querer ir a este museo? ¡La guía le llevará allí!",
+  "popupYes": "SÍ",
+  "popupNo": "NO"
+},
+"pl": {
+  "mainTitle": "CityLoop Quest Mons - Szarża świętego Jerzego",
+  "title": "🏛️ Muzea do odwiedzenia w Mons",
+  "artHeritage": "Muzea sztuki i dziedzictwa",
+  "historyMemory": "Muzea historii i pamięci",
+  "scienceTech": "Muzea nauki i techniki",
+  "industrialHeritage": "Muzea dziedzictwa przemysłowego i technicznego",
+  "bam": {
+    "name": "Muzeum Sztuk Pięknych (BAM)",
+    "address": "Adres: Rue Neuve 8, 7000 Mons",
+    "description": "BAM (Beaux-Arts Mons) to muzeum sztuki nowoczesnej i współczesnej, prezentujące prestiżowe wystawy czasowe w nowoczesnej oprawie architektonicznej.",
+    "button": "Iść tam?"
+  },
+  "cap": {
+    "name": "Muzeum Kolekcji (CAP)",
+    "address": "Adres: Rue Neuve 8, 7000 Mons",
+    "description": "Muzeum Kolekcji (CAP) w Mons pokazuje bogate zbiory miasta, łącząc sztukę dawną, nowoczesną i współczesną w tematycznym układzie zwiedzania.",
+    "button": "Iść tam?"
+  },
+  "maisonLosseau": {
+    "name": "Maison Losseau",
+    "address": "Adres: Rue de Nimy 37, 7000 Mons",
+    "description": "Maison Losseau w Mons to klejnot secesji; mieści centrum literackie i dom–muzeum poświęcony bibliofilowi Léonowi Losseau.",
+    "button": "Iść tam?"
+  },
+  "museeDoudou": {
+    "name": "Musée du Doudou",
+    "address": "Adres: Jardin du Mayeur, 7000 Mons",
+    "description": "Musée du Doudou w Mons poświęcone jest Ducasse rituelle; ukazuje jej historię, tradycje oraz wpis na listę niematerialnego dziedzictwa UNESCO.",
+    "button": "Iść tam?"
+  },
+  "anciensAbattoirs": {
+    "name": "Dawne Rzeźnie (Anciens Abattoirs)",
+    "address": "Adres: Rue de la Trouille 17, 7000 Mons",
+    "description": "Przestrzeń sztuki współczesnej ulokowana w imponującym, odnowionym zespole przemysłowym z XIX wieku.",
+    "button": "Iść tam?"
+  },
+  "artotheque": {
+    "name": "Artothèque",
+    "address": "Adres: Rue Claude de Bettignies 1, 7000 Mons",
+    "description": "Artothèque w Mons to centrum przechowywania i badań nad miejskimi zbiorami muzealnymi, mieszczące się w odnowionej dawnej kaplicy.",
+    "button": "Iść tam?"
+  },
+  "mmm": {
+    "name": "Mons Memorial Museum (MMM)",
+    "address": "Adres: Boulevard Dolez 51, 7000 Mons",
+    "description": "Mons Memorial Museum przedstawia historię militarną Mons przez pryzmat konfliktów XX wieku, kładąc nacisk na doświadczenia cywilów i żołnierzy.",
+    "button": "Iść tam?"
+  },
+  "maisonVanGogh": {
+    "name": "Maison Van Gogh",
+    "address": "Adres: Rue du Pavillon 3, 7033 Cuesmes (konieczny dojazd samochodem)",
+    "description": "Maison Van Gogh przywołuje pobyt malarza w Cuesmes i prezentuje jego rozwój artystyczny poprzez immersyjną scenografię.",
+    "button": "Iść tam?"
+  },
+  "mundaneum": {
+    "name": "Mundaneum",
+    "address": "Adres: Rue de Nimy 76, 7000 Mons",
+    "description": "Archiwa światowej wiedzy – muzeum i centrum wystaw poświęcone dokumentacyjnym utopiom.",
+    "button": "Iść tam?"
+  },
+  "maisonLescart": {
+    "name": "Maison Jean Lescart",
+    "address": "Adres: Rue Neuve 8, 7000 Mons",
+    "description": "Maison Jean Lescart w Mons to muzeum lokalnego folkloru, ukazujące życie mieszkańców poprzez obiekty, tradycje i inscenizacje. Niestety zamknięte na stałe.",
+    "button": "Iść tam?"
+  },
+  "mumons": {
+    "name": "MUMONS",
+    "address": "Adres: Place du Parc 24, 7000 Mons",
+    "description": "MUMONS to uniwersyteckie muzeum UMONS, które bada relacje między nauką, sztuką i społeczeństwem poprzez oryginalne wystawy.",
+    "button": "Iść tam?"
+  },
+  "scitechlab": {
+    "name": "SciTechLab",
+    "address": "Adres: Rue de Houdain 9, 7000 Mons",
+    "description": "SciTechLab to interaktywna przestrzeń muzealna UMONS, zachęcająca do odkrywania nauki i technologii w sposób przystępny i immersyjny.",
+    "button": "Iść tam?"
+  },
+  "sciencesNaturelles": {
+    "name": "Regionalne Muzeum Nauk Przyrodniczych w Mons",
+    "address": "Adres: Rue des Gailliers 7, 7000 Mons",
+    "description": "Muzeum prezentuje bogatą kolekcję okazów zoologicznych, botanicznych i geologicznych, umożliwiając poznanie bioróżnorodności.",
+    "button": "Iść tam?"
+  },
+  "museeRoute": {
+    "name": "Muzeum Dróg w Mons",
+    "address": "Adres: Rue des Canonniers (Place Nervienne), Kazamaty 3, 4 i 5, 7000 Mons",
+    "description": "Muzeum Dróg w Mons opowiada historię infrastruktury drogowej i zawodów związanych z utrzymaniem dróg w Walonii. Niestety zamknięte na stałe.",
+    "button": "Iść tam?"
+  },
+  "backButton": "POWRÓT",
+  "popupTitle": "Ostrzeżenie!",
+  "popupMessage": "UWAGA: ta akcja spowoduje zakończenie wybranej przez Ciebie trasy zwiedzania. Czy na pewno chcesz przejść do tego muzeum? Nawigacja poprowadzi Cię na miejsce!",
+  "popupYes": "TAK",
+  "popupNo": "NIE"
+},
+"ar": {
+"mainTitle": "سيتي لووب كويست مونس – صهوة القديس جورج",
+"title": "🏛️ متاحف للزيارة في مونس",
+"artHeritage": "متاحف الفن والتراث",
+"historyMemory": "متاحف التاريخ والذاكرة",
+"scienceTech": "متاحف العلوم والتقنيات",
+"industrialHeritage": "متاحف التراث الصناعي والتقني",
+"bam": {
+"name": "Musée des Beaux-Arts (BAM)",
+"address": "العنوان: Rue Neuve 8, 7000 Mons",
+"description": "BAM (Beaux-Arts Mons) متحف للفن الحديث والمعاصر يقدّم معارض مؤقتة مرموقة في إطار معماري معاصر.",
+"button": "الذهاب؟"
+},
+"cap": {
+"name": "Musée des Collections (CAP)",
+"address": "العنوان: Rue Neuve 8, 7000 Mons",
+"description": "يعرض متحف المجموعات (CAP) في مونس المقتنيات الدائمة الغنية للمدينة، جامعًا بين الفنون القديمة والحديثة والمعاصرة ضمن مسار موضوعي.",
+"button": "الذهاب؟"
+},
+"maisonLosseau": {
+"name": "Maison Losseau",
+"address": "العنوان: Rue de Nimy 37, 7000 Mons",
+"description": "منزل لوسو في مونس جوهرة على طراز الآرت نوفو، يضم مركزًا أدبيًا ومنزلًا-متحفًا مكرّسًا لأعمال الببليوفيلي ليون لوسو.",
+"button": "الذهاب؟"
+},
+"museeDoudou": {
+"name": "Musée du Doudou",
+"address": "العنوان: Jardin du Mayeur, 7000 Mons",
+"description": "متحف الدودو في مونس مكرّس للدُّكاس الطقسي، ويبرز تاريخه وتقاليده وإدراجه ضمن التراث غير المادي لليونسكو.",
+"button": "الذهاب؟"
+},
+"anciensAbattoirs": {
+"name": "Anciens abattoirs",
+"address": "العنوان: Rue de la Trouille 17, 7000 Mons",
+"description": "«المسالخ القديمة» فضاء للفن المعاصر مُقام داخل موقع صناعي مُجدَّد من القرن التاسع عشر.",
+"button": "الذهاب؟"
+},
+"artotheque": {
+"name": "Artothèque",
+"address": "العنوان: Rue Claude de Bettignies 1, 7000 Mons",
+"description": "الأرتوتيك في مونس مركز للحفظ والبحث مخصّص لمجموعات متاحف المدينة، يقع في كنيسة قديمة مجدَّدة.",
+"button": "الذهاب؟"
+},
+"mmm": {
+"name": "Mons Memorial Museum (MMM)",
+"address": "العنوان: Boulevard Dolez 51, 7000 Mons",
+"description": "يستعرض متحف ذكرى مونس التاريخ العسكري للمدينة عبر صراعات القرن العشرين، مع التركيز على التجارب الإنسانية للمدنيين والجنود.",
+"button": "الذهاب؟"
+},
+"maisonVanGogh": {
+"name": "Maison Van Gogh",
+"address": "العنوان: Rue du Pavillon 3, 7033 Cuesmes (بحاجة إلى سيارة)",
+"description": "يستحضر «منزل فان جوخ» في مونس إقامة الرسام في كوسم ويعرض تطوّره الفني عبر سردٍ غامر.",
+"button": "الذهاب؟"
+},
+"mundaneum": {
+"name": "Mundaneum",
+"address": "العنوان: Rue de Nimy 76, 7000 Mons",
+"description": "أرشيف «معرفة العالم»، متحف ومركز معارض حول الطوباويات الوثائقية وتنظيم المعرفة.",
+"button": "الذهاب؟"
+},
+"maisonLescart": {
+"name": "Maison Jean Lescart",
+"address": "العنوان: Rue Neuve 8, 7000 Mons",
+"description": "منزل جان ليسكار في مونس متحفٌ للفولكلور المحلي يروي الحياة المُنْتوازية عبر أشياء وتقاليد ومشاهد مُعاد تكوينها. للأسف أُغلق نهائيًا.",
+"button": "الذهاب؟"
+},
+"mumons": {
+"name": "MUMONS",
+"address": "العنوان: Place du Parc 24, 7000 Mons",
+"description": "متحف MUMONS الجامعي التابع لجامعة مونس يستكشف الروابط بين العلم والفن والمجتمع من خلال معارض مبتكرة.",
+"button": "الذهاب؟"
+},
+"scitechlab": {
+"name": "SciTechLab",
+"address": "العنوان: Rue de Houdain 9, 7000 Mons",
+"description": "«ساي تك لاب» فضاء متحفي تفاعلي تابع لجامعة مونس، مخصّص لاكتشاف العلوم والتقنيات بطريقة مرحة وغامرة.",
+"button": "الذهاب؟"
+},
+"sciencesNaturelles": {
+"name": "Muséum régional des Sciences naturelles de Mons",
+"address": "العنوان: Rue des Gailliers 7, 7000 Mons",
+"description": "يعرض المتحف الإقليمي للعلوم الطبيعية في مونس مجموعة ثرية من العينات الحيوانية والنباتية والجيولوجية لاستكشاف التنوع الحيوي.",
+"button": "الذهاب؟"
+},
+"museeRoute": {
+"name": "Musée de la Route de Mons",
+"address": "العنوان: Rue des Canonniers (Place Nervienne), Casemates 3, 4 et 5, 7000 Mons",
+"description": "يروي متحف طريق مونس تاريخ البنى التحتية الطرقية والمهن المرتبطة بالطرقات في والونيا. للأسف أُغلق نهائيًا.",
+"button": "الذهاب؟"
+},
+"backButton": "رجوع",
+"popupTitle": "تحذير!",
+"popupMessage": "انتباه! هذا الإجراء سيؤدي إلى إيقاف المسار السياحي الذي اخترته. هل أنت متأكد من رغبتك في الذهاب إلى هذا المتحف؟ سيقودك نظام الإرشاد إليه!",
+"popupYes": "نعم",
+"popupNo": "لا"
+},
+"cn": {
+"mainTitle": "CityLoop Quest Mons - 圣乔治的骑行",
+"title": "🏛️ 蒙斯可参观的博物馆",
+"artHeritage": "艺术与遗产博物馆",
+"historyMemory": "历史与记忆博物馆",
+"scienceTech": "科学与技术博物馆",
+"industrialHeritage": "工业与技术遗产博物馆",
+"bam": {
+"name": "美术博物馆（BAM）",
+"address": "地址：Rue Neuve 8, 7000 Mons",
+"description": "BAM（蒙斯美术博物馆）是一座现代与当代艺术馆，在当代建筑空间中推出高规格的临时展览。",
+"button": "去那儿？"
+},
+"cap": {
+"name": "藏品博物馆（CAP）",
+"address": "地址：Rue Neuve 8, 7000 Mons",
+"description": "蒙斯藏品博物馆（CAP）展示城市丰富的常设藏品，以主题化路径串联古代、现代与当代艺术。",
+"button": "去那儿？"
+},
+"maisonLosseau": {
+"name": "洛索之家",
+"address": "地址：Rue de Nimy 37, 7000 Mons",
+"description": "蒙斯洛索之家是新艺术风格的瑰宝，内设文学中心与致敬藏书家莱昂·洛索的故居博物馆。",
+"button": "去那儿？"
+},
+"museeDoudou": {
+"name": "杜杜博物馆",
+"address": "地址：Jardin du Mayeur, 7000 Mons",
+"description": "蒙斯杜杜博物馆专注于仪式性盛会，展示其历史、传统以及列入联合国教科文组织非遗名录的历程。",
+"button": "去那儿？"
+},
+"anciensAbattoirs": {
+"name": "旧屠宰场",
+"address": "地址：Rue de la Trouille 17, 7000 Mons",
+"description": "蒙斯旧屠宰场博物馆位于翻新后的 19 世纪工业遗址中，是一处当代艺术空间。",
+"button": "去那儿？"
+},
+"artotheque": {
+"name": "艺术文献馆（Artothèque）",
+"address": "地址：Rue Claude de Bettignies 1, 7000 Mons",
+"description": "蒙斯艺术文献馆是城市馆藏的保存与研究中心，坐落于一座修复后的旧礼拜堂内。",
+"button": "去那儿？"
+},
+"mmm": {
+"name": "蒙斯纪念博物馆（MMM）",
+"address": "地址：Boulevard Dolez 51, 7000 Mons",
+"description": "蒙斯纪念博物馆通过 20 世纪的战争讲述蒙斯的军事史，重点呈现平民与士兵的亲身经历。",
+"button": "去那儿？"
+},
+"maisonVanGogh": {
+"name": "梵高之家",
+"address": "地址：Rue du Pavillon 3, 7033 Cuesmes（需自驾）",
+"description": "蒙斯梵高之家呈现画家在屈姆的居留与其艺术演变，并以沉浸式叙事加以展示。",
+"button": "去那儿？"
+},
+"mundaneum": {
+"name": "万代文献馆（Mundaneum）",
+"address": "地址：Rue de Nimy 76, 7000 Mons",
+"description": "“世界知识档案馆”，围绕文献乌托邦的博物馆与展览中心。",
+"button": "去那儿？"
+},
+"maisonLescart": {
+"name": "让·莱斯卡尔之家",
+"address": "地址：Rue Neuve 8, 7000 Mons",
+"description": "让·莱斯卡尔之家是蒙斯地方民俗博物馆，通过实物、传统与复原场景再现蒙斯人的生活。很遗憾，已永久闭馆。",
+"button": "去那儿？"
+},
+"mumons": {
+"name": "MUMONS",
+"address": "地址：Place du Parc 24, 7000 Mons",
+"description": "MUMONS 是蒙斯大学（UMONS）的大学博物馆，以原创展览探索科学、艺术与社会之间的关联。",
+"button": "去那儿？"
+},
+"scitechlab": {
+"name": "SciTechLab",
+"address": "地址：Rue de Houdain 9, 7000 Mons",
+"description": "SciTechLab 是蒙斯大学的互动式科普空间，以有趣沉浸的方式带你探索科学与技术。",
+"button": "去那儿？"
+},
+"sciencesNaturelles": {
+"name": "蒙斯地区自然科学博物馆",
+"address": "地址：Rue des Gailliers 7, 7000 Mons",
+"description": "蒙斯地区自然科学博物馆以丰富的动物、植物与地质标本，带你认识生物多样性。",
+"button": "去那儿？"
+},
+"museeRoute": {
+"name": "蒙斯公路博物馆",
+"address": "地址：Rue des Canonniers（Place Nervienne），Casemates 3、4 和 5，7000 Mons",
+"description": "蒙斯公路博物馆回顾瓦隆道路基础设施与道路相关行业的历史。很遗憾，已永久闭馆。",
+"button": "去那儿？"
+},
+"backButton": "返回",
+"popupTitle": "警告！",
+"popupMessage": "注意：此操作将停止你所选择的旅游路线。确定要前往该博物馆吗？导航将带你过去！",
+"popupYes": "是",
+"popupNo": "否"
+},
+"jp": {
+    "mainTitle": "CityLoop Quest Mons ― 聖ゲオルギウスの騎行",
+    "title": "🏛️ モンスで訪れたい博物館",
+    "artHeritage": "美術・文化遺産の博物館",
+    "historyMemory": "歴史・記憶の博物館",
+    "scienceTech": "科学・技術の博物館",
+    "industrialHeritage": "産業・技術遺産の博物館",
+    "bam": {
+      "name": "ベルギー・モンス美術館（BAM）",
+      "address": "住所：Rue Neuve 8, 7000 Mons",
+      "description": "BAM（Beaux-Arts Mons）は近現代美術を中心に、現代的な建築空間で一流の企画展を開催する美術館です。",
+      "button": "行ってみる？"
+    },
+    "cap": {
+      "name": "コレクション博物館（CAP）",
+      "address": "住所：Rue Neuve 8, 7000 Mons",
+      "description": "モンスの常設コレクションを、古美術から近現代までテーマ別に紹介する博物館です。",
+      "button": "行ってみる？"
+    },
+    "maisonLosseau": {
+      "name": "メゾン・ロソー",
+      "address": "住所：Rue de Nimy 37, 7000 Mons",
+      "description": "アール・ヌーヴォーの傑作建築。蔵書家レオン・ロソーに捧げる文学センターと家屋博物館を併設。",
+      "button": "行ってみる？"
+    },
+    "museeDoudou": {
+      "name": "ドゥドゥ博物館",
+      "address": "住所：Jardin du Mayeur, 7000 Mons",
+      "description": "モンスの〈ドゥカス儀礼（ドゥドゥ）〉に特化し、その歴史・伝統・ユネスコ無形文化遺産登録について紹介します。",
+      "button": "行ってみる？"
+    },
+    "anciensAbattoirs": {
+      "name": "旧屠殺場",
+      "address": "住所：Rue de la Trouille 17, 7000 Mons",
+      "description": "19世紀の産業遺産を再生した空間で現代アートを展示するアートセンター。",
+      "button": "行ってみる？"
+    },
+    "artotheque": {
+      "name": "アルトテーク",
+      "address": "住所：Rue Claude de Bettignies 1, 7000 Mons",
+      "description": "旧礼拝堂を再生した、市のコレクション保存・研究センター。",
+      "button": "行ってみる？"
+    },
+    "mmm": {
+      "name": "モンス・メモリアル・ミュージアム（MMM）",
+      "address": "住所：Boulevard Dolez 51, 7000 Mons",
+      "description": "20世紀の諸戦争におけるモンスの軍事史を、市民と兵士の体験に焦点を当てて辿ります。",
+      "button": "行ってみる？"
+    },
+    "maisonVanGogh": {
+      "name": "ヴァン・ゴッホの家",
+      "address": "住所：Rue du Pavillon 3, 7033 Cuesmes（車が必要）",
+      "description": "キュスマでのゴッホの滞在を、没入型の展示で紹介する施設。",
+      "button": "行ってみる？"
+    },
+    "mundaneum": {
+      "name": "マンデネウム",
+      "address": "住所：Rue de Nimy 76, 7000 Mons",
+      "description": "〈知の世界アーカイブ〉を掲げる、資料ユートピアに関する博物館・展示センター。",
+      "button": "行ってみる？"
+    },
+    "maisonLescart": {
+      "name": "メゾン・ジャン＝レスカー",
+      "address": "住所：Rue Neuve 8, 7000 Mons",
+      "description": "モンスの生活文化を、資料・伝統・再現展示で辿る郷土博物館――残念ながら恒久閉館となりました。",
+      "button": "行ってみる？"
+    },
+    "mumons": {
+      "name": "MUMONS",
+      "address": "住所：Place du Parc 24, 7000 Mons",
+      "description": "モンス大学（UMONS）の大学博物館。科学・芸術・社会の交差点を独創的な企画で探ります。",
+      "button": "行ってみる？"
+    },
+    "scitechlab": {
+      "name": "サイテックラボ（SciTechLab）",
+      "address": "住所：Rue de Houdain 9, 7000 Mons",
+      "description": "UMONSによる体験型の科学技術ミュージアム。遊びながら学べるインタラクティブ展示が魅力。",
+      "button": "行ってみる？"
+    },
+    "sciencesNaturelles": {
+      "name": "モンス地域自然科学博物館",
+      "address": "住所：Rue des Gailliers 7, 7000 Mons",
+      "description": "動物・植物・地質の豊富な標本で生物多様性を学べる博物館。",
+      "button": "行ってみる？"
+    },
+    "museeRoute": {
+      "name": "道路博物館（モンス）",
+      "address": "住所：Rue des Canonniers（Place Nervienne）、Casemates 3, 4, 5, 7000 Mons",
+      "description": "ワロン地域の道路インフラと関連職能の歴史を紹介――残念ながら恒久閉館となりました。",
+      "button": "行ってみる？"
+    },
+    "backButton": "戻る",
+    "popupTitle": "ご注意！",
+    "popupMessage": "この操作を行うと、現在選択中の観光ルートが終了します。本当にこの博物館へ移動しますか？ ルート案内を開始します！",
+    "popupYes": "はい",
+    "popupNo": "いいえ"
+  }
+}

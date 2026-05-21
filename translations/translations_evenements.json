@@ -1,0 +1,705 @@
+{
+  "fr": {
+    "title": "Événements",
+    "headerTitle": "CityLoop Quest Mons - La Chevauchée de Saint Georges",
+    "mainTitle": "Événements récurrents à Mons",
+    "navButtons": {
+      "back": "RETOUR"
+    },
+    "events": {
+      "doudou": {
+        "title": "La Ducasse de Mons (Doudou)",
+        "period": "Période : Week-end de la Trinité (fin mai ou début juin)",
+        "description": "C'est l'événement le plus emblématique de la ville. Classé au patrimoine oral et immatériel de l'humanité par l'UNESCO, il inclut :\n\nLa descente de la châsse de Sainte-Waudru\n\nLe Cortège historique\n\nLe célèbre Combat dit Lumeçon, opposant Saint Georges au Dragon sur la Grand-Place",
+        "button": "🔙 Photos et vidéos du Doudou"
+      },
+      "messines": {
+        "title": "La Ducasse de Messines",
+        "period": "Période : Au début du printemps, généralement vers la fin mars, dans le quartier de Messines à Mons, autour de l’église Notre-Dame de Messines. La fête se tient traditionnellement pendant le week-end le plus proche de cette période printanière.",
+        "description": "La Ducasse de Messines est une fête traditionnelle montoise qui se déroule chaque année au début du printemps, généralement vers la fin du mois de mars, dans le quartier de Messines, autour de l’église Notre-Dame de Messines. Comptant parmi les rendez-vous folkloriques les plus anciens de Mons, elle associe patrimoine religieux, traditions populaires et ambiance de quartier dans un cadre chaleureux et authentique. À l’origine liée à un ancien pèlerinage marial, elle a progressivement évolué vers une grande fête conviviale très appréciée des habitants. Aujourd’hui, elle est surtout connue pour son marché aux fleurs, qui apporte couleur et animation à tout le quartier, mais aussi pour ses nombreuses activités festives : brocante, concerts, animations familiales, moments de rencontre et présence des géants traditionnels. La Ducasse de Messines offre ainsi aux visiteurs une belle occasion de découvrir une facette plus intime de Mons, en dehors des grands sites les plus connus, tout en profitant d’un événement vivant, populaire et profondément enraciné dans l’identité locale. C’est une sortie idéale pour les touristes en quête d’authenticité, de folklore et d’atmosphère printanière au cœur de la ville.",
+        "button": "🔙 Photos et vidéos de la Ducasse de Messines"
+      },
+      "carre": {
+        "title": "Le festival au Carré",
+        "period": "Période : Juillet",
+        "description": "Festival pluridisciplinaire (théâtre, musique, danse, cirque) organisé par le Théâtre le Manège dans le cadre du Mons Arts de la Scène.",
+        "button": "🔙 Photos et vidéos du Festival au Carré"
+      },
+      "film": {
+        "title": "Le festival International du Film d'Amour de Mons",
+        "period": "Période : Mars",
+        "description": "Festival de cinéma centré sur les thématiques de l'amour et des relations humaines.",
+        "button": "🔙 Photos et vidéos du Festival International du Film d'Amour de Mons"
+      },
+      "festifood": {
+        "title": "Festifood Mons",
+        "period": "Période : Fin août (debut septembre)",
+        "description": "Le Festifood, c'est bien plus qu'un simple festival culinaire. Chaque année, cet événement s'engage à offrir une expérience gastronomique incomparable, réunissant une affiche de chefs renommés et de talents émergents. Le Festifood, une expérience inscrite à l'agenda de tous les passionnés de gastronomie en quête d'émotions culinaires uniques. FestiFood ne se limite pas à la découverte de plats de chefs renommés ; c'est également une vitrine pour les artisans locaux. En mettant en lumière les produits de qualité et le savoir-faire des artisans belges, Jean-Noël Delaunois souhaite renforcer le lien entre la gastronomie, la culture et l'économie locale.",
+        "button": "🔙 Photos et vidéos du Festifood Mons"
+      },
+      "feux": {
+        "title": "Les feux de la Saint Jean",
+        "period": "Période : fin Juin",
+        "description": "Organisés fin juin, ces festivités incluent un banquet citoyen, des concerts, un cortège aux flambeaux et l'embrasement d'un grand bûcher sur la Place Nervienne.",
+        "button": "🔙 Photos et vidéos des Feux de la Saint Jean"
+      },
+      "tanks": {
+        "title": "Tanks in Town",
+        "period": "Période : Août ou Septembre",
+        "description": "Cette commémoration de la libération de Mons en 1944 rassemble des véhicules militaires d'époque dans le centre historique de la ville.",
+        "button": "🔙 Photos et vidéos de Tanks in Town"
+      },
+      "patrimoine": {
+        "title": "Week-end du Patrimoine",
+        "period": "Période : Septembre",
+        "description": "Visites guidées, accès aux bâtiments historiques, animations autour du patrimoine montois.",
+        "button": "🔙 Photos et vidéos du week-end du Patrimoine"
+      },
+      "lumieres": {
+        "title": "Mons en Lumières",
+        "period": "Période : Novembre",
+        "description": "Spectacle de lumières et projections sur les bâtiments du centre-ville.",
+        "button": "🔙 Photos et vidéos de Mons en Lumières"
+      },
+      "noel": {
+        "title": "Marché de Noël - Mons Cœur en Neige",
+        "period": "Période : Décembre",
+        "description": "Chalets, patinoire, grande roue, décorations féériques sur la Grand-Place.",
+        "button": "🔙 Photos et vidéos du Marché de Noël"
+      }
+    }
+  },
+  "en": {
+    "title": "Events",
+    "headerTitle": "CityLoop Quest Mons - The Ride of Saint George",
+    "mainTitle": "Recurring Events in Mons",
+    "navButtons": {
+      "back": "BACK"
+    },
+    "events": {
+      "doudou": {
+        "title": "The Mons Ducasse (Doudou)",
+        "period": "Period: Trinity Weekend (late May or early June)",
+        "description": "This is the most emblematic event of the city. Listed as UNESCO Intangible Cultural Heritage, it includes:\n\nThe descent of Saint Waltrude's shrine\n\nThe historical procession\n\nThe famous Lumeçon combat, pitting Saint George against the Dragon on the Grand-Place",
+        "button": "🔙 Photos and videos of the Doudou"
+      },
+      "messines": {
+        "title": "The Messines Ducasse",
+        "period": "Period: Early spring, usually around late March, in the Messines district of Mons, around Notre-Dame de Messines church. The festival traditionally takes place over the weekend closest to this spring period.",
+        "description": "The Messines Ducasse is a traditional Mons festival held every year in early spring, generally in late March, in the Messines district around Notre-Dame de Messines church. As one of Mons’s oldest folk gatherings, it blends religious heritage, popular traditions and neighbourhood atmosphere in a warm, authentic setting. Originally linked to an old Marian pilgrimage, it gradually grew into a large, friendly celebration much loved by locals. Today it is best known for its flower market, which brings colour and life to the whole district, as well as for its many festive activities: flea markets, concerts, family entertainment, social gatherings and appearances by traditional giants. The Messines Ducasse thus gives visitors a fine chance to discover a more intimate side of Mons—beyond the best-known monuments—while enjoying a lively, popular event deeply rooted in local identity. It is an ideal outing for tourists seeking authenticity, folklore and a spring atmosphere in the heart of the city.",
+        "button": "🔙 Photos and videos of the Messines Ducasse"
+      },
+      "carre": {
+        "title": "The Festival at Le Carré",
+        "period": "Period: July",
+        "description": "Multidisciplinary festival (theater, music, dance, circus) organized by the Manège Theater as part of Mons Arts de la Scène.",
+        "button": "🔙 Photos and videos of the Festival at Le Carré"
+      },
+      "film": {
+        "title": "The International Love Film Festival of Mons",
+        "period": "Period: March",
+        "description": "Film festival focused on themes of love and human relationships.",
+        "button": "🔙 Photos and videos of the International Love Film Festival of Mons"
+      },
+      "festifood": {
+        "title": "Festifood Mons",
+        "period": "Period: Late August (beginning September)",
+        "description": "Festifood is far more than a culinary festival. Each year the event is committed to delivering an incomparable gastronomic experience, gathering a line-up of renowned chefs and rising talents. Festifood has become a must-attend date for every food lover seeking unique culinary emotions. It is also a showcase for local artisans: by highlighting quality products and Belgian craftsmanship, Jean-Noël Delaunois strengthens the ties between gastronomy, culture and the local economy.",
+        "button": "🔙 Photos and videos of Festifood Mons"
+      },
+      "feux": {
+        "title": "The Saint John's Fires",
+        "period": "Period: Late June",
+        "description": "Organized in late June, these festivities include a citizens' banquet, concerts, a torchlight procession, and the lighting of a large bonfire on Place Nervienne.",
+        "button": "🔙 Photos and videos of the Saint John's Fires"
+      },
+      "tanks": {
+        "title": "Tanks in Town",
+        "period": "Period: August or September",
+        "description": "This commemoration of the liberation of Mons in 1944 brings together period military vehicles in the historic center of the city.",
+        "button": "🔙 Photos and videos of Tanks in Town"
+      },
+      "patrimoine": {
+        "title": "Heritage Weekend",
+        "period": "Period: September",
+        "description": "Guided tours, access to historic buildings, activities around Montois heritage.",
+        "button": "🔙 Photos and videos of Heritage Weekend"
+      },
+      "lumieres": {
+        "title": "Mons in Lights",
+        "period": "Period: November",
+        "description": "Light show and projections on downtown buildings.",
+        "button": "🔙 Photos and videos of Mons in Lights"
+      },
+      "noel": {
+        "title": "Christmas Market - Mons Cœur en Neige",
+        "period": "Period: December",
+        "description": "Chalets, ice rink, Ferris wheel, fairy decorations on the Grand-Place.",
+        "button": "🔙 Photos and videos of the Christmas Market"
+      }
+    }
+  },
+  "nl": {
+    "title": "Evenementen",
+    "headerTitle": "CityLoop Quest Mons - De Ruiterstoet van Sint Georges",
+    "mainTitle": "Herhaalde evenementen in Mons",
+    "navButtons": {
+      "back": "TERUG"
+    },
+    "events": {
+        "doudou": {
+          "title": "De Ducasse van Bergen (Doudou)",
+          "period": "Periode: Weekend van Drievuldigheid (eind mei of begin juni)",
+          "description": "Het is het meest emblematische evenement van de stad. Door de UNESCO erkend als immaterieel cultureel erfgoed van de mensheid. Het omvat:\n\nDe afname van de reliekschrijn van Sint-Waltrudis\n\nDe historische stoet\n\nHet beroemde gevecht, het zogeheten Lumeçon, tussen Sint-Joris en de Draak op de Grote Markt",
+          "button": "🔙 Foto's en video's van de Doudou"
+        },
+        "messines": {
+          "title": "De Ducasse van Messines",
+          "period": "Periode: Vroeg in het voorjaar, doorgaans eind maart, in de wijk Messines in Bergen, rond de kerk Notre-Dame de Messines. Het feest vindt traditioneel plaats tijdens het weekend het dichtst bij deze lenteperiode.",
+          "description": "De Ducasse van Messines is een traditioneel montois volksfeest dat elk jaar vroeg in het voorjaar plaatsvindt, doorgaans eind maart, in de wijk Messines rond de kerk Notre-Dame de Messines. Het behoort tot de oudste folkloristische afspraken van Bergen en verbindt religieus erfgoed, volkstradities en buurtsfeer in een warme, authentieke sfeer. Oorspronkelijk verbonden met een oude Maria-bedevaart, groeide het uit tot een grote, gezellige viering die bij de inwoners zeer geliefd is. Vandaag staat het vooral bekend om zijn bloemenmarkt, die kleur en levendigheid in de hele wijk brengt, en om talrijke feestelijke activiteiten: rommelmarkt, concerten, familie-animatie, ontmoetingen en de traditionele reuzen. De Ducasse van Messines biedt bezoekers zo een mooie kans om een intiemere kant van Bergen te ontdekken, buiten de bekendste monumenten, terwijl ze genieten van een levendig, populair evenement diep geworteld in de lokale identiteit. Het is een ideale uitstap voor toeristen op zoek naar authenticiteit, folklore en lentestemming in het hart van de stad.",
+          "button": "🔙 Foto's en video's van de Ducasse van Messines"
+        },
+        "carre": {
+          "title": "Het Festival au Carré",
+          "period": "Periode: Juli",
+          "description": "Multidisciplinair festival (theater, muziek, dans, circus) georganiseerd door het Théâtre le Manège in het kader van Mons Arts de la Scène.",
+          "button": "🔙 Foto's en video's van het Festival au Carré"
+        },
+        "film": {
+          "title": "Internationaal Festival van de Liefdesfilm van Bergen",
+          "period": "Periode: Maart",
+          "description": "Filmfestival rond de thema’s liefde en menselijke relaties.",
+          "button": "🔙 Foto's en video's van het Internationaal Festival van de Liefdesfilm van Bergen"
+        },
+        "festifood": {
+          "title": "Festifood Mons",
+          "period": "Periode: Eind augustus (begin september)",
+          "description": "Festifood is veel meer dan een gewoon culinair festival. Elk jaar staat het evenement garant voor een ongeëvenaarde gastronomische beleving, met een affiche van gerenommeerde chefs en nieuw talent. Festifood is een vaste afspraak voor alle fijnproevers die op zoek zijn naar unieke smaakervaringen. Het festival is ook een etalage voor lokale ambachtslieden: door kwaliteitsproducten en Belgisch vakmanschap in de kijker te zetten wil Jean-Noël Delaunois de band tussen gastronomie, cultuur en de lokale economie versterken.",
+          "button": "🔙 Foto's en video's van Festifood Mons"
+        },
+        "feux": {
+          "title": "Sint-Jansvuren",
+          "period": "Periode: Eind juni",
+          "description": "Georganiseerd eind juni, deze festiviteiten omvatten een burgerbanket, concerten, een fakkeloptocht en de verbranding van een grote brandstapel op het Nerviërsplein.",
+          "button": "🔙 Foto's en video's van de Sint-Jansvuren"
+        },
+        "tanks": {
+          "title": "Tanks in Town",
+          "period": "Periode: Augustus of september",
+          "description": "Deze herdenking van de bevrijding van Bergen in 1944 brengt historische legervoertuigen samen in het oude stadscentrum.",
+          "button": "🔙 Foto's en video's van Tanks in Town"
+        },
+        "patrimoine": {
+          "title": "Open Monumentendag",
+          "period": "Periode: September",
+          "description": "Geleide bezoeken, toegang tot historische gebouwen, animaties rond het erfgoed van Bergen.",
+          "button": "🔙 Foto's en video's van de Open Monumentendag"
+        },
+        "lumieres": {
+          "title": "Mons en Lumières",
+          "period": "Periode: November",
+          "description": "Lichtshow en projecties op gebouwen in het stadscentrum.",
+          "button": "🔙 Foto's en video's van Mons en Lumières"
+        },
+        "noel": {
+          "title": "Kerstmarkt – Mons Cœur en Neige",
+          "period": "Periode: December",
+          "description": "Kerstkraampjes, ijsbaan, reuzenrad, feeërieke versieringen op de Grote Markt.",
+          "button": "🔙 Foto's en video's van de Kerstmarkt"
+        }
+      }
+    },
+"de": {
+  "title": "Veranstaltungen",
+  "headerTitle": "CityLoop Quest Mons - Der Ritt des heiligen Georg",
+  "mainTitle": "Wiederkehrende Veranstaltungen in Mons",
+  "navButtons": {
+    "back": "ZURÜCK"
+  },
+  "events": {
+    "doudou": {
+      "title": "Die Ducasse von Mons (Doudou)",
+      "period": "Zeitraum: Trinitatis-Wochenende (Ende Mai oder Anfang Juni)",
+      "description": "Dies ist das symbolträchtigste Ereignis der Stadt. Als mündliches und immaterielles Kulturerbe der Menschheit von der UNESCO anerkannt, umfasst es:\n\nDie Herablassung der Reliquienlade der heiligen Waudru\n\nDen historischen Umzug\n\nDen berühmten sogenannten Lumeçon-Kampf, bei dem der heilige Georg auf dem Grand-Place gegen den Drachen antritt",
+      "button": "🔙 Fotos und Videos vom Doudou"
+    },
+    "messines": {
+      "title": "Die Ducasse von Messines",
+      "period": "Zeitraum: Frühling, in der Regel Ende März, im Stadtteil Messines in Mons, rund um die Kirche Notre-Dame de Messines. Das Fest findet traditionell am Wochenende statt, das diesem Frühjahrszeitraum am nächsten liegt.",
+      "description": "Die Ducasse von Messines ist ein traditionelles Volksfest in Mons, das jedes Jahr zu Beginn des Frühlings, meist Ende März, im Viertel Messines rund um die Kirche Notre-Dame de Messines stattfindet. Es zählt zu den ältesten folkloristischen Terminen der Stadt und verbindet religiöses Erbe, Volkstraditionen und Nachbarschaftsstimmung in einer herzlichen, authentischen Atmosphäre. Ursprünglich mit einer alten Marienwallfahrt verbunden, entwickelte es sich zu einem großen, geselligen Fest, das bei den Einwohnern sehr geschätzt wird. Heute ist es vor allem für seinen Blumenmarkt bekannt, der dem ganzen Viertel Farbe und Leben verleiht, sowie für zahlreiche Festaktivitäten: Flohmarkt, Konzerte, Familienanimation, Begegnungen und die traditionellen Riesen. Die Ducasse von Messines bietet Besuchern so eine schöne Gelegenheit, eine intimere Seite von Mons jenseits der bekanntesten Sehenswürdigkeiten kennenzulernen – bei einem lebendigen, volksnahen Ereignis, das tief in der lokalen Identität verwurzelt ist. Ideal für Touristen, die Authentizität, Folklore und Frühlingsstimmung im Herzen der Stadt suchen.",
+      "button": "🔙 Fotos und Videos der Ducasse von Messines"
+    },
+    "carre": {
+      "title": "Das Festival au Carré",
+      "period": "Zeitraum: Juli",
+      "description": "Spartenübergreifendes Festival (Theater, Musik, Tanz, Zirkus), organisiert vom Théâtre le Manège im Rahmen von Mons Arts de la Scène.",
+      "button": "🔙 Fotos und Videos vom Festival au Carré"
+    },
+    "film": {
+      "title": "Das Internationale Liebesfilmfestival von Mons",
+      "period": "Zeitraum: März",
+      "description": "Filmfestival, das sich auf die Themen Liebe und zwischenmenschliche Beziehungen konzentriert.",
+      "button": "🔙 Fotos und Videos des Internationalen Liebesfilmfestivals von Mons"
+    },
+    "festifood": {
+      "title": "Festifood Mons",
+      "period": "Zeitraum: Ende August (Anfang September)",
+      "description": "Festifood ist weit mehr als ein einfaches Kulinarikfestival. Jedes Jahr bietet die Veranstaltung ein unvergleichliches gastronomisches Erlebnis und vereint ein Line-up aus renommierten Küchenchefs und aufstrebenden Talenten. Festifood ist zu einem Pflichttermin für Feinschmecker geworden, die nach einzigartigen kulinarischen Emotionen suchen. Zugleich ist es eine Bühne für lokale Handwerker: Durch die Hervorhebung hochwertiger Produkte und belgischen Know-hows stärkt Jean-Noël Delaunois die Verbindung zwischen Gastronomie, Kultur und der lokalen Wirtschaft.",
+      "button": "🔙 Fotos und Videos von Festifood Mons"
+    },
+    "feux": {
+      "title": "Johannisfeuer",
+      "period": "Zeitraum: Ende Juni",
+      "description": "Diese Feierlichkeiten finden Ende Juni statt und umfassen ein Bürgerbankett, Konzerte, einen Fackelumzug und das Entzünden eines großen Scheiterhaufens auf der Place Nervienne.",
+      "button": "🔙 Fotos und Videos der Johannisfeuer"
+    },
+    "tanks": {
+      "title": "Tanks in Town",
+      "period": "Zeitraum: August oder September",
+      "description": "Diese Gedenkveranstaltung zur Befreiung von Mons im Jahr 1944 versammelt historische Militärfahrzeuge im historischen Zentrum der Stadt.",
+      "button": "🔙 Fotos und Videos von Tanks in Town"
+    },
+    "patrimoine": {
+      "title": "Kulturerbe-Wochenende",
+      "period": "Zeitraum: September",
+      "description": "Führungen, Zugang zu historischen Gebäuden, Aktionen rund um das Kulturerbe von Mons.",
+      "button": "🔙 Fotos und Videos vom Kulturerbe-Wochenende"
+    },
+    "lumieres": {
+      "title": "Mons en Lumières",
+      "period": "Zeitraum: November",
+      "description": "Lichtshow und Projektionen auf die Gebäude der Innenstadt.",
+      "button": "🔙 Fotos und Videos von Mons en Lumières"
+    },
+    "noel": {
+      "title": "Weihnachtsmarkt – Mons Cœur en Neige",
+      "period": "Zeitraum: Dezember",
+      "description": "Chalets, Eislaufbahn, Riesenrad, märchenhafte Dekorationen auf dem Grand-Place.",
+      "button": "🔙 Fotos und Videos vom Weihnachtsmarkt"
+    }
+  }
+},
+"it": {
+"title": "Eventi",
+"headerTitle": "CityLoop Quest Mons - La Cavalcata di San Giorgio",
+"mainTitle": "Eventi ricorrenti a Mons",
+"navButtons": {
+"back": "INDIETRO"
+},
+"events": {
+"doudou": {
+"title": "La Ducasse di Mons (Doudou)",
+"period": "Periodo: Fine settimana della Trinità (fine maggio o inizio giugno)",
+"description": "È l’evento più emblematico della città. Inserito nel patrimonio orale e immateriale dell’umanità dall’UNESCO, include:\n\nLa discesa della reliquia di Santa Waudru\n\nIl Corteo storico\n\nIl celebre Combattimento detto Lumeçon, che oppone San Giorgio al Drago sulla Grand-Place",
+"button": "🔙 Foto e video del Doudou"
+},
+"messines": {
+"title": "La Ducasse di Messines",
+"period": "Periodo: Inizio primavera, di solito verso fine marzo, nel quartiere di Messines a Mons, intorno alla chiesa Notre-Dame de Messines. La festa si svolge tradizionalmente nel fine settimana più vicino a questo periodo primaverile.",
+"description": "La Ducasse di Messines è una festa tradizionale di Mons che si tiene ogni anno all’inizio della primavera, di solito verso fine marzo, nel quartiere di Messines, intorno alla chiesa Notre-Dame de Messines. È tra gli appuntamenti folkloristici più antichi della città e unisce patrimonio religioso, tradizioni popolari e atmosfera di quartiere in un contesto caldo e autentico. Legata in origine a un antico pellegrinaggio mariano, si è evoluta in una grande festa conviviale molto apprezzata dagli abitanti. Oggi è soprattutto nota per il suo mercato dei fiori, che porta colore e vivacità a tutto il quartiere, e per le numerose attività festive: mercatino dell’usato, concerti, animazioni per famiglie, momenti di incontro e presenza dei giganti tradizionali. La Ducasse di Messines offre così ai visitatori una bella occasione per scoprire un volto più intimo di Mons, al di là dei grandi siti più conosciuti, godendo di un evento vivo, popolare e profondamente radicato nell’identità locale. È un’uscita ideale per i turisti in cerca di autenticità, folklore e atmosfera primaverile nel cuore della città.",
+"button": "🔙 Foto e video della Ducasse di Messines"
+},
+"carre": {
+"title": "Il Festival au Carré",
+"period": "Periodo: Luglio",
+"description": "Festival multidisciplinare (teatro, musica, danza, circo) organizzato dal Théâtre le Manège nell’ambito del Mons Arts de la Scène.",
+"button": "🔙 Foto e video del Festival au Carré"
+},
+"film": {
+"title": "Il Festival Internazionale del Film d’Amore di Mons",
+"period": "Periodo: Marzo",
+"description": "Festival cinematografico incentrato sulle tematiche dell’amore e delle relazioni umane.",
+"button": "🔙 Foto e video del Festival Internazionale del Film d’Amore di Mons"
+},
+"festifood": {
+"title": "Festifood Mons",
+"period": "Periodo: fine agosto (inizio settembre)",
+"description": "Festifood è molto più di un semplice festival culinario. Ogni anno l’evento si impegna a offrire un’esperienza gastronomica incomparabile, riunendo chef rinomati e nuovi talenti. Festifood è ormai un appuntamento immancabile per tutti gli appassionati in cerca di emozioni gastronomiche uniche. È anche una vetrina per gli artigiani locali: valorizzando i prodotti di qualità e il know-how belga, Jean-Noël Delaunois desidera rafforzare il legame tra gastronomia, cultura ed economia locale.",
+"button": "🔙 Foto e video del Festifood Mons"
+},
+"feux": {
+"title": "I falò di San Giovanni",
+"period": "Periodo: fine Giugno",
+"description": "Organizzate a fine giugno, queste festività includono un banchetto cittadino, concerti, corteo con fiaccole e l’accensione di un grande falò sulla Place Nervienne.",
+"button": "🔙 Foto e video dei Falò di San Giovanni"
+},
+"tanks": {
+"title": "Tanks in Town",
+"period": "Periodo: Agosto o Settembre",
+"description": "Questa commemorazione della liberazione di Mons nel 1944 riunisce veicoli militari d’epoca nel centro storico della città.",
+"button": "🔙 Foto e video di Tanks in Town"
+},
+"patrimoine": {
+"title": "Weekend del Patrimonio",
+"period": "Periodo: Settembre",
+"description": "Visite guidate, accesso agli edifici storici, animazioni legate al patrimonio di Mons.",
+"button": "🔙 Foto e video del Weekend del Patrimonio"
+},
+"lumieres": {
+"title": "Mons en Lumières",
+"period": "Periodo: Novembre",
+"description": "Spettacolo di luci e proiezioni sugli edifici del centro città.",
+"button": "🔙 Foto e video di Mons en Lumières"
+},
+"noel": {
+"title": "Mercatino di Natale - Mons Cœur en Neige",
+"period": "Periodo: Dicembre",
+"description": "Chalet, pista di pattinaggio, ruota panoramica, decorazioni fiabesche sulla Grand-Place.",
+"button": "🔙 Foto e video del Mercatino di Natale"
+}
+}
+},
+"es": {
+  "title": "Eventos",
+  "headerTitle": "CityLoop Quest Mons - La Cabalgata de San Jorge",
+  "mainTitle": "Eventos recurrentes en Mons",
+  "navButtons": {
+    "back": "VOLVER"
+  },
+  "events": {
+    "doudou": {
+      "title": "La Ducasse de Mons (Doudou)",
+      "period": "Periodo: Fin de semana de la Trinidad (finales de mayo o principios de junio)",
+      "description": "Es el evento más emblemático de la ciudad. Inscrito en el patrimonio oral e inmaterial de la humanidad por la UNESCO, incluye:\n\nEl descenso del relicario de Santa Waudru\n\nEl Cortejo histórico\n\nEl célebre Combate llamado Lumeçon, que enfrenta a San Jorge y el Dragón en la Grand-Place",
+      "button": "🔙 Fotos y vídeos del Doudou"
+    },
+    "messines": {
+      "title": "La Ducasse de Messines",
+      "period": "Periodo: A comienzos de primavera, normalmente hacia finales de marzo, en el barrio de Messines de Mons, alrededor de la iglesia Notre-Dame de Messines. La fiesta se celebra tradicionalmente el fin de semana más cercano a este periodo primaveral.",
+      "description": "La Ducasse de Messines es una fiesta tradicional de Mons que se celebra cada año a comienzos de primavera, normalmente hacia finales de marzo, en el barrio de Messines, alrededor de la iglesia Notre-Dame de Messines. Cuenta entre los encuentros folklóricos más antiguos de la ciudad y combina patrimonio religioso, tradiciones populares y ambiente de barrio en un marco cálido y auténtico. En origen ligada a una antigua peregrinación mariana, evolucionó hacia una gran fiesta convivial muy querida por los habitantes. Hoy es sobre todo conocida por su mercado de flores, que aporta color y animación a todo el barrio, y por sus numerosas actividades festivas: rastrillo, conciertos, animación familiar, momentos de encuentro y presencia de los gigantes tradicionales. La Ducasse de Messines ofrece así a los visitantes una buena ocasión de descubrir un rostro más íntimo de Mons, más allá de los grandes sitios más conocidos, disfrutando de un evento vivo, popular y profundamente arraigado en la identidad local. Es una salida ideal para turistas en busca de autenticidad, folclore y ambiente primaveral en el corazón de la ciudad.",
+      "button": "🔙 Fotos y vídeos de la Ducasse de Messines"
+    },
+    "carre": {
+      "title": "El Festival au Carré",
+      "period": "Periodo: Julio",
+      "description": "Festival pluridisciplinar (teatro, música, danza, circo) organizado por el Théâtre le Manège en el marco de Mons Arts de la Scène.",
+      "button": "🔙 Fotos y vídeos del Festival au Carré"
+    },
+    "film": {
+      "title": "El Festival Internacional de Cine de Amor de Mons",
+      "period": "Periodo: Marzo",
+      "description": "Festival de cine centrado en las temáticas del amor y las relaciones humanas.",
+      "button": "🔙 Fotos y vídeos del Festival Internacional de Cine de Amor de Mons"
+    },
+    "festifood": {
+      "title": "Festifood Mons",
+      "period": "Periodo: finales de agosto (principios de septiembre)",
+      "description": "Festifood es mucho más que un simple festival culinario. Cada año el evento se compromete a ofrecer una experiencia gastronómica incomparable, reuniendo a chefs consagrados y talentos emergentes. Festifood se ha convertido en una cita imprescindible para los amantes de la gastronomía que buscan emociones culinarias únicas. También es un escaparate para los artesanos locales: al destacar productos de calidad y el saber hacer belga, Jean-Noël Delaunois refuerza el vínculo entre gastronomía, cultura y economía local.",
+      "button": "🔙 Fotos y vídeos de Festifood Mons"
+    },
+    "feux": {
+      "title": "Las Hogueras de San Juan",
+      "period": "Periodo: finales de junio",
+      "description": "Organizadas a finales de junio, estas festividades incluyen un banquete ciudadano, conciertos, un cortejo con antorchas y el encendido de una gran hoguera en la Place Nervienne.",
+      "button": "🔙 Fotos y vídeos de las Hogueras de San Juan"
+    },
+    "tanks": {
+      "title": "Tanks in Town",
+      "period": "Periodo: agosto o septiembre",
+      "description": "Conmemoración de la liberación de Mons en 1944 que reúne vehículos militares de época en el centro histórico de la ciudad.",
+      "button": "🔙 Fotos y vídeos de Tanks in Town"
+    },
+    "patrimoine": {
+      "title": "Fin de semana del Patrimonio",
+      "period": "Periodo: septiembre",
+      "description": "Visitas guiadas, acceso a edificios históricos y actividades en torno al patrimonio de Mons.",
+      "button": "🔙 Fotos y vídeos del Fin de semana del Patrimonio"
+    },
+    "lumieres": {
+      "title": "Mons en Lumières",
+      "period": "Periodo: noviembre",
+      "description": "Espectáculo de luces y proyecciones sobre los edificios del centro de la ciudad.",
+      "button": "🔙 Fotos y vídeos de Mons en Lumières"
+    },
+    "noel": {
+      "title": "Mercado de Navidad - Mons Cœur en Neige",
+      "period": "Periodo: diciembre",
+      "description": "Chalets, pista de patinaje, noria y decoraciones de ensueño en la Grand-Place.",
+      "button": "🔙 Fotos y vídeos del Mercado de Navidad"
+    }
+  }
+},
+"pl": {
+  "title": "Wydarzenia",
+  "headerTitle": "CityLoop Quest Mons - Szarża św. Jerzego",
+  "mainTitle": "Wydarzenia cykliczne w Mons",
+  "navButtons": {
+    "back": "POWRÓT"
+  },
+  "events": {
+    "doudou": {
+      "title": "Ducasse de Mons (Doudou)",
+      "period": "Okres: weekend Trójcy Świętej (koniec maja lub początek czerwca)",
+      "description": "Najbardziej emblematyczne wydarzenie miasta. Wpisane na listę niematerialnego dziedzictwa ludzkości UNESCO, obejmuje:\n\nZejście relikwiarza św. Waldru\n\nHistoryczny korowód\n\nSłynny „pojedynek” zwany Lumeçon – starcie św. Jerzego ze Smokiem na Grand-Place",
+      "button": "🔙 Zdjęcia i filmy z Doudou"
+    },
+    "messines": {
+      "title": "Ducasse de Messines",
+      "period": "Okres: Początek wiosny, zwykle pod koniec marca, w dzielnicy Messines w Mons, wokół kościoła Notre-Dame de Messines. Święto odbywa się tradycyjnie w weekend najbliższy temu okresowi wiosennemu.",
+      "description": "Ducasse de Messines to tradycyjne święto ludowe w Mons, odbywające się co roku na początku wiosny, zwykle pod koniec marca, w dzielnicy Messines wokół kościoła Notre-Dame de Messines. Należy do najstarszych spotkań folklorystycznych miasta i łączy dziedzictwo religijne, tradycje ludowe oraz atmosferę sąsiedzką w ciepłym, autentycznym otoczeniu. Początkowo związane ze starą pielgrzymką maryjną, z czasem przekształciło się w wielką, przyjacielską uroczystość bardzo cenną dla mieszkańców. Dziś znane jest przede wszystkim ze swojego targu kwiatów, który nadaje barw i życia całej dzielnicy, a także z licznych atrakcji: pchli targ, koncerty, animacje rodzinne, spotkania oraz obecność tradycyjnych olbrzymów. Ducasse de Messines daje odwiedzającym piękną okazję, by odkryć bardziej intymną twarz Mons, poza najbardziej znanymi zabytkami, przy żywym, ludowym wydarzeniu głęboko zakorzenionym w lokalnej tożsamości. To idealna propozycja dla turystów szukających autentyczności, folkloru i wiosennej atmosfery w sercu miasta.",
+      "button": "🔙 Zdjęcia i filmy z Ducasse de Messines"
+    },
+    "carre": {
+      "title": "Festival au Carré",
+      "period": "Okres: lipiec",
+      "description": "Festiwal multidyscyplinarny (teatr, muzyka, taniec, cyrk) organizowany przez Théâtre le Manège w ramach Mons Arts de la Scène.",
+      "button": "🔙 Zdjęcia i filmy z Festival au Carré"
+    },
+    "film": {
+      "title": "Międzynarodowy Festiwal Filmu o Miłości w Mons",
+      "period": "Okres: marzec",
+      "description": "Festiwal filmowy koncentrujący się na tematach miłości i relacji międzyludzkich.",
+      "button": "🔙 Zdjęcia i filmy z Międzynarodowego Festiwalu Filmu o Miłości"
+    },
+    "festifood": {
+      "title": "Festifood Mons",
+      "period": "Okres: koniec sierpnia (początek września)",
+      "description": "Festifood to o wiele więcej niż zwykły festiwal kulinarny. Każdego roku wydarzenie gwarantuje niepowtarzalne doznania gastronomiczne, łącząc znanych szefów kuchni z wschodzącymi talentami. Festifood stał się obowiązkowym punktem w kalendarzu wszystkich smakoszy poszukujących wyjątkowych przeżyć kulinarnych. To również scena dla lokalnych rzemieślników: podkreślając wysoką jakość produktów i belgijskie rzemiosło, Jean-Noël Delaunois wzmacnia więzi między gastronomią, kulturą i lokalną gospodarką.",
+      "button": "🔙 Zdjęcia i filmy z Festifood Mons"
+    },
+    "feux": {
+      "title": "Feux de la Saint-Jean (Ognie św. Jana)",
+      "period": "Okres: koniec czerwca",
+      "description": "Organizowane pod koniec czerwca obchody obejmują bankiet obywatelski, koncerty, korowód z pochodniami oraz podpalenie wielkiego stosu na Place Nervienne.",
+      "button": "🔙 Zdjęcia i filmy z Ogni św. Jana"
+    },
+    "tanks": {
+      "title": "Tanks in Town",
+      "period": "Okres: sierpień lub wrzesień",
+      "description": "Upamiętnienie wyzwolenia Mons w 1944 r., gromadzące zabytkowe pojazdy wojskowe w historycznym centrum miasta.",
+      "button": "🔙 Zdjęcia i filmy z Tanks in Town"
+    },
+    "patrimoine": {
+      "title": "Weekend Dziedzictwa",
+      "period": "Okres: wrzesień",
+      "description": "Zwiedzanie z przewodnikiem, dostęp do zabytkowych budynków, animacje wokół dziedzictwa Mons.",
+      "button": "🔙 Zdjęcia i filmy z Weekendu Dziedzictwa"
+    },
+    "lumieres": {
+      "title": "Mons en Lumières",
+      "period": "Okres: listopad",
+      "description": "Pokazy świateł i projekcje na budynkach w centrum miasta.",
+      "button": "🔙 Zdjęcia i filmy z Mons en Lumières"
+    },
+    "noel": {
+      "title": "Jarmark Bożonarodzeniowy – Mons Cœur en Neige",
+      "period": "Okres: grudzień",
+      "description": "Domki świąteczne, lodowisko, diabelski młyn i bajkowe dekoracje na Grand-Place.",
+      "button": "🔙 Zdjęcia i filmy z Jarmarku Bożonarodzeniowego"
+    }
+  }
+},
+
+  "ar": {
+  "title": "الفعاليات",
+  "headerTitle": "CityLoop Quest Mons - حملة القديس جورج",
+  "mainTitle": "فعاليات دورية في مونس",
+  "navButtons": {
+  "back": "عودة"
+  },
+  "events": {
+  "doudou": {
+  "title": "دُكَاس مونس (الـدودو)",
+  "period": "الفترة: عطلة نهاية أسبوع «الثالوث» (نهاية مايو أو مطلع يونيو)",
+  "description": "أشهر فعاليات المدينة والمُسجَّلة ضمن التراث الشفهي وغير المادي للبشرية لدى اليونسكو. تتضمن:\n\nإنزال مزار القديسة وادرو\n\nالموكب التاريخي\n\nالمنازلة الشهيرة المسماة «لومسون» بين القديس جورج والتنين في الساحة الكبرى",
+  "button": "🔙 صور وفيديوهات الدودو"
+  },
+  "messines": {
+  "title": "دُكَاس مِيسين",
+  "period": "الفترة: أوائل الربيع، عادةً نهاية مارس، في حيّ مِيسين في مونس، حول كنيسة «نوتردام دو مِيسين». يُقام الاحتفال تقليديًا في عطلة نهاية الأسبوع الأقرب إلى هذه الفترة الربيعية.",
+  "description": "دُكَاس مِيسين هو احتفال شعبي تقليدي في مونس يُقام كل عام في أوائل الربيع، عادةً نهاية مارس، في حيّ مِيسين حول كنيسة نوتردام دو مِيسين. يُعدّ من أقدم المواعيد الفولكلورية في المدينة ويجمع بين تراث ديني وتقاليد شعبية وأجواء حيّية في إطار دافئ وأصيل. كان في الأصل مرتبطًا بحجّ مريمي قديم، ثم تطوّر تدريجيًا إلى احتفال كبير وودّي محبوب لدى السكان. اليوم يُعرف خصوصًا بسوق الزهور الذي يضفي لونًا وحيوية على الحيّ بأكمله، وكذلك بفعالياته الاحتفالية: سوق للبضائع المستعملة، حفلات موسيقية، أنشطة عائلية، لقاءات وحضور العمالقة التقليديين. يوفّر دُكَاس مِيسين للزائرين فرصة جميلة لاكتشاف وجه أكثر حميمية من مونس، بعيدًا عن أشهر المعالم، مع الاستمتاع بحدث حيّ وشعبي متجذّر في الهوية المحلية. إنه خروج مثالي للسياح الباحثين عن أصالة وفولكلور وأجواء ربيعية في قلب المدينة.",
+  "button": "🔙 صور وفيديوهات دُكَاس مِيسين"
+  },
+  "carre": {
+  "title": "مهرجان «لو كارّيه»",
+  "period": "الفترة: يوليو",
+  "description": "مهرجان متعدّد التخصصات (مسرح، موسيقى، رقص، سيرك) ينظمه مسرح «لو ماناج» ضمن إطار «Mons Arts de la Scène».",
+  "button": "🔙 صور وفيديوهات مهرجان لو كارّيه"
+  },
+  "film": {
+  "title": "المهرجان الدولي لفيلم الحب في مونس",
+  "period": "الفترة: مارس",
+  "description": "مهرجان سينمائي يتمحور حول موضوعات الحب والعلاقات الإنسانية.",
+  "button": "🔙 صور وفيديوهات المهرجان الدولي لفيلم الحب"
+  },
+  "festifood": {
+  "title": "Festifood Mons",
+  "period": "الفترة: أواخر أغسطس (أوائل سبتمبر)",
+  "description": "يُعد «فستي فود» أكثر بكثير من مجرد مهرجان للطعام. ففي كل عام يلتزم الحدث بتقديم تجربة ذواقة لا مثيل لها، جامعًا نخبة من الطهاة المشهورين والمواهب الصاعدة. أصبح فستي فود موعدًا ثابتًا لعشّاق المذاقات الباحثين عن أحاسيس طهوية فريدة. كما أنه واجهة حقيقية للحرفيين المحليين: من خلال إبراز جودة المنتجات ومهارة الصنّاع البلجيكيين، يسعى جان-نويل دولانوا إلى تعزيز الروابط بين فن الطبخ والثقافة والاقتصاد المحلي.",
+  "button": "🔙 صور وفيديوهات Festifood Mons"
+  },
+  "feux": {
+  "title": "نيران القديس جان",
+  "period": "الفترة: أواخر يونيو",
+  "description": "تُقام في أواخر يونيو وتشمل مأدبة مواطنية وحفلات موسيقية وموكبًا بالمشاعل وإشعال محرقة كبيرة في ساحة نيرفين.",
+  "button": "🔙 صور وفيديوهات نيران القديس جان"
+  },
+  "tanks": {
+  "title": "Tanks in Town",
+  "period": "الفترة: أغسطس أو سبتمبر",
+  "description": "إحياء لذكرى تحرير مونس عام 1944، ويجمع مركبات عسكرية تاريخية في قلب المدينة القديمة.",
+  "button": "🔙 صور وفيديوهات Tanks in Town"
+  },
+  "patrimoine": {
+  "title": "عطلة نهاية أسبوع التراث",
+  "period": "الفترة: سبتمبر",
+  "description": "جولات إرشادية، دخول إلى المباني التاريخية، وأنشطة تتمحور حول تراث مونس.",
+  "button": "🔙 صور وفيديوهات عطلة نهاية أسبوع التراث"
+  },
+  "lumieres": {
+  "title": "مونس في الأضواء",
+  "period": "الفترة: نوفمبر",
+  "description": "عروض ضوئية وإسقاطات على مباني وسط المدينة.",
+  "button": "🔙 صور وفيديوهات «مونس في الأضواء»"
+  },
+  "noel": {
+  "title": "سوق عيد الميلاد – Mons Cœur en Neige",
+  "period": "الفترة: ديسمبر",
+  "description": "أكشاك خشبية، ساحة تزلّج، عجلة عملاقة، وزينة ساحرة في الساحة الكبرى.",
+  "button": "🔙 صور وفيديوهات سوق عيد الميلاد"
+  }
+  }
+  },
+  "cn": {
+"title": "活动",
+"headerTitle": "CityLoop Quest Mons - 圣乔治的骑行",
+"mainTitle": "蒙斯的年度活动",
+"navButtons": {
+"back": "返回"
+},
+"events": {
+"doudou": {
+"title": "蒙斯盛会（Doudou）",
+"period": "时间：三位一体主日周末（5 月下旬或 6 月上旬）",
+"description": "这是这座城市最具代表性的节庆。已被联合国教科文组织列入人类口头与非物质文化遗产名录，其中包括：\n\n圣瓦德鲁圣物下架仪式\n\n历史巡游\n\n著名的鲁梅松之战：圣乔治在大广场与巨龙对决",
+"button": "🔙 杜杜节的照片和视频"
+},
+"messines": {
+"title": "梅西讷盛会（Ducasse de Messines）",
+"period": "时间：初春，一般在三月下旬，在蒙斯的梅西讷街区，围绕梅西讷圣母教堂举行。节庆传统上在最接近这段春季时期的周末举办。",
+"description": "梅西讷盛会是蒙斯一年一度的传统民俗节庆，于每年初春举行，一般在三月下旬，地点在梅西讷街区及梅西讷圣母教堂一带。它是蒙斯最古老的民俗活动之一，将宗教遗产、民间传统与邻里氛围融于温馨而真实的场景中。节庆最初与古老的圣母朝圣有关，后来逐渐演变成深受居民喜爱的大型欢聚活动。如今它尤以花市闻名，为整个街区带来色彩与活力，同时还有丰富的节庆活动：跳蚤市场、音乐会、亲子活动、聚会以及传统巨人巡游等。梅西讷盛会让游客有机会在知名景点之外，发现蒙斯更生活化的一面，感受扎根于地方认同的热闹民俗活动。对于追求真实感、民俗气息与春日氛围的游客而言，这是市中心理想的出游选择。",
+"button": "🔙 梅西讷盛会的照片和视频"
+},
+"carre": {
+"title": "Carré 艺术节",
+"period": "时间：7 月",
+"description": "由 Le Manège 剧院主办的多学科艺术节（戏剧、音乐、舞蹈、马戏），属于“蒙斯舞台艺术”项目的一部分。",
+"button": "🔙 Carré 艺术节的照片和视频"
+},
+"film": {
+"title": "蒙斯国际爱情电影节",
+"period": "时间：3 月",
+"description": "以爱情与人际关系为主题的电影节。",
+"button": "🔙 蒙斯国际爱情电影节的照片和视频"
+},
+"festifood": {
+"title": "Festifood Mons",
+"period": "时间：八月下旬（九月初）",
+"description": "Festifood 远不止是一个美食节。每一年，这个活动都致力于带来无与伦比的美食体验，汇聚知名主厨与新锐才俊。Festifood 已成为所有寻求独特味觉享受的美食爱好者日程表上不可错过的盛会。它同样是本地匠人的展示窗口：通过突出优质产品与比利时的工艺，Jean-Noël Delaunois 希望加强美食、文化与地方经济之间的联系。",
+"button": "🔙 Festifood Mons 的照片与视频"
+},
+"feux": {
+"title": "圣让之火",
+"period": "时间：6 月下旬",
+"description": "活动于 6 月底举行，包括市民宴会、音乐会、火把巡游，以及在纳维耶纳广场点燃巨大篝火。",
+"button": "🔙 圣让之火的照片和视频"
+},
+"tanks": {
+"title": "Tanks in Town",
+"period": "时间：8 月或 9 月",
+"description": "纪念 1944 年蒙斯解放的活动，历史军用车辆齐聚老城中心。",
+"button": "🔙 Tanks in Town 的照片和视频"
+},
+"patrimoine": {
+"title": "遗产周末",
+"period": "时间：9 月",
+"description": "导览参观、历史建筑开放，以及围绕蒙斯遗产展开的各类活动。",
+"button": "🔙 遗产周末的照片和视频"
+},
+"lumieres": {
+"title": "光影蒙斯",
+"period": "时间：11 月",
+"description": "在市中心建筑上演出灯光秀与影像投射。",
+"button": "🔙 光影蒙斯的照片和视频"
+},
+"noel": {
+"title": "圣诞集市——Mons Cœur en Neige",
+"period": "时间：12 月",
+"description": "小木屋、溜冰场、摩天轮，以及大广场上的奇幻装饰。",
+"button": "🔙 圣诞集市的照片和视频"
+}
+}
+},
+"jp": {
+    "title": "イベント",
+    "headerTitle": "CityLoop Quest Mons - 聖ジョルジュの騎行",
+    "mainTitle": "モンスの定期イベント",
+    "navButtons": {
+      "back": "戻る"
+    },
+    "events": {
+      "doudou": {
+        "title": "モンスのデュカス（ドゥドゥ）",
+        "period": "期間：三位一体の主日（5月末〜6月初め）の週末",
+        "description": "市で最も象徴的なイベント。ユネスコの人類の口承・無形遺産に登録。内容：\n\n聖ワドルーの聖遺物櫃の降下\n\n歴史的コルテージ（行列）\n\nグラン＝プラスで行われる、聖ジョルジュとドラゴンの有名な「ルメソン」",
+        "button": "🔙 ドゥドゥの写真と動画"
+      },
+        "messines": {
+        "title": "メシーヌのデュカス（Ducasse de Messines）",
+        "period": "期間：早春、通常は3月下旬、モンスのメシーヌ地区、ノートルダム・ド・メシーヌ教会周辺。伝統的に、この春の時期に最も近い週末に開催されます。",
+        "description": "メシーヌのデュカスは、モンスで毎年春の初め—おおむね3月下旬—にメシーヌ地区、ノートルダム・ド・メシーヌ教会の周辺で行われる伝統的な民俗祭です。モンスでも古くからある民俗の集いの一つで、宗教的遺産、民衆の伝統、そして地区の温かい雰囲気が一体となった、心温まる本物の場をつくります。もともとは古いマリア巡礼に由来し、やがて住民に深く愛される大きな親睦の祭りへと発展しました。今日では特に花市で知られ、地区全体に色彩と活気をもたらすほか、蚤の市、コンサート、家族向けアニメーション、交流の場、伝統的な巨人の登場など多彩な催しがあります。メシーヌのデュカスは、有名な名所の外側にある、モンスのより親しみやすい一面を知るよい機会であり、地域のアイデンティティに深く根ざした生き生きとした祭りです。本物の雰囲気、民俗、春の街角を求める観光客にとって、都心での理想的な外出先です。",
+        "button": "🔙 メシーヌのデュカスの写真と動画"
+      },
+      "carre": {
+        "title": "フェスティヴァル・オ・カレ",
+        "period": "期間：7月",
+        "description": "演劇・音楽・ダンス・サーカスの枠を超えた総合芸術祭。Mons Arts de la Scène（モンス舞台芸術）内で劇場ル・マネージュが主催。",
+        "button": "🔙 フェスティヴァル・オ・カレの写真と動画"
+      },
+      "film": {
+        "title": "モンス国際恋愛映画祭",
+        "period": "期間：3月",
+        "description": "愛と人間関係をテーマにした映画祭。",
+        "button": "🔙 モンス国際恋愛映画祭の写真と動画"
+      },
+      "festifood": {
+        "title": "Festifood Mons",
+        "period": "期間：8月下旬（9月上旬）",
+        "description": "Festifood は単なるグルメ・フェスティバルではありません。毎年このイベントは、名だたるシェフと新進気鋭の才能を一堂に集め、比類ないガストロノミー体験を提供しています。唯一無二の味覚体験を求める美食家にとって欠かせない催しとなりました。また、地元の職人にスポットを当てる場でもあります。質の高い食材とベルギーの職人技を丁寧に紹介することで、ジャン＝ノエル・ドロノワはガストロノミーと文化、地域経済のつながりを強化したいと考えています。",
+        "button": "🔙 Festifood Mons の写真と動画"
+      },
+      "feux": {
+        "title": "聖ヨハネの火",
+        "period": "期間：6月下旬",
+        "description": "6月末に開催。市民バンケット、コンサート、たいまつの行列、ネルヴィエンヌ広場での大かがり火の点火などを含む。",
+        "button": "🔙 聖ヨハネの火の写真と動画"
+      },
+      "tanks": {
+        "title": "Tanks in Town（タンクス・イン・タウン）",
+        "period": "期間：8月または9月",
+        "description": "1944年のモンス解放を記念し、当時の軍用車両が市の歴史地区に集結するイベント。",
+        "button": "🔙 タンクス・イン・タウンの写真と動画"
+      },
+      "patrimoine": {
+        "title": "ヘリテージ・ウィークエンド",
+        "period": "期間：9月",
+        "description": "ガイドツアー、歴史的建物の公開、モンスの文化遺産に関する各種企画。",
+        "button": "🔙 ヘリテージ・ウィークエンドの写真と動画"
+      },
+      "lumieres": {
+        "title": "Mons en Lumières（モンス・アン・リュミエール）",
+        "period": "期間：11月",
+        "description": "中心街の建物を彩る光とプロジェクションのショー。",
+        "button": "🔙 モンス・アン・リュミエールの写真と動画"
+      },
+      "noel": {
+        "title": "クリスマスマーケット ― Mons Cœur en Neige",
+        "period": "期間：12月",
+        "description": "木造シャレー、スケートリンク、観覧車、そしてグラン＝プラスを飾る幻想的なデコレーション。",
+        "button": "🔙 クリスマスマーケットの写真と動画"
+      }
+    }
+  }
+  }
+  
+

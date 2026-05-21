@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Accès</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .hidden { display:none; }
+    main { max-width:900px;margin:40px auto;padding:16px }
+    .btn {
+      display:block;width:100%;padding:14px 18px;border:0;border-radius:10px;
+      background:#2b6cb0;color:#fff;font-size:20px;font-weight:600
+    }
+    .stack { display:flex;gap:16px;flex-direction:column }
+    #btnHaveCode { font-size: clamp(14px, 3.5vw, 18px); line-height: 1.25; white-space: normal; text-align: center; }
+    #err, .err { color:#b00;margin-top:10px }
+  </style>
+
+  <!-- Traductions -->
+  <script src="translations/translationManager.js"></script>
+  <script src="translations/languageSelector.js"></script>
+  
+  <!-- ⚙️ Base API côté Netlify : mets à jour le host ngrok ici -->
+  <meta name="api-base" content="https://nonhumorous-ossie-nonintuitively.ngrok-free.dev">
+
+  <script>
+    // Garde-fou: si pas de langue => retour à la sélection (sauf si lang fournie dans l'URL, ex. from_expired)
+    (function () {
+      try {
+        var urlParams = new URLSearchParams(window.location.search || '');
+        var langFromUrl = urlParams.get('lang');
+        if (langFromUrl) {
+          localStorage.setItem('selectedLanguage', langFromUrl);
+          localStorage.setItem('lang', langFromUrl);
+          sessionStorage.setItem('webLanguageSelected', 'true');
+          return;
+        }
+        var lang = localStorage.getItem('selectedLanguage') || localStorage.getItem('lang');
+        if (!lang) location.replace('language-selection.html');
+      } catch (_) {
+        location.replace('language-selection.html');
+      }
+    })();
+  </script>
+</head>
+<body>
+  <main>
+    <!-- Vue CHOIX (par défaut) -->
+    <section id="view-choose">
+      <h1 data-translate="continue_title">Continuer</h1>
+      <div class="stack">
+        <button id="btnHaveCode" class="btn" data-translate="have_code_button">J'AI UNE IDENTIFICATION CLIENT RECUE PAR MAIL APRES PAIEMENT (Pas un code promo)</button>
+        <button id="btnBuyFull" class="btn" data-translate="buy_full_button">Acheter version Full</button>
+        <button id="btnBuyLite" class="btn" data-translate="buy_lite_button">Acheter version Lite</button>
+      </div>
+
+      <!-- Texte d'information sur le code d'activation -->
+      <p id="activation-info"
+         style="margin-top:12px;font-size:14px;"
+         data-translate="activation_info_notice">
+        Un code d'activation va vous parvenir par mail, conservez le pendant la période de validité, il vous permettra d'activer l'application non installée (page web) pendant la période de validité. Si vous utilisez l'application installée, celle-ci est automatiquement activée pour la période de validité.
+      </p>
+      <p id="activation-promo-notice"
+         style="margin-top:10px;font-size:14px;font-weight:bold;"
+         data-translate="promo_code_payment_notice">
+        SI VOUS AVEZ UN CODE PROMO, VOUS DEVREZ LE RENTRER DANS LA PAGE DES PAIEMENTS QUI SUIT
+      </p>
+
+      <p id="err"></p>
+    </section>
+
+    <!-- Vue UPGRADE (affichée si ?upgrade=1) -->
+    <section id="view-upgrade" class="hidden">
+      <h1 data-translate="upgrade_title">Mise à niveau vers FULL</h1>
+      <button id="btnUpgrade" class="btn" data-translate="upgrade_to_full">Mettre à niveau vers FULL</button>
+      <p id="err-up" class="err"></p>
+    </section>
+  </main>
+
+  <!-- Config API + logique checkout -->
+  <script src="./api-base.js"></script>
+  <script src="./checkout.js" defer></script>
+
+  <script>
+    // Vérifier si l'utilisateur a déjà un code - si oui, rediriger vers index.html pour afficher l'écran d'avertissement
+    // Sauf si marqueur (sessionStorage ou URL from_expired=1) : l'utilisateur vient de cliquer OK sur "accès expiré" → rester sur choose-access
+    (function() {
+      const hasCode = localStorage.getItem('clq_short_code') || 
+                     localStorage.getItem('clq_token') || 
+                     localStorage.getItem('jwt') ||
+                     localStorage.getItem('clq_has_access') === '1';
+      const urlParams = new URLSearchParams(window.location.search || '');
+      const fromExpiredPopup = sessionStorage.getItem('expired_popup_acknowledged') === '1' || urlParams.get('from_expired') === '1';
+      const fromClquestPortal = urlParams.get('from') === 'clquest' ||
+        (document.referrer && /clquest\.netlify\.app/i.test(document.referrer));
+      
+      if (hasCode && !fromExpiredPopup && !fromClquestPortal) {
+        if (localStorage.getItem('debug_mode') === 'true') {
+          alert('Code détecté !\nRedirection vers index.html pour afficher l\'écran d\'avertissement...');
+        }
+        // S'assurer qu'une langue est définie
+        if (!localStorage.getItem('selectedLanguage')) {
+          localStorage.setItem('selectedLanguage', 'fr');
+          sessionStorage.setItem('webLanguageSelected', 'true');
+        }
+        location.replace('index.html');
+        return;
+      }
+    })();
+
+    // Charger et appliquer les traductions
+    document.addEventListener('DOMContentLoaded', async function() {
+      if (window.translationManager) {
+        const selectedLang = localStorage.getItem('selectedLanguage') || 'fr';
+        await window.translationManager.loadTranslations();
+        window.translationManager.setLanguage(selectedLang);
+
+        document.querySelectorAll('[data-translate]').forEach(el => {
+          const key = el.getAttribute('data-translate');
+          const t = window.translationManager.translate(key);
+          if (t) el.textContent = t;
+        });
+
+      }
+    });
+
+    // Câblage robuste + garde-fous API
+    function initButtons() {
+      const $ = (s) => document.querySelector(s);
+      const errEl = $('#err');
+      const upErrEl = $('#err-up');
+      const setErr = (m)=>{ if(errEl) errEl.textContent = m || ''; };
+      const setUpErr = (m)=>{ if(upErrEl) upErrEl.textContent = m || ''; };
+
+      function apiReady() {
+        const base = window.__API_BASE__ || (window.APP_CONFIG && window.APP_CONFIG.API_BASE);
+        return typeof base === 'string' && base.startsWith('http');
+      }
+
+      function getTranslation(key, fallback) {
+        if (window.translationManager && window.translationManager.translate) {
+          const translated = window.translationManager.translate(key);
+          if (translated && translated !== key) return translated;
+        }
+        return fallback;
+      }
+
+      async function start(plan) {
+        if (!apiReady()) {
+          setErr(getTranslation('checkout_api_missing', "Configuration API manquante. Actualise la page ou réessaie dans une minute."));
+          alert(getTranslation('checkout_api_unreachable', "Impossible de joindre l'API : vérifie l'URL ngrok dans le <meta name='api-base'>."));
+          return;
+        }
+        if (window.startCheckout) {
+          return window.startCheckout({ plan });
+        }
+        setErr(getTranslation('checkout_module_not_loaded', "Le module de paiement ne s'est pas chargé. Rafraîchis la page."));
+        alert(getTranslation('checkout_module_not_loaded_refresh', "Le module de paiement ne s'est pas chargé. Rafraîchis la page (Ctrl/Cmd + F5)."));
+      }
+
+      const btnHaveCode = $('#btnHaveCode');
+      const btnBuyFull  = $('#btnBuyFull');
+      const btnBuyLite  = $('#btnBuyLite');
+
+      if (btnHaveCode) {
+        btnHaveCode.addEventListener('click', () => {
+          location.href = 'activation-manual.html';
+        });
+      }
+
+      if (btnBuyFull) {
+        btnBuyFull.addEventListener('click', () => start('full'));
+      }
+
+      if (btnBuyLite) {
+        btnBuyLite.addEventListener('click', () => start('lite'));
+      }
+
+      const params = new URLSearchParams(location.search);
+      if (params.get('upgrade') === '1') {
+        const viewChoose = document.getElementById('view-choose');
+        const viewUpgrade = document.getElementById('view-upgrade');
+        if (viewChoose) viewChoose.classList.add('hidden');
+        if (viewUpgrade) viewUpgrade.classList.remove('hidden');
+
+        const btnUpgrade = document.getElementById('btnUpgrade');
+        if (btnUpgrade) {
+          btnUpgrade.addEventListener('click', async () => {
+            if (!apiReady()) {
+              setUpErr(getTranslation('checkout_api_missing', "Configuration API manquante. Actualise la page."));
+              alert(getTranslation('checkout_api_unreachable', "Impossible de joindre l'API : vérifie l'URL ngrok dans le <meta name='api-base'>."));
+              return;
+            }
+            if (window.startCheckout) window.startCheckout({ is_upgrade: true });
+            else setUpErr(getTranslation('checkout_module_not_loaded', "Le module de paiement ne s'est pas chargé. Rafraîchis la page."));
+          });
+        }
+      }
+
+      setTimeout(() => {
+      }, 0);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initButtons);
+    } else {
+      initButtons();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,1470 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><style>body,html{height:100%;margin:0;background:#fff!important}#app,.app-root,main{min-height:100vh;background:#fff!important}script{display:none!important}</style><title>CityLoop Quest Mons</title><script>(function(){var u=navigator.userAgent||'';document.write('<link rel="manifest" href="'+(/android/i.test(u)?'manifest-android.json':'manifest.json')+'">');})();</script><script>(function () {
+      if (!/android/i.test(navigator.userAgent || '')) return;
+      try {
+        if (window.matchMedia('(display-mode: fullscreen)').matches ||
+            window.matchMedia('(display-mode: standalone)').matches) {
+          localStorage.setItem('pwa-installed', 'true');
+        }
+      } catch (e) {}
+    })();</script><meta name="theme-color" content="#b30000"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="apple-mobile-web-app-title" content="CQ Mons"><meta name="application-name" content="CLQ Mons"><link rel="apple-touch-icon" href="images/cityLoopQuest_Mons_192.png"><link rel="apple-touch-icon" sizes="192x192" href="images/cityLoopQuest_Mons_192.png"><link rel="apple-touch-icon" sizes="512x512" href="images/cityLoopQuest_Mons_512.png"><meta name="msapplication-TileColor" content="#b30000"><meta name="msapplication-tap-highlight" content="no"><script src="/api-base.js"></script><script src="js/access-control.js"></script><script src="js/access-guard.js" defer="defer"></script><script>// Détection de la langue depuis l'URL pour l'activation
+    (function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const langFromUrl = urlParams.get('lang');
+      
+      if (langFromUrl) {
+        // Sauvegarder la langue dans localStorage pour qu'elle soit appliquée
+        localStorage.setItem('selectedLanguage', langFromUrl);
+        
+        // Appliquer les traductions une fois que le DOM est chargé
+        document.addEventListener('DOMContentLoaded', function() {
+          // Attendre que le translationManager soit disponible
+          const checkTranslationManager = () => {
+            if (window.translationManager && window.translationManager.isLoaded) {
+              window.translationManager.setLanguage(langFromUrl);
+              // Appliquer les traductions aux éléments
+              const elements = document.querySelectorAll('[data-translate]');
+              elements.forEach(element => {
+                const key = element.getAttribute('data-translate');
+                const translation = window.translationManager.translate(key);
+                if (translation) {
+                  element.textContent = translation;
+                }
+              });
+            } else {
+              // Réessayer dans 100ms
+              setTimeout(checkTranslationManager, 100);
+            }
+          };
+          checkTranslationManager();
+        });
+      }
+    })();</script><script>// Helper centralisé pour obtenir la bonne base d'API
+    function resolveApiBase() {
+      try {
+        if (window.APP_CONFIG && window.APP_CONFIG.API_BASE) {
+          return window.APP_CONFIG.API_BASE;
+        }
+      } catch (_) {}
+
+      // Fallback : valeur persistée
+      let stored = null;
+      try {
+        stored = localStorage.getItem('api_base');
+      } catch (_) {}
+
+      if (stored) return stored;
+
+      // Fallback DEV : si on est sur Vite (5173/5174), on dérive vers 8081
+      try {
+        const origin = location.origin || '';
+        if (origin.includes(':5173') || origin.includes(':5174')) {
+          return origin.replace(':5173', ':8081').replace(':5174', ':8081');
+        }
+      } catch (_) {}
+
+      // Fallback PROD : API Render
+      return 'https://cityloopquest-api.onrender.com';
+    }
+
+    // Rafraîchissement silencieux du token au démarrage de l'app
+    (async function silentRefreshOnBoot(){
+      const API_BASE = resolveApiBase();
+      const tok = localStorage.getItem('clq_token');
+      if (!tok) return;
+
+      try {
+        const r = await fetch(`${API_BASE}/api/auth/refresh`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${tok}` }
+        });
+        const data = await r.json().catch(()=>null);
+        if (r.ok && data?.token) {
+          localStorage.setItem('clq_token', data.token);
+          localStorage.setItem('jwt', data.token); // Compatibilité avec app.js
+        }
+      } catch (err) {
+        // on ne bloque pas le démarrage si le refresh échoue
+      }
+    })();</script><script src="storage-helper.js"></script><script src="translations/translationManager.js"></script><script src="translations/languageSelector.js"></script><script src="orientation-handler.js"></script></head><body><section id="activation" style="display:none;max-width:520px;margin:2rem auto;padding:1rem;border:1px solid #ddd;border-radius:12px"><h3>Activer l'accès</h3><p>Entre ton code reçu après paiement (Email) :</p><form id="activation-form"><input id="code-input" placeholder="XXXX-XXXX-XXXX" required style="width:100%;padding:.6rem;margin:.4rem 0;border:1px solid #ccc;border-radius:8px"> <button type="submit" style="padding:.6rem 1rem;border:0;border-radius:8px;background:#0d6efd;color:#fff">Activer</button></form><p id="activation-msg" style="color:#555;margin-top:.6rem"></p></section><script>/** Android uniquement : PWA installée via manifest-android (display: fullscreen). iOS : toujours false. */
+    function isAndroidPwaActive() {
+      try {
+        if (!/android/i.test(navigator.userAgent || '')) return false;
+        return window.matchMedia('(display-mode: fullscreen)').matches ||
+               window.matchMedia('(display-mode: standalone)').matches;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function isRunningAsInstalledPwa() {
+      try {
+        if (window.matchMedia('(display-mode: standalone)').matches) return true;
+        if (window.matchMedia('(display-mode: fullscreen)').matches) return true;
+      } catch (e) {}
+      if (window.navigator && window.navigator.standalone === true) return true;
+      if (isAndroidPwaActive()) return true;
+      return false;
+    }
+
+    function syncPwaInstalledFlag() {
+      try {
+        if (isRunningAsInstalledPwa()) {
+          localStorage.setItem('pwa-installed', 'true');
+        } else {
+          localStorage.removeItem('pwa-installed');
+        }
+      } catch (e) {}
+    }
+
+    (async function bootRouteGuard() {
+      syncPwaInstalledFlag();
+      // Activer le mode debug via paramètre d'URL (pour PC avec console)
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('debug') === 'true') {
+        localStorage.setItem('debug_mode', 'true');
+      }
+      
+      // IMPORTANT : Restaurer les données depuis cookies, IndexedDB ou API si localStorage est vide
+      // (nécessaire pour l'app installée où localStorage n'est pas partagé)
+      
+      // D'abord, essayer de récupérer le code depuis les cookies
+      function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
+      }
+      
+      const codeFromCookie = getCookie('clq_short_code');
+      const langFromCookie = getCookie('clq_selected_language');
+      const existingLang = localStorage.getItem('selectedLanguage');
+      
+      // TOUJOURS marquer la langue comme sélectionnée si on en possède une (localStorage ou cookie)
+      if (!sessionStorage.getItem('webLanguageSelected') && (existingLang || langFromCookie)) {
+        sessionStorage.setItem('webLanguageSelected', 'true');
+      }
+      
+      // Restaurer la langue depuis le cookie si disponible
+      if (langFromCookie && !existingLang) {
+        localStorage.setItem('selectedLanguage', langFromCookie);
+        localStorage.setItem('lang', langFromCookie);
+        sessionStorage.setItem('webLanguageSelected', 'true');
+      }
+      
+      if (codeFromCookie && !localStorage.getItem('clq_short_code')) {
+        localStorage.setItem('clq_short_code', codeFromCookie);
+        
+        // Essayer de réactiver le code via l'API
+        try {
+          const API_BASE = resolveApiBase();
+          
+          const activateRes = await fetch(`${API_BASE}/api/auth/activate-code`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'ngrok-skip-browser-warning': 'true'
+            },
+            body: JSON.stringify({ code: codeFromCookie })
+          });
+          
+              if (activateRes.ok) {
+            const activateData = await activateRes.json();
+            if (activateData.token) {
+              localStorage.setItem('clq_token', activateData.token);
+              localStorage.setItem('jwt', activateData.token);
+              localStorage.setItem('clq_has_access', '1');
+              try { sessionStorage.removeItem('expired_popup_acknowledged'); } catch (_) {}
+              
+              // S'assurer que la langue est définie
+              if (!localStorage.getItem('selectedLanguage') && langFromCookie) {
+                localStorage.setItem('selectedLanguage', langFromCookie);
+                sessionStorage.setItem('webLanguageSelected', 'true');
+              } else if (!localStorage.getItem('selectedLanguage')) {
+                // Si pas de langue dans le cookie, utiliser le français par défaut
+                localStorage.setItem('selectedLanguage', 'fr');
+                sessionStorage.setItem('webLanguageSelected', 'true');
+              }
+              
+              if (localStorage.getItem('debug_mode') === 'true') {
+                alert(`✅ Code récupéré depuis cookie et réactivé !\nLangue: ${localStorage.getItem('selectedLanguage')}`);
+              }
+            }
+          }
+        } catch (error) {
+          console.error('[bootRouteGuard] ❌ Erreur lors de la réactivation depuis cookie:', error);
+        }
+      }
+      
+      // Attendre que storageHelper soit chargé (peut prendre quelques ms)
+      let storageHelperReady = false;
+      for (let i = 0; i < 10; i++) {
+        if (window.storageHelper) {
+          storageHelperReady = true;
+          break;
+        }
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+      
+      if (storageHelperReady) {
+        try {
+          const restored = await window.storageHelper.restorePurchaseData();
+          if (restored) {
+            if (localStorage.getItem('debug_mode') === 'true') {
+              alert('✅ Données restaurées depuis IndexedDB\n\nLe code et le token ont été récupérés.');
+            }
+          } else {
+            // Essayer la restauration directe
+            await restoreFromIndexedDBDirect();
+          }
+        } catch (error) {
+          console.error('[bootRouteGuard] ❌ Erreur lors de la restauration via storageHelper:', error);
+          // Essayer la restauration directe en cas d'erreur
+          await restoreFromIndexedDBDirect();
+        }
+      } else {
+        console.warn('[bootRouteGuard] ⚠️ storageHelper non disponible, tentative de restauration directe...');
+        await restoreFromIndexedDBDirect();
+      }
+      
+      // Fonction de restauration directe depuis IndexedDB
+      async function restoreFromIndexedDBDirect() {
+        try {
+          const db = await new Promise((resolve, reject) => {
+            const request = indexedDB.open('cityloopquest_db', 1);
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => resolve(request.result);
+            request.onupgradeneeded = (event) => {
+              const db = event.target.result;
+              if (!db.objectStoreNames.contains('app_data')) {
+                db.createObjectStore('app_data');
+              }
+            };
+          });
+          
+          const transaction = db.transaction(['app_data'], 'readonly');
+          const store = transaction.objectStore('app_data');
+          const keysToRestore = ['clq_token', 'jwt', 'clq_has_access', 'clq_short_code', 'selectedLanguage', 'user_version'];
+          let restored = false;
+          let restoredKeys = [];
+          
+          for (const key of keysToRestore) {
+            try {
+              const request = store.get(key);
+              const value = await new Promise((resolve) => {
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => resolve(null);
+              });
+              
+              if (value !== undefined && value !== null && !localStorage.getItem(key)) {
+                localStorage.setItem(key, value);
+                restored = true;
+                restoredKeys.push(key);
+              }
+            } catch (error) {
+              console.error(`[bootRouteGuard] ❌ Erreur restauration ${key}:`, error);
+            }
+          }
+          
+          if (restored) {
+            if (localStorage.getItem('selectedLanguage') && !sessionStorage.getItem('webLanguageSelected')) {
+              sessionStorage.setItem('webLanguageSelected', 'true');
+            }
+            if (localStorage.getItem('debug_mode') === 'true') {
+              alert(`✅ Données restaurées depuis IndexedDB (direct)\n\nClés restaurées: ${restoredKeys.join(', ')}`);
+            }
+          } else {
+            if (localStorage.getItem('debug_mode') === 'true') {
+              alert('⚠️ Aucune donnée trouvée dans IndexedDB\n\nLes données n\'ont peut-être pas été sauvegardées lors de l\'achat.');
+            }
+          }
+        } catch (error) {
+          console.error('[bootRouteGuard] ❌ Erreur lors de la restauration directe:', error);
+          if (localStorage.getItem('debug_mode') === 'true') {
+            alert(`❌ Erreur lors de la restauration directe:\n${error.message}`);
+          }
+        }
+      }
+      
+      // TOUJOURS afficher l'état au démarrage (même sans debug activé)
+      const hasCode = localStorage.getItem('clq_short_code') || 
+                     localStorage.getItem('clq_token') || 
+                     localStorage.getItem('jwt') ||
+                     localStorage.getItem('clq_has_access') === '1';
+      
+      const debugState = {
+        clq_short_code: localStorage.getItem('clq_short_code') || 'absent',
+        clq_token: localStorage.getItem('clq_token') ? 'présent' : 'absent',
+        jwt: localStorage.getItem('jwt') ? 'présent' : 'absent',
+        clq_has_access: localStorage.getItem('clq_has_access') || 'absent',
+        selectedLanguage: localStorage.getItem('selectedLanguage') || 'absent',
+        webLanguageSelected: sessionStorage.getItem('webLanguageSelected') || 'absent',
+        debug_mode: localStorage.getItem('debug_mode') || 'désactivé'
+      };
+      
+      // Si le mode debug est activé, afficher une alerte
+      if (localStorage.getItem('debug_mode') === 'true') {
+        alert(`🔍 ÉTAT AU DÉMARRAGE:\n\nCode: ${debugState.clq_short_code}\nToken: ${debugState.clq_token}\nJWT: ${debugState.jwt}\nAccès: ${debugState.clq_has_access}\nLangue: ${debugState.selectedLanguage}\nLangue sélectionnée: ${debugState.webLanguageSelected}`);
+      }
+      
+      const isPWAInstalled = isRunningAsInstalledPwa();
+      const isAndroid = /android/i.test(navigator.userAgent || '');
+      
+      if (localStorage.getItem('debug_mode') === 'true') {
+        alert(`🚀 DÉTECTION PWA:\n\nPWA active (display-mode): ${isPWAInstalled}\nFlag localStorage: ${localStorage.getItem('pwa-installed') || 'absent'}`);
+      }
+      
+      // On vérifie le code si l'app est installée OU si l'on dispose déjà d'un code/token stocké (localStorage/cookie)
+      const shouldCheckCode = isPWAInstalled || Boolean(hasCode) || Boolean(codeFromCookie);
+      
+      if (hasCode && !isPWAInstalled) {
+        if (localStorage.getItem('debug_mode') === 'true') {
+          alert('Code présent mais app non installée\n→ Affichage de l\'écran d\'avertissement');
+        }
+      }
+      
+      // Si on vient d'une activation (activated=1), vérifier la langue depuis l'URL
+      const isActivated = urlParams.get('activated') === '1';
+      const urlLang = urlParams.get('lang');
+      
+      // Si on vient d'une activation avec une langue dans l'URL, on ne redirige pas
+      if (isActivated && urlLang) {
+        // Sauvegarder la langue depuis l'URL
+        localStorage.setItem('selectedLanguage', urlLang);
+        localStorage.setItem('lang', urlLang);
+        sessionStorage.setItem('webLanguageSelected', 'true');
+        return; // On ne redirige pas, on laisse le code continuer
+      }
+      
+      // Si l'app est installée en PWA, vérifier l'accès et rediriger directement
+      // Si l'app n'est PAS installée, même avec un code, on affiche l'écran d'avertissement
+      if (shouldCheckCode) {
+        
+        const token = localStorage.getItem('clq_token') || localStorage.getItem('jwt');
+        const shortCode = localStorage.getItem('clq_short_code');
+        const hasAccess = localStorage.getItem('clq_has_access') === '1';
+        
+        // Logs de débogage détaillés
+        const debugInfo = {
+          clq_token: token ? 'présent' : 'absent',
+          jwt: localStorage.getItem('jwt') ? 'présent' : 'absent',
+          clq_short_code: shortCode || 'absent',
+          clq_has_access: hasAccess ? 'oui' : 'non',
+          selectedLanguage: localStorage.getItem('selectedLanguage') || 'non défini'
+        };
+        
+        // Afficher un message de débogage visible (pour mobile)
+        const showDebugAlert = localStorage.getItem('debug_mode') === 'true';
+        if (showDebugAlert) {
+          alert(`PWA Détectée\nToken: ${debugInfo.clq_token}\nCode: ${debugInfo.clq_short_code}\nAccès: ${debugInfo.clq_has_access}`);
+        }
+        
+        // Si on n'a PAS de token, code, ni accès dans l'app installée
+        // C'est normal sur iOS car localStorage n'est pas partagé
+        // Dans ce cas, rediriger vers la page d'activation manuelle
+        if (!token && !shortCode && !hasAccess) {
+          if (showDebugAlert) {
+            alert('⚠️ App installée détectée mais aucune donnée trouvée.\n\nC\'est normal sur iOS : les données ne sont pas partagées entre le navigateur et l\'app installée.\n\n→ Redirection vers la page d\'activation pour entrer le code depuis l\'email.');
+          }
+          
+          // Récupérer la langue sauvegardée (depuis cookie, localStorage ou défaut)
+          let lang = localStorage.getItem('selectedLanguage');
+          if (!lang) {
+            // Essayer de récupérer depuis le cookie
+            const langCookie = getCookie('clq_selected_language');
+            if (langCookie) {
+              lang = langCookie;
+              localStorage.setItem('selectedLanguage', lang);
+            } else {
+              lang = 'fr';
+              localStorage.setItem('selectedLanguage', lang);
+            }
+          }
+          sessionStorage.setItem('webLanguageSelected', 'true');
+          
+          // Rediriger vers la page d'activation manuelle avec la langue
+          window.location.replace(`activation-manual.html?lang=${encodeURIComponent(lang)}&from=pwa`);
+          return; // IMPORTANT : arrêter ici
+        }
+        
+        // Si on a un token ou un code, vérifier la validité
+        if (token || shortCode || hasAccess) {
+          if (showDebugAlert) {
+            alert('Accès détecté, vérification en cours...');
+          }
+          
+          try {
+            const API_BASE = resolveApiBase();
+            
+            // Essayer de vérifier via whoami
+            if (token) {
+              const whoamiRes = await fetch(`${API_BASE}/api/auth/whoami`, {
+                method: 'GET',
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                  'ngrok-skip-browser-warning': 'true'
+                }
+              });
+              
+              if (whoamiRes.ok) {
+                const whoamiData = await whoamiRes.json();
+                
+                try {
+                  const planFromWhoami = (whoamiData && (whoamiData.plan || whoamiData.license_plan || whoamiData.access_type));
+                  if (planFromWhoami) {
+                    const normalizedPlan = String(planFromWhoami).toLowerCase();
+                    const version = normalizedPlan === 'full' ? 'FULL' : 'LITE';
+                    localStorage.setItem('user_version', version);
+                  }
+                } catch (planError) {
+                  console.warn('⚠️ Impossible de déterminer le plan depuis whoami:', planError);
+                }
+                
+                // Récupérer la langue sauvegardée (depuis cookie, localStorage ou défaut)
+                let lang = localStorage.getItem('selectedLanguage');
+                if (!lang) {
+                  // Essayer de récupérer depuis le cookie
+                  const langCookie = getCookie('clq_selected_language');
+                  if (langCookie) {
+                    lang = langCookie;
+                    localStorage.setItem('selectedLanguage', lang);
+                  } else {
+                    // Si aucune langue n'est sauvegardée, utiliser le français par défaut
+                    lang = 'fr';
+                    localStorage.setItem('selectedLanguage', lang);
+                  }
+                }
+                
+                // S'assurer que la langue est définie dans sessionStorage
+                sessionStorage.setItem('webLanguageSelected', 'true');
+                
+                // Message de débogage
+                if (localStorage.getItem('debug_mode') === 'true') {
+                  alert(`Token valide ! Redirection vers parcours.html avec langue: ${lang}`);
+                }
+                
+                if (isPWAInstalled) {
+                  window.location.replace(`parcours.html?lang=${encodeURIComponent(lang)}`);
+                  return; // IMPORTANT : arrêter ici pour éviter le flux normal
+                } else {
+                  // non-PWA : on continue le flux d’avertissement
+                }
+              } else {
+                if (localStorage.getItem('debug_mode') === 'true') {
+                  alert(`Token invalide (statut: ${whoamiRes.status}), tentative avec le code...`);
+                }
+              }
+            }
+            
+            // Si le token n'est pas valide, essayer avec le code
+            if (shortCode) {
+              
+              // Normaliser le code (enlever les tirets et espaces, puis reformater)
+              let code = String(shortCode).toLowerCase().replace(/[^a-z0-9]/g, '');
+              if (code.length >= 9) {
+                // Reformater en xxx-xxx-xxx si nécessaire
+                code = code.slice(0, 9).match(/.{1,3}/g).join('-');
+              }
+              
+              let activateRes;
+              try {
+                const API_BASE = resolveApiBase();
+                activateRes = await fetch(`${API_BASE}/api/auth/activate-code`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'ngrok-skip-browser-warning': 'true'
+                  },
+                  body: JSON.stringify({ code }),
+                  // Ajouter un timeout pour éviter les blocages
+                  signal: AbortSignal.timeout(10000) // 10 secondes max
+                });
+              } catch (fetchError) {
+                console.error('❌ Erreur réseau lors de l\'activation:', fetchError);
+                if (localStorage.getItem('debug_mode') === 'true') {
+                  alert(`Erreur réseau: ${fetchError.message}\n\nLe code est présent mais la vérification a échoué.\n→ Flux normal vers sélection de langue`);
+                }
+                // En cas d'erreur réseau, on ne peut pas vérifier, donc on continue le flux normal
+                throw fetchError; // Re-lancer pour être capturé par le catch externe
+              }
+              
+              if (activateRes.ok) {
+                const activateData = await activateRes.json();
+                if (activateData.token) {
+                  localStorage.setItem('clq_token', activateData.token);
+                  localStorage.setItem('jwt', activateData.token);
+                  localStorage.setItem('clq_has_access', '1');
+                  try { sessionStorage.removeItem('expired_popup_acknowledged'); } catch (_) {}
+                  if (activateData.short_code) {
+                    localStorage.setItem('clq_short_code', activateData.short_code);
+                  }
+
+                  try {
+                    const planFromActivate = (activateData.plan || (activateData.entitlements && activateData.entitlements.plan));
+                    if (planFromActivate) {
+                      const normalizedPlan = String(planFromActivate).toLowerCase();
+                      const version = normalizedPlan === 'full' ? 'FULL' : 'LITE';
+                      localStorage.setItem('user_version', version);
+                    }
+                  } catch (planError) {
+                    console.warn('⚠️ Impossible de déterminer le plan depuis activate-code:', planError);
+                  }
+                  
+                  // Récupérer la langue sauvegardée (depuis cookie, localStorage ou défaut)
+                  let lang = localStorage.getItem('selectedLanguage');
+                  if (!lang) {
+                    // Essayer de récupérer depuis le cookie
+                    const langCookie = getCookie('clq_selected_language');
+                    if (langCookie) {
+                      lang = langCookie;
+                      localStorage.setItem('selectedLanguage', lang);
+                    } else {
+                      // Si aucune langue n'est sauvegardée, utiliser le français par défaut
+                      lang = 'fr';
+                      localStorage.setItem('selectedLanguage', lang);
+                    }
+                  }
+                  
+                  // S'assurer que la langue est définie dans sessionStorage
+                  sessionStorage.setItem('webLanguageSelected', 'true');
+                  
+                  // Message de débogage
+                  if (localStorage.getItem('debug_mode') === 'true') {
+                    alert(`Code valide ! Redirection vers parcours.html avec langue: ${lang}`);
+                  }
+                  
+                  if (isPWAInstalled) {
+                    window.location.replace(`parcours.html?lang=${encodeURIComponent(lang)}`);
+                    return; // IMPORTANT : arrêter ici pour éviter le flux normal
+                  } else {
+                    // non-PWA : on continue l’écran d’avertissement
+                  }
+                } else {
+                  if (localStorage.getItem('debug_mode') === 'true') {
+                    alert('Code activé mais pas de token reçu');
+                  }
+                }
+              } else {
+                if (localStorage.getItem('debug_mode') === 'true') {
+                  alert(`Code invalide (statut: ${activateRes.status})`);
+                }
+              }
+            }
+            
+            // Si ni token ni code ne sont valides, continuer le flux normal
+            if (localStorage.getItem('debug_mode') === 'true') {
+              alert('Accès invalide ou expiré\n→ Redirection vers page paiements');
+            }
+            // PWA installée mais accès expiré/invalide → redirection directe vers choose-access (évite la boucle popup)
+            if (isPWAInstalled) {
+              try {
+                let lang = localStorage.getItem('selectedLanguage');
+                if (!lang) { const c = getCookie('clq_selected_language'); lang = c || 'fr'; }
+                window.location.replace('choose-access.html?lang=' + encodeURIComponent(lang) + '&from_expired=1');
+                return;
+              } catch (_) {}
+            }
+          } catch (error) {
+            console.error('❌ Erreur lors de la vérification de l\'accès PWA:', error);
+            
+            // Si on a un code sauvegardé mais que la vérification échoue (réseau, etc.),
+            // on considère que le code est valide et on redirige quand même
+            // MAIS UNIQUEMENT si l'app est installée (PWA détectée)
+            // Si l'app n'est pas installée, on passe par le flux normal (écran d'avertissement)
+            const errorMessage = (error && error.message) ? error.message : '';
+            if (shortCode && isPWAInstalled && (error.name === 'AbortError' || errorMessage.includes('fetch') || errorMessage.includes('network'))) {
+              if (localStorage.getItem('debug_mode') === 'true') {
+                alert(`Erreur réseau mais code présent ET app installée.\nOn considère le code comme valide.\nRedirection vers parcours...`);
+              }
+
+              // Récupérer la langue sauvegardée (depuis cookie, localStorage ou défaut)
+              let lang = localStorage.getItem('selectedLanguage');
+              if (!lang) {
+                const langCookie = getCookie('clq_selected_language');
+                if (langCookie) {
+                  lang = langCookie;
+                  localStorage.setItem('selectedLanguage', lang);
+                } else {
+                  lang = 'fr';
+                  localStorage.setItem('selectedLanguage', lang);
+                }
+              }
+              sessionStorage.setItem('webLanguageSelected', 'true');
+
+              if (!localStorage.getItem('user_version')) {
+                localStorage.setItem('user_version', 'LITE');
+              }
+
+              window.location.replace(`parcours.html?lang=${encodeURIComponent(lang)}`);
+              return;
+            }
+            
+            if (localStorage.getItem('debug_mode') === 'true') {
+              alert(`Erreur lors de la vérification:\n${error.message}\n→ Redirection vers page paiements`);
+            }
+            // PWA installée mais vérification en erreur (accès expiré) → redirection directe vers choose-access
+            if (isPWAInstalled) {
+              try {
+                let lang = localStorage.getItem('selectedLanguage');
+                if (!lang) { const c = getCookie('clq_selected_language'); lang = c || 'fr'; }
+                window.location.replace('choose-access.html?lang=' + encodeURIComponent(lang) + '&from_expired=1');
+                return;
+              } catch (_) {}
+            }
+            // En cas d'erreur, continuer le flux normal
+          }
+        } else {
+          // Pas de code/token, flux normal vers sélection de langue
+          if (localStorage.getItem('debug_mode') === 'true') {
+            alert('Pas d\'accès détecté dans PWA\nToken: absent\nCode: absent\nAccès: non\n→ Flux normal vers sélection de langue');
+          }
+        }
+      }
+      
+      // IMPORTANT : Vérifier si on a un accès valide AVANT de vérifier la langue
+      // Si on a un accès, on doit afficher l'écran d'avertissement, pas rediriger vers language-selection
+      const hasAccessBeforeLangCheck = localStorage.getItem('clq_has_access') === '1' || 
+                                       localStorage.getItem('clq_token') || 
+                                       localStorage.getItem('jwt') ||
+                                       localStorage.getItem('clq_short_code') ||
+                                       codeFromCookie;
+      
+      if (hasAccessBeforeLangCheck) {
+        // Si on a un accès, s'assurer qu'une langue est définie (utiliser le français par défaut si nécessaire)
+        const selectedLang = localStorage.getItem('selectedLanguage');
+        const webLanguageSelected = sessionStorage.getItem('webLanguageSelected');
+        
+        if (!selectedLang) {
+          // Utiliser le français par défaut ou la langue du cookie
+          const langCookie = getCookie('clq_selected_language');
+          const defaultLang = langCookie || 'fr';
+          localStorage.setItem('selectedLanguage', defaultLang);
+          sessionStorage.setItem('webLanguageSelected', 'true');
+        } else if (!webLanguageSelected) {
+          sessionStorage.setItem('webLanguageSelected', 'true');
+        }
+        
+        // Ne pas rediriger, laisser le code continuer pour afficher l'écran d'avertissement
+        // Le DOMContentLoaded gérera l'affichage de l'écran d'avertissement
+        return;
+      }
+      
+      // Flux normal : vérifier si une langue est sélectionnée (seulement si pas d'accès)
+      // NE PAS rediriger si on a un accès - on définira la langue par défaut dans ce cas
+      const finalCheckHasAccess = localStorage.getItem('clq_has_access') === '1' || 
+                                   localStorage.getItem('clq_token') || 
+                                   localStorage.getItem('jwt') ||
+                                   localStorage.getItem('clq_short_code') ||
+                                   codeFromCookie;
+      
+      if (!finalCheckHasAccess) {
+        // Seulement rediriger vers language-selection si on n'a PAS d'accès
+        const selectedLang = localStorage.getItem('selectedLanguage');
+        const webLanguageSelected = sessionStorage.getItem('webLanguageSelected');
+        
+        if (!selectedLang || !webLanguageSelected) {
+          if (!location.pathname.endsWith('language-selection.html')) {
+            location.replace('language-selection.html');
+          }
+        }
+      }
+    })();</script><script>// SOLUTION AGRESSIVE : Masquer le bouton d'activation immédiatement
+    (function() {
+      
+      // Fonction pour masquer le bouton
+      function forceHideActivationButton() {
+        const manualBtn = document.getElementById('manual-activation-btn');
+        if (manualBtn) {
+          manualBtn.remove();
+        }
+        
+        const activationSection = document.getElementById('activation');
+        if (activationSection) {
+          activationSection.style.display = 'none';
+        }
+      }
+      
+      // Masquer immédiatement
+      forceHideActivationButton();
+      
+      // Masquer toutes les 100ms pendant 5 secondes
+      let attempts = 0;
+      const interval = setInterval(() => {
+        forceHideActivationButton();
+        attempts++;
+        if (attempts > 50) { // 5 secondes
+          clearInterval(interval);
+        }
+      }, 100);
+      
+      // Masquer aussi au chargement du DOM
+      document.addEventListener('DOMContentLoaded', forceHideActivationButton);
+      
+      // Masquer à chaque changement de DOM
+      const observer = new MutationObserver(forceHideActivationButton);
+      observer.observe(document.body, { childList: true, subtree: true });
+    })();
+
+    // Attendre que le DOM soit prêt
+    document.addEventListener('DOMContentLoaded', function() {
+      
+      // SUPPRESSION RADICALE DE TOUS LES SÉLECTEURS EXISTANTS AU CHARGEMENT
+      const allSelectors = document.querySelectorAll('select, .language-selector, .flag-selector, #language-selector, [data-language]');
+      allSelectors.forEach((selector, index) => {
+        selector.remove();
+      });
+      
+      // CRÉATION DU SÉLECTEUR
+      if (window.languageSelector) {
+        setTimeout(() => {
+          try {
+            window.languageSelector.createSelector();
+          } catch (err) {
+            console.error('❌ ERREUR CRÉATION SÉLECTEUR:', err);
+          }
+        }, 1000);
+        
+        // FORCER LA MISE À JOUR DU SERVICE WORKER
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            for(let registration of registrations) {
+              registration.update();
+              // Service Worker mis à jour
+            }
+          });
+        }
+      }
+      
+      const hasAccess = localStorage.getItem('clq_has_access') === '1' || 
+                       localStorage.getItem('clq_token') || 
+                       localStorage.getItem('jwt') ||
+                       sessionStorage.getItem('payment_successful') === 'true';
+      
+      // SOLUTION RADICALE : Ne jamais afficher le bouton d'activation
+      
+      // Masquer le bouton s'il existe déjà
+      hideManualActivationButton();
+      
+      // Vérification périodique pour s'assurer que le bouton reste masqué
+      setInterval(() => {
+        hideManualActivationButton();
+      }, 1000);
+    });
+    
+    // Fonction pour masquer le bouton d'activation manuelle
+    function hideManualActivationButton() {
+      const manualBtn = document.getElementById('manual-activation-btn');
+      if (manualBtn) {
+        manualBtn.remove();
+      }
+      
+      // Masquer aussi la section d'activation si elle est visible
+      const activationSection = document.getElementById('activation');
+      if (activationSection) {
+        activationSection.style.display = 'none';
+      }
+    }
+    
+    // Fonction pour ajouter le bouton d'activation manuelle - DÉSACTIVÉE
+    function addManualActivationButton() {
+      return; // Ne jamais ajouter le bouton
+    }</script><style>*{box-sizing:border-box;margin:0;padding:0}body,html{width:100%;height:100%;overflow-x:hidden;position:relative}#warning-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:100000;display:none;align-items:center;justify-content:center;flex-direction:column;overflow:hidden}#warning-title{display:none!important;visibility:hidden!important;opacity:0!important}#warning-continue-btn{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(255,255,255,.95);border:2px solid #14365c;color:#14365c;padding:clamp(24px,4vw,32px) clamp(28px,5vw,48px);border-radius:16px;font-size:clamp(1em, 3.5vw, 1.3em);cursor:pointer;box-shadow:0 18px 45px rgba(20,54,92,.35);font-weight:600;max-width:min(420px,calc(100vw - 40px));width:auto;text-align:center;line-height:1.5;white-space:normal;z-index:100001;font-family:Arial,sans-serif;word-wrap:break-word}#warning-continue-btn:hover{background:#fff;box-shadow:0 20px 50px rgba(20,54,92,.4)}#warning-text{color:#14365c;display:block}#warning-text strong{color:#14365c;font-weight:700}#pwa-install-btn,#web-usage-btn{position:fixed;left:50%;transform:translateX(-50%);border:2px solid #14365c;color:#14365c;padding:clamp(20px,3vw,24px) clamp(16px,2.5vw,20px);border-radius:16px;font-size:clamp(.9em, 2.8vw, 1.1em);cursor:pointer;font-weight:600;text-align:center;line-height:1.4;white-space:normal;display:none;box-shadow:0 18px 45px rgba(20,54,92,.35);background:rgba(255,255,255,.95);z-index:100001}#pwa-install-btn{top:10%;width:calc(100% - 40px);max-width:calc(100vw - 40px);min-height:clamp(80px,15vw,120px)}#pwa-install-btn:hover{background:#fff;box-shadow:0 20px 50px rgba(20,54,92,.4)}#web-usage-btn{top:calc(10% + clamp(100px,20vw,140px) + 10vh);width:calc(100% - 40px);max-width:calc(100vw - 40px);min-height:clamp(60px,12vw,90px);z-index:100002}#web-usage-btn:hover{background:#fff;box-shadow:0 20px 50px rgba(20,54,92,.4)}#pwa-install-btn span,#web-usage-btn span{color:#14365c}#install-button-text{color:#14365c}#web-usage-btn span{word-break:break-word;overflow-wrap:break-word;hyphens:auto}@keyframes warningPulse{0%{transform:translate(-50%,-50%) scale(1);box-shadow:0 18px 45px rgba(20,54,92,.35)}50%{transform:translate(-50%,-50%) scale(1.02);box-shadow:0 20px 50px rgba(20,54,92,.4)}100%{transform:translate(-50%,-50%) scale(1);box-shadow:0 18px 45px rgba(20,54,92,.35)}}#warning-continue-btn{animation:warningPulse 2s infinite}@media (max-width:768px){#warning-continue-btn{font-size:clamp(.9em, 4vw, 1.2em);padding:clamp(16px,3vw,24px) clamp(20px,4vw,32px);max-width:90vw}#pwa-install-btn,#web-usage-btn{width:calc(100% - 20px);max-width:calc(100vw - 20px);font-size:clamp(.8em, 3vw, 1em);padding:clamp(16px,2.5vw,20px) clamp(12px,2vw,16px)}#pwa-install-btn{top:5%}#web-usage-btn{top:calc(5% + clamp(90px,18vw,130px) + 10vh)}}@supports (-webkit-touch-callout:none){#warning-screen{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}#warning-continue-btn{margin:env(safe-area-inset-top) 0}}#expired-access-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100002;display:none;align-items:center;justify-content:center;padding:20px}#expired-access-overlay.show{display:flex}#expired-access-box{background:rgba(255,255,255,.98);max-width:min(420px,calc(100vw - 40px));width:100%;padding:24px 28px;border-radius:16px;box-shadow:0 18px 45px rgba(20,54,92,.35);text-align:center;border:2px solid #14365c}#expired-access-box p{color:#14365c;font-size:1.1em;line-height:1.5;margin:0 0 20px}#expired-access-ok{display:inline-block;padding:14px 32px;border-radius:12px;border:none;background:#14365c;color:#fff;font-weight:600;cursor:pointer;font-size:16px}#manual-activation-btn{display:none!important;visibility:hidden!important;opacity:0!important;height:0!important;width:0!important;margin:0!important;padding:0!important;border:none!important;position:absolute!important;left:-9999px!important;top:-9999px!important}</style><div id="expired-access-overlay" aria-hidden="true"><div id="expired-access-box"><p id="expired-access-message">Votre accès n'est plus valable. Merci de souscrire une nouvelle inscription si vous désirez continuer dans l'application.</p><button type="button" id="expired-access-ok">OK</button></div></div><div id="warning-screen"><button id="warning-continue-btn" onclick="continueToSplash()"><span id="warning-text" data-translate="warning_button_text">Certaines plateformes n'acceptent pas l'installation en tant que app. Si tel est le cas, vous pouvez utiliser le système en tant que page web. Le choix vous est donné dans l'écran suivant.<br><br><strong>Pour continuer, cliquez ici.</strong></span></button></div><button id="pwa-install-btn" title="Installer l'application" onclick="handleInstallButtonClick(event)"><div style="display:flex;flex-direction:column;align-items:center;width:100%"><strong id="recommended-label" style="font-weight:700;margin-bottom:8px;font-size:1.1em">RECOMMANDE</strong><div style="display:flex;align-items:center;justify-content:center"><img src="images/partager_ios.png" alt="Installer" style="height:1.3em;vertical-align:-.2em;margin-right:3px"> <span id="install-button-text" data-translate="install_button">Installer l'application</span></div></div></button> <button id="web-usage-btn" title="Utilisation en page web" onclick="handleWebUsageClick(event)"><div style="display:flex;flex-direction:column;align-items:center;width:100%;line-height:1.5"><span data-translate="web_usage_button" style="display:block;word-wrap:break-word;max-width:100%">🌐 Pas d'installation, utilisation en page web</span></div></button><script>// SYSTÈME SIMPLIFIÉ - SPLASHSCREEN UNIQUEMENT POUR LES PWA
+    document.addEventListener('DOMContentLoaded', function() {
+      syncPwaInstalledFlag();
+
+      // Accès expiré (flag posé par bootRouteGuard ou ancien cache) → redirection directe, jamais de popup (Safari cache)
+      const showExpiredPopup = sessionStorage.getItem('show_expired_access_popup') === '1';
+      if (showExpiredPopup) {
+        try {
+          sessionStorage.removeItem('show_expired_access_popup');
+          const lang = sessionStorage.getItem('expired_access_lang') || localStorage.getItem('selectedLanguage') || 'fr';
+          sessionStorage.removeItem('expired_access_lang');
+          window.location.replace('choose-access.html?lang=' + encodeURIComponent(lang) + '&from_expired=1');
+        } catch (_) {
+          window.location.replace('choose-access.html?lang=fr&from_expired=1');
+        }
+        return;
+      }
+
+      // Détection Android pour affichage de debug
+      const isAndroid = /android/i.test(navigator.userAgent);
+      
+      // Android : si bootRouteGuard a posé ce flag (PWA détectée mais accès expiré/invalide, pas de redirection),
+      // on force l’affichage du premier écran d’accueil (popup) comme en non-PWA. Ne pas toucher à iOS.
+      const androidForceShowWelcome = isAndroid && sessionStorage.getItem('android_pwa_show_welcome') === '1';
+      if (androidForceShowWelcome) {
+        try { sessionStorage.removeItem('android_pwa_show_welcome'); } catch (_) {}
+      }
+      
+      let isPWA = isRunningAsInstalledPwa();
+      if (androidForceShowWelcome) isPWA = false;
+      
+      let isAppInstalled = isRunningAsInstalledPwa() ||
+                           window.location.search.includes('installed=true');
+      if (androidForceShowWelcome) isAppInstalled = false;
+      
+      let selectedLang = localStorage.getItem('selectedLanguage');
+      let webLanguageSelected = sessionStorage.getItem('webLanguageSelected');
+      
+      // VÉRIFICATION D'ACCÈS - Si l'utilisateur a un accès valide, forcer l'avertissement
+      const hasAccess = localStorage.getItem('clq_has_access') === '1' || 
+                       localStorage.getItem('clq_token') || 
+                       localStorage.getItem('jwt') ||
+                       sessionStorage.getItem('payment_successful') === 'true';
+      
+      // Vérifier si on vient d'une activation manuelle
+      const urlParams = new URLSearchParams(window.location.search);
+      const isActivated = urlParams.get('activated') === '1';
+      
+      // Si l'utilisateur a un accès valide OU si on vient d'une activation manuelle, forcer l'affichage de l'avertissement
+      if (hasAccess || isActivated) {
+        
+        try {
+          // Si on vient d'une activation, vérifier la langue depuis l'URL d'abord
+          const urlLang = urlParams.get('lang');
+          if (isActivated && urlLang) {
+            localStorage.setItem('selectedLanguage', urlLang);
+            localStorage.setItem('lang', urlLang);
+            selectedLang = urlLang;
+          }
+          
+          // S'assurer que la langue est définie si elle ne l'est pas
+          if (!selectedLang) {
+            localStorage.setItem('selectedLanguage', 'fr');
+            selectedLang = 'fr';
+          }
+          if (!webLanguageSelected) {
+            sessionStorage.setItem('webLanguageSelected', 'true');
+            webLanguageSelected = 'true';
+          }
+          
+          // Forcer l'affichage de l'avertissement
+          if (!isPWA) {
+            // Attendre que le DOM soit prêt si nécessaire
+            if (document.readyState === 'loading') {
+              document.addEventListener('DOMContentLoaded', showWarningScreen);
+            } else {
+              showWarningScreen();
+            }
+            return;
+          } else {
+            return;
+          }
+        } catch (error) {
+          console.error('❌ Erreur lors de la gestion de l\'activation:', error);
+          // En cas d'erreur, essayer quand même d'afficher l'avertissement
+          if (!isPWA) {
+            setTimeout(() => {
+              try {
+                showWarningScreen();
+              } catch (e) {
+                console.error('❌ Erreur lors de l\'affichage de l\'avertissement:', e);
+              }
+            }, 100);
+          }
+        }
+      }
+      
+      // FALLBACK : Si on a le paramètre activated mais pas d'accès détecté, forcer quand même
+      if (isActivated && !hasAccess) {
+        
+        // Vérifier la langue depuis l'URL d'abord
+        const urlLang = urlParams.get('lang');
+        if (urlLang) {
+          localStorage.setItem('selectedLanguage', urlLang);
+          localStorage.setItem('lang', urlLang);
+        } else {
+          localStorage.setItem('selectedLanguage', 'fr');
+        }
+        sessionStorage.setItem('webLanguageSelected', 'true');
+        
+        if (!isPWA) {
+          showWarningScreen();
+          return;
+        } else {
+          // Si PWA, NE PAS rediriger ici - laisser bootRouteGuard gérer
+          return;
+        }
+      }
+      
+      // MODIFIER LES MESSAGES SELON L'ÉTAT D'INSTALLATION
+      if (isAppInstalled) {
+        
+        // Modifier le message d'avertissement
+        const warningText = document.getElementById('warning-text');
+        if (warningText) {
+          warningText.setAttribute('data-translate', 'warning_button_text_installed');
+          warningText.innerHTML = 'L\'application est déjà installée sur cet appareil.<br><br><strong>Pour continuer, cliquez ici.</strong>';
+        }
+        
+        // Modifier le bouton d'installation
+        const installButtonText = document.getElementById('install-button-text');
+        if (installButtonText) {
+          installButtonText.setAttribute('data-translate', 'install_button_installed');
+          installButtonText.textContent = 'Je quitte cette page web et je lance l\'app installée';
+        }
+      }
+      
+      // CAS 1: Pas de langue sélectionnée OU pas de confirmation de sélection (même en PWA)
+      // → Redirection vers sélection de langue
+      if (!selectedLang || !webLanguageSelected) {
+        function redirectToLanguageSelection() {
+          // Cache-busting pour forcer le rechargement sur Android
+          const timestamp = Date.now();
+          const url = 'language-selection.html?v=' + timestamp;
+          try {
+            window.location.replace(url);
+            return;
+          } catch (err1) {
+            console.error('❌ Erreur avec replace:', err1);
+          }
+          try {
+            window.location.href = url;
+            return;
+          } catch (err2) {
+            console.error('❌ Erreur avec href:', err2);
+          }
+          try {
+            window.location.assign(url);
+          } catch (err3) {
+            console.error('❌ Erreur avec assign:', err3);
+            alert('Erreur de redirection. Veuillez naviguer manuellement vers language-selection.html');
+          }
+        }
+        
+        setTimeout(() => {
+          redirectToLanguageSelection();
+        }, 100);
+        return;
+      }
+      
+      // CAS 2: PWA installée avec langue sélectionnée → Redirection directe vers parcours
+      // NE PAS rediriger ici si PWA - laisser bootRouteGuard vérifier la validité du code
+      if (isPWA && selectedLang) {
+        return;
+      }
+      
+      // CAS 3: Non-PWA avec langue sélectionnée ET confirmation via webLanguageSelected
+      // → Écran d'avertissement
+      if (!isPWA && selectedLang && webLanguageSelected) {
+        if (sessionStorage.getItem('warningScreenShown') === 'true') {
+          showButtonsDirectly();
+          return;
+        }
+        showWarningScreen();
+        return;
+      }
+      
+      // Ajouter le sélecteur de langue (maintenant aussi sur Android)
+      if (window.languageSelector) {
+        window.languageSelector.createSelector();
+      } else {
+        console.error('❌ INDEX.HTML - window.languageSelector n\'existe pas!');
+      }
+    });
+
+    // Fonction pour afficher l'écran d'avertissement
+    function showWarningScreen() {
+      const warningScreen = document.getElementById('warning-screen');
+      
+      if (warningScreen) {
+        warningScreen.style.display = 'flex';
+        
+        // MARQUER QUE L'ÉCRAN D'AVERTISSEMENT A ÉTÉ AFFICHÉ (éviter la boucle)
+        sessionStorage.setItem('warningScreenShown', 'true');
+        
+        // Appliquer les traductions au bouton d'avertissement
+        loadInstallTranslations().then(t => {
+          if (t.warning_button_text) {
+            const warningBtn = document.getElementById('warning-continue-btn');
+            if (warningBtn) {
+              const span = warningBtn.querySelector('[data-translate="warning_button_text"]');
+              if (span) span.innerHTML = t.warning_button_text;
+            }
+          }
+        });
+        
+        // Masquer le body pour éviter le scroll
+        document.body.style.overflow = 'hidden';
+        
+      } else {
+      }
+    }
+
+    // Fonction pour afficher directement les boutons (éviter la boucle)
+    function showButtonsDirectly() {
+      const warningScreen = document.getElementById('warning-screen');
+      if (warningScreen) {
+        warningScreen.style.display = 'none';
+      }
+      const pwaInstallBtn = document.getElementById('pwa-install-btn');
+      const webUsageBtn = document.getElementById('web-usage-btn');
+      
+      if (pwaInstallBtn && webUsageBtn) {
+        pwaInstallBtn.style.display = 'block';
+        webUsageBtn.style.display = 'block';
+        
+        // Appliquer les traductions
+        loadInstallTranslations().then(t => {
+          if (t.install_button) {
+            const span = pwaInstallBtn.querySelector('[data-translate="install_button"]');
+            if (span) span.textContent = t.install_button;
+          }
+          if (t.web_usage_button) {
+            const span = webUsageBtn.querySelector('[data-translate="web_usage_button"]');
+            if (span) span.textContent = t.web_usage_button;
+          }
+          if (t.recommended) {
+            const recommendedLabel = document.getElementById('recommended-label');
+            if (recommendedLabel) recommendedLabel.textContent = t.recommended;
+          }
+        });
+      }
+    }
+
+    // Fonction pour continuer vers les boutons
+    function continueToSplash() {
+      const warningScreen = document.getElementById('warning-screen');
+      
+      if (warningScreen) {
+        warningScreen.style.display = 'none';
+        const pwaInstallBtn = document.getElementById('pwa-install-btn');
+        const webUsageBtn = document.getElementById('web-usage-btn');
+        
+        if (pwaInstallBtn && webUsageBtn) {
+          pwaInstallBtn.style.display = 'block';
+          webUsageBtn.style.display = 'block';
+          
+          loadInstallTranslations().then(t => {
+            if (t.install_button) {
+              const span = pwaInstallBtn.querySelector('[data-translate="install_button"]');
+              if (span) span.textContent = t.install_button;
+            }
+            if (t.web_usage_button) {
+              const span = webUsageBtn.querySelector('[data-translate="web_usage_button"]');
+              if (span) span.textContent = t.web_usage_button;
+            }
+            if (t.recommended) {
+              const recommendedLabel = document.getElementById('recommended-label');
+              if (recommendedLabel) recommendedLabel.textContent = t.recommended;
+            }
+          });
+        }
+      }
+    }
+
+    // Fonction globale pour gérer le clic sur le bouton d'installation
+    function handleInstallButtonClick(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      
+      // Vérifier si l'app est déjà installée
+      const isAppInstalled = isRunningAsInstalledPwa() ||
+                             window.location.search.includes('installed=true');
+      
+      if (isAppInstalled) {
+        // Afficher le popup "vous pouvez fermer cette fenêtre !"
+        showCloseWindowPopup();
+        return;
+      }
+      
+      // Détecter iOS Safari
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+      
+      if (isIOS && isSafari) {
+        showIOSInstallInstructions();
+        return;
+      }
+      
+      if (deferredPrompt) {
+        deferredPrompt.prompt()
+          .then(({outcome}) => {
+            if (outcome === 'accepted') {
+              // Afficher le message "Installation en cours"
+              showInstallationInProgress();
+              localStorage.setItem('pwa-installed', 'true');
+            } else {
+              showManualInstallInstructions();
+            }
+            deferredPrompt = null;
+          })
+          .catch(error => {
+            showManualInstallInstructions();
+          });
+      } else {
+        showManualInstallInstructions();
+      }
+    }
+    
+    // Fonction pour afficher le message "Installation en cours"
+    function showInstallationInProgress() {
+      const progressMsg = document.createElement('div');
+      progressMsg.id = 'installation-progress';
+      progressMsg.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.9);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 999999;
+      `;
+      
+      const progressContent = document.createElement('div');
+      progressContent.style.cssText = `
+        background: white;
+        padding: 40px;
+        border-radius: 15px;
+        text-align: center;
+        max-width: 350px;
+        margin: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      `;
+      
+      let message = 'Installation en cours, veuillez patienter...';
+      if (window.translationManager && window.translationManager.isLoaded) {
+        message = window.translationManager.translate('installation_in_progress') || message;
+      }
+      
+      progressContent.innerHTML = `
+        <div style="margin: 0 0 20px 0; font-size: 48px;">⏳</div>
+        <p style="margin: 0; color: #333; font-size: 18px; line-height: 1.6; font-weight: 500;">
+          ${message}
+        </p>
+      `;
+      
+      progressMsg.appendChild(progressContent);
+      document.body.appendChild(progressMsg);
+    }
+    
+    // Fonction pour afficher le popup "Installation terminée"
+    function showInstallationComplete() {
+      const progressMsg = document.getElementById('installation-progress');
+      if (progressMsg) {
+        progressMsg.remove();
+      }
+      
+      const popup = document.createElement('div');
+      popup.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.9);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 999999;
+      `;
+      
+      const popupContent = document.createElement('div');
+      popupContent.style.cssText = `
+        background: white;
+        padding: 40px;
+        border-radius: 15px;
+        text-align: center;
+        max-width: 350px;
+        margin: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      `;
+      
+      let message = 'Installation terminée ! Vous pouvez fermer le navigateur et démarrer l\'app à partir de l\'icône sur votre écran d\'accueil.';
+      if (window.translationManager && window.translationManager.isLoaded) {
+        message = window.translationManager.translate('installation_complete') || message;
+      }
+      
+      popupContent.innerHTML = `
+        <div style="margin: 0 0 20px 0; font-size: 48px;">✅</div>
+        <p style="margin: 0; color: #333; font-size: 16px; line-height: 1.6;">
+          ${message}
+        </p>
+      `;
+      
+      popup.appendChild(popupContent);
+      document.body.appendChild(popup);
+    }
+    
+    function showChromeRequiredPopup() {
+      if (document.getElementById('chrome-required-popup')) return;
+      const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+      const tm = window.translationManager;
+      const title = tm && tm.isLoaded ? tm.translate('chrome_required_title') : 'Google Chrome/Safari requis';
+      const message = tm && tm.isLoaded ? 
+        tm.translate('chrome_required_message') :
+        'Google Chrome/Safari est requis pour le fonctionnement correct de ce programme. Si vous utilisez Google Chrome/Safari, vous pouvez continuer. Sinon, vous êtes invité à installer Google Chrome/Safari et à relancer le programme via Google Chrome/Safari.';
+      const detectedMessage = tm && tm.isLoaded ?
+        (isChrome ? tm.translate('chrome_detected_yes') : tm.translate('chrome_detected_no')) :
+        (isChrome ? 'Nous avons détecté que votre navigateur est Google Chrome' : 'Nous avons détecté que votre navigateur n\'est pas Google Chrome');
+      const continueText = tm && tm.isLoaded ? tm.translate('chrome_continue') : 'Continuer';
+      const installText = tm && tm.isLoaded ? tm.translate('chrome_install') : 'Installer Chrome';
+      
+      const popup = document.createElement('div');
+      popup.id = 'chrome-required-popup';
+      popup.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 100000;
+        font-family: Arial, sans-serif;
+      `;
+      
+      const popupContent = document.createElement('div');
+      popupContent.style.cssText = `
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        text-align: center;
+        max-width: 500px;
+        margin: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      `;
+      
+      popupContent.innerHTML = `
+        <div style="margin: 0 0 20px 0; font-size: 48px;">🌐</div>
+        <h2 style="margin: 0 0 20px 0; color: #d32f2f; font-size: 1.8em;">${title}</h2>
+        <p style="margin: 0 0 20px 0; color: #333; font-size: 16px; line-height: 1.6;">
+          ${message}
+        </p>
+        <div style="margin: 20px 0; padding: 15px; border-radius: 10px; background: ${isChrome ? '#e8f5e8' : '#ffeaea'};">
+          <p style="margin: 0; color: ${isChrome ? '#2e7d32' : '#d32f2f'}; font-size: 16px; font-weight: bold;">
+            ${detectedMessage}
+          </p>
+        </div>
+        <div style="margin-top: 30px;">
+          ${isChrome ? 
+            `<button onclick="document.body.removeChild(document.getElementById('chrome-required-popup')); window.location.href='parcours.html';" style="
+              background: #28a745;
+              color: white;
+              border: none;
+              padding: 15px 30px;
+              border-radius: 10px;
+              font-size: 16px;
+              cursor: pointer;
+              font-weight: bold;
+              margin: 0 10px;
+            ">${continueText}</button>` :
+            `<button onclick="window.open('https://www.google.com/chrome/', '_blank');" style="
+              background: #d32f2f;
+              color: white;
+              border: none;
+              padding: 15px 30px;
+              border-radius: 10px;
+              font-size: 16px;
+              cursor: pointer;
+              font-weight: bold;
+              margin: 0 10px;
+            ">${installText}</button>`
+          }
+        </div>
+      `;
+      
+      popup.appendChild(popupContent);
+      document.body.appendChild(popup);
+    }
+    
+    function showCloseWindowPopup() {
+      const popup = document.createElement('div');
+      popup.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 999999;
+      `;
+      
+      const popupContent = document.createElement('div');
+      popupContent.style.cssText = `
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        text-align: center;
+        max-width: 300px;
+        margin: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      `;
+      
+      popupContent.innerHTML = `
+        <h3 style="margin: 0 0 20px 0; color: #333;">✅</h3>
+        <p style="margin: 0 0 20px 0; color: #333; font-size: 16px; line-height: 1.4;">
+          Vous pouvez fermer cette fenêtre !
+        </p>
+        <button onclick="this.closest('.popup').remove()" style="
+          background: #b30000;
+          color: white;
+          border: none;
+          padding: 12px 24px;
+          border-radius: 8px;
+          font-size: 16px;
+          cursor: pointer;
+        ">OK</button>
+      `;
+      
+      popup.className = 'popup';
+      popup.appendChild(popupContent);
+      document.body.appendChild(popup);
+    }
+
+    // Fonction globale pour gérer le clic sur le bouton "Utilisation en page web"
+    function handleWebUsageClick(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      
+      const selectedLanguage = localStorage.getItem('selectedLanguage');
+      if (selectedLanguage) {
+        window.location.href = 'parcours.html';
+      } else {
+        window.location.href = 'language-selection.html';
+      }
+    }
+
+    // Variables pour l'installation PWA
+    let deferredPrompt = null;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+    });
+
+    window.addEventListener('appinstalled', (evt) => {
+      localStorage.setItem('pwa-installed', 'true');
+      if (localStorage.getItem('debug_mode') === 'true') {
+        alert('🚀 Application installée !\nFlag pwa-installed sauvegardé.');
+      }
+      const isAndroid = /Android/i.test(navigator.userAgent);
+      if (isAndroid) {
+        setTimeout(() => {
+          showInstallationComplete();
+        }, 20000);
+      } else {
+        showInstallationComplete();
+      }
+      const pwaInstallBtn = document.getElementById('pwa-install-btn');
+      if (pwaInstallBtn) pwaInstallBtn.style.display = 'none';
+    });
+
+    function showIOSInstallInstructions() {
+      const instructionsDiv = document.createElement('div');
+      instructionsDiv.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.9); z-index: 100003;
+        display: flex; align-items: center; justify-content: center;
+        padding: 20px; overflow-y: auto;
+      `;
+       
+      loadInstallTranslations().then(t => {
+        instructionsDiv.innerHTML = `
+          <div style="
+            background: white; border-radius: 20px; padding: 30px;
+            max-width: 90vw; max-height: 90vh; overflow-y: auto;
+            text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+          ">
+            <h2 style="color: #c8102e; margin-bottom: 25px; font-size: 1.5em;">
+              🍎 ${t.ios_title || 'Installation sur iPhone/iPad'}
+            </h2>
+            
+            <p style="margin-bottom: 20px; color: #333; font-size: 1.1em;">
+              ${t.ios_intro || 'Pour installer CityLoop Quest Mons sur votre appareil iOS :'}
+            </p>
+            
+            <div style="text-align: left; margin-bottom: 25px;">
+               <div style="margin-bottom: 15px;">
+                 <strong style="color: #c8102e;">1. ${t.ios_step1 || 'Appuyez sur le bouton "Partager"'}</strong><br>
+                 <span style="color: #666; font-size: 0.9em;">
+                   ${t.ios_step1_detail || 'Trouvez le bouton carré avec une flèche vers le haut dans la barre d\'outils Safari'}
+                   <img src="images/partager_ios.png" alt="Partager" style="height:1.3em; vertical-align:-0.2em; margin:0 2px;">
+                 </span>
+               </div>
+               
+               <div style="margin-bottom: 15px;">
+                 <strong style="color: #c8102e;">2. ${t.ios_step2 || 'Sélectionnez "Sur l\'écran d\'accueil"'}</strong><br>
+                 <span style="color: #666; font-size: 0.9em;">${t.ios_step2_detail || 'Faites défiler dans le menu et appuyez sur cette option - Si l\'option n\'est pas disponible, choisissez OUVRIR DANS SAFARI et recommencez l\'opération'}</span>
+               </div>
+               
+               <div style="margin-bottom: 15px;">
+                 <strong style="color: #c8102e;">3. ${t.ios_step3 || 'Appuyez sur "Ajouter"'}</strong><br>
+                 <span style="color: #666; font-size: 0.9em;">${t.ios_step3_detail || 'Confirmez l\'ajout de l\'application'}</span>
+               </div>
+             </div>
+             
+             <div style="background: #f5f5f5; padding: 20px; border-radius: 15px;">
+               <h3 style="color: #c8102e; margin-bottom: 15px; font-size: 1.2em;">
+                 ${t.ios_tips_title || 'Conseils pour iOS :'}
+               </h3>
+               <ul style="text-align: left; color: #333; line-height: 1.6;">
+                 <li style="margin-bottom: 8px;">${t.ios_tip1 || 'L\'application apparaîtra sur votre écran d\'accueil'}</li>
+                 <li style="margin-bottom: 8px;">${t.ios_tip2 || 'Vous pouvez la déplacer et organiser comme les autres apps'}</li>
+                 <li style="margin-bottom: 8px;">${t.ios_tip3 || 'L\'application ne fonctionnera pas hors ligne'}</li>
+               </ul>
+             </div>
+          </div>
+        `;
+      });
+       
+      document.body.appendChild(instructionsDiv);
+    }
+
+    function showManualInstallInstructions() {
+      alert('Installation de l\'application\n\nCherchez l\'icône d\'installation ou "Installer" dans la barre d\'adresse de votre navigateur');
+    }
+
+    // --- Gestion multilingue unifiée --- 
+    async function loadInstallTranslations() {
+      const selectedLang = localStorage.getItem('selectedLanguage');
+      const webLanguageSelected = sessionStorage.getItem('webLanguageSelected');
+      let lang = selectedLang || (webLanguageSelected === 'true' ? 'fr' : 'fr') || 'fr';
+      try {
+        const resp = await fetch('translations/translations_install.json');
+        const data = await resp.json();
+        return data[lang] || data['fr'];
+      } catch (e) {
+        return {};
+      }
+    }
+
+    // Fonction pour mettre à jour les traductions d'installation lors du changement de langue
+    function updateInstallTranslations() {
+      const pwaInstallBtn = document.getElementById('pwa-install-btn');
+      const webUsageBtn = document.getElementById('web-usage-btn');
+      
+      if (pwaInstallBtn && pwaInstallBtn.style.display !== 'none') {
+        loadInstallTranslations().then(t => {
+          if (t.install_button) {
+            const span = pwaInstallBtn.querySelector('[data-translate="install_button"]');
+            if (span) span.textContent = t.install_button;
+          }
+          if (t.recommended) {
+            const recommendedLabel = document.getElementById('recommended-label');
+            if (recommendedLabel) recommendedLabel.textContent = t.recommended;
+          }
+        });
+      }
+      
+      if (webUsageBtn && webUsageBtn.style.display !== 'none') {
+        loadInstallTranslations().then(t => {
+          if (t.web_usage_button) {
+            const span = webUsageBtn.querySelector('[data-translate="web_usage_button"]');
+            if (span) span.textContent = t.web_usage_button;
+          }
+        });
+      }
+    }
+
+    // Écouter les changements de langue
+    document.addEventListener('languageChanged', function(event) {
+      updateInstallTranslations();
+    });</script></body></html>

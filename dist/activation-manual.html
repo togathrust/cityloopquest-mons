@@ -1,0 +1,320 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Activer l’accès</title><link rel="stylesheet" href="style.css"><style>.muted{color:#666;font-size:14px;margin-top:6px}.offline{background:#fee2e2;color:#991b1b;border:1px solid #fecaca;padding:10px;border-radius:8px;margin:12px 0}.popup-confirm.hidden{display:none}.popup-confirm{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(255,255,255,.95);color:#14365c;border-radius:16px;padding:24px 28px;box-shadow:0 18px 45px rgba(20,54,92,.35);z-index:10002;width:min(420px,calc(100vw - 40px));text-align:center;border:2px solid #14365c}.popup-title{font-size:1.45rem;font-weight:700;margin-bottom:18px;color:#14365c;text-shadow:0 2px 4px rgba(0,0,0,.25)}.popup-title small{display:block;font-size:.9rem;font-weight:500;margin-top:6px;color:#2b6cb0}.popup-confirm button{background:#14365c;color:#fff;border:none;border-radius:12px;font-weight:600;box-shadow:0 8px 18px rgba(20,54,92,.25);padding:12px 24px;font-size:16px;cursor:pointer}.popup-confirm button:hover{background:#2b6cb0}.popup-actions{display:flex;gap:12px;justify-content:center;margin-top:15px;margin-bottom:10px;flex-wrap:wrap}.popup-actions button{flex:1 1 120px;padding:14px 32px;font-size:16px}.popup-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:10001}@media (orientation:landscape){.popup-confirm{width:min(460px,calc(100vw - 80px));padding:26px 32px}}@media screen and (max-width:480px){.popup-confirm{width:min(350px,calc(100vw - 40px));padding:20px 24px;font-size:14px}.popup-confirm button{font-size:14px;padding:10px 18px}}</style></head><body><main style="max-width:900px;margin:40px auto;padding:16px"><h1 data-translate="activate_title">Activer l'accès</h1><p data-translate="activate_description">Entre ton code reçu après paiement (Email) :</p><div id="offline" class="offline" style="display:none">API indisponible. Vérifie l’URL dans <code>localStorage.api_base</code> ou relance ngrok/serveur.</div><div style="display:flex;gap:8px;align-items:center"><input id="code" placeholder="xxx-xxx-xxx" autocomplete="one-time-code" style="flex:1;padding:10px;border-radius:8px;border:1px solid #ccc"> <button id="btn-activate" type="button" data-translate="activate_button" style="padding:10px 16px;border-radius:8px;background:#2b6cb0;color:#fff;border:0">Activer</button></div><p id="status" class="muted"></p><p id="err" style="color:#b00;margin-top:10px"></p></main><div id="license-expired-overlay" class="popup-overlay hidden"></div><div id="license-expired-popup" class="popup-confirm hidden"><div id="license-expired-title" class="popup-title">Licence expirée</div><p id="license-expired-message" style="color:#666;font-size:14px;line-height:1.5;margin-bottom:10px">Ce numéro de licence est malheureusement arrivé à expiration. Voulez vous acquérir une autre licence valable 7 jours ?</p><div class="popup-actions"><button id="license-expired-yes" type="button">OUI</button> <button id="license-expired-no" type="button">NON</button></div></div><script src="translations/translationManager.js"></script><script src="translations/languageSelector.js"></script><script src="./api-base.js"></script><script>document.addEventListener('DOMContentLoaded', async function() {
+      if (window.translationManager) {
+        const selectedLang = localStorage.getItem('selectedLanguage') || 'fr';
+        try {
+          await window.translationManager.init();
+          window.translationManager.setLanguage(selectedLang);
+          window.translationManager.applyTranslations();
+        } catch (error) {
+          console.error('[activation-manual] Erreur lors du chargement des traductions:', error);
+        }
+      }
+    });</script><script>(function () {
+      // Base API
+      const API_BASE =
+        (window.APP_CONFIG && window.APP_CONFIG.API_BASE) ||
+        localStorage.getItem('api_base') ||
+        window.location.origin.replace(':5173', ':8080');
+
+      const $ = s => document.querySelector(s);
+      const codeEl = $('#code');
+      const btn = $('#btn-activate');
+      const errEl = $('#err');
+      const statusEl = $('#status');
+      const offlineEl = $('#offline');
+
+      const setErr = (m) => { if (errEl) errEl.textContent = m || ''; };
+      const setStatus = (m) => { if (statusEl) statusEl.textContent = m || ''; };
+
+      // Récupérer et sauvegarder la langue depuis l'URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const langFromUrl = urlParams.get('lang');
+      if (langFromUrl) {
+        localStorage.setItem('selectedLanguage', langFromUrl);
+        localStorage.setItem('lang', langFromUrl); // Compatibilité
+        sessionStorage.setItem('webLanguageSelected', 'true');
+      }
+
+      // Fonction pour obtenir la langue actuelle (depuis URL ou localStorage)
+      function getCurrentLang() {
+        return langFromUrl || 
+               localStorage.getItem('selectedLanguage') || 
+               localStorage.getItem('lang') || 
+               'fr';
+      }
+
+      // Bannière si API KO
+      (async () => {
+        try {
+          const r = await fetch(`${API_BASE}/api/health`, { cache:'no-store' });
+          if (!r.ok) throw new Error(String(r.status));
+        } catch {
+          offlineEl.style.display = 'block';
+        }
+      })();
+
+      // Prefill via ?prefill=xxx-xxx-xxx
+      try {
+        const pre = new URL(window.location.href).searchParams.get('prefill');
+        if (pre && codeEl) codeEl.value = pre.trim();
+      } catch {}
+
+      // Normalisation: uuid -> xxx-xxx-xxx
+      function normalizeShort(input) {
+        const raw = String(input).toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (!raw) return '';
+        const nine = raw.slice(0, 9);  // 9 caractères
+        return (nine.match(/.{1,3}/g) || [nine]).join('-');  // Format: xxx-xxx-xxx
+      }
+
+      async function activate() {
+        try {
+          setErr('');
+          setStatus('');
+          btn.disabled = true;
+
+          const val = (codeEl && codeEl.value || '').trim();
+          if (!val) {
+            setErr('Code requis.');
+            if (window.translationManager && window.translationManager.isLoaded) {
+              const key = 'code_required';
+              const translated = window.translationManager.translate(key);
+              if (translated && translated !== key) {
+                setErr(translated);
+              }
+            }
+            return;
+          }
+
+          // Normaliser le code saisi
+          const code = normalizeShort(val);
+          if (!code) {
+            setErr('Code invalide. Merci de vérifier votre email.');
+            if (window.translationManager && window.translationManager.isLoaded) {
+              const key = 'invalid_code_message';
+              const translated = window.translationManager.translate(key);
+              if (translated && translated !== key) {
+                setErr(translated);
+              }
+            }
+            return;
+          }
+
+          if (codeEl) codeEl.value = code;
+
+          setStatus('Vérification du code...');
+          if (window.translationManager && window.translationManager.isLoaded && typeof window.translationManager.translate === 'function') {
+            const verifyingKey = 'verifying_code';
+            const translated = window.translationManager.translate(verifyingKey);
+            if (translated && translated !== verifyingKey) {
+              setStatus(translated);
+            }
+          }
+
+          const r = await fetch(`${API_BASE}/api/auth/activate-code`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            cache: 'no-store',
+            body: JSON.stringify({ code })
+          });
+
+          const text = await r.text();
+          let data = null;
+          try { data = text ? JSON.parse(text) : null; } catch(_) {}
+
+          if (!r.ok || !data || !data.token) {
+            const msg = (data && (data.error || data.message)) || 'activation_failed';
+            
+            // Si l'erreur est "license_expired", afficher le popup au lieu du message simple
+            if (msg === 'license_expired' || msg.toLowerCase().includes('expired') || msg.toLowerCase().includes('expirée')) {
+              showLicenseExpiredPopup();
+              return; // Ne pas throw pour éviter l'affichage du message d'erreur simple
+            }
+            
+            // remonte le vrai code d'erreur côté UI pour debug
+            setErr(msg);
+            throw new Error(msg);
+          }
+
+          // Store token + flag
+          localStorage.setItem('clq_token', data.token);
+          localStorage.setItem('jwt', data.token);
+          localStorage.setItem('clq_has_access', '1');
+          try { sessionStorage.removeItem('expired_popup_acknowledged'); } catch (_) {}
+
+          // Mémoriser le short code normalisé pour faciliter l'upgrade
+          localStorage.setItem('clq_short_code', code);
+
+          // Sauvegarder dans un cookie (7 jours)
+          const expirationDate = new Date();
+          expirationDate.setDate(expirationDate.getDate() + 7);
+          document.cookie = `clq_short_code=${code}; expires=${expirationDate.toUTCString()}; path=/; SameSite=Lax`;
+
+          const currentLangForCookie = getCurrentLang();
+          document.cookie = `clq_selected_language=${currentLangForCookie}; expires=${expirationDate.toUTCString()}; path=/; SameSite=Lax`;
+
+          // Nettoyage flags upgrade éventuels
+          sessionStorage.removeItem('upgrade_intent');
+          sessionStorage.removeItem('payment_successful');
+          localStorage.removeItem('clq_upgrade_prompted');
+
+          // (optionnel) tenter un refresh
+          try {
+            const rr = await fetch(`${API_BASE}/api/auth/refresh`, {
+              method: 'POST',
+              headers: { Authorization: `Bearer ${data.token}` }
+            });
+            const fresh = await rr.json().catch(()=>null);
+            if (rr.ok && fresh?.token) {
+              localStorage.setItem('clq_token', fresh.token);
+              localStorage.setItem('jwt', fresh.token);
+            }
+          } catch {}
+
+          // Déterminer la version et la sauvegarder
+          let plan = 'lite';
+          if (data.plan) {
+            plan = String(data.plan).toLowerCase();
+          } else if (data.entitlements && data.entitlements.plan) {
+            plan = String(data.entitlements.plan).toLowerCase();
+          }
+          const userVersion = plan === 'lite' ? 'LITE' : 'FULL';
+          localStorage.setItem('user_version', userVersion);
+
+          // Sauvegarder dans IndexedDB si possible
+          try {
+            if (window.storageHelper && typeof window.storageHelper.savePurchaseData === 'function') {
+              await window.storageHelper.savePurchaseData({
+                clq_token: localStorage.getItem('clq_token'),
+                jwt: localStorage.getItem('jwt'),
+                clq_has_access: '1',
+                selectedLanguage: currentLangForCookie,
+                user_version: userVersion,
+                clq_short_code: code
+              });
+            }
+          } catch (dbError) {
+            console.warn('[activation-manual] Impossible de sauvegarder dans IndexedDB:', dbError);
+          }
+
+          // Récupérer la langue pour la redirection
+          const currentLang = currentLangForCookie;
+          sessionStorage.setItem('webLanguageSelected', 'true');
+
+          setStatus('Activation réussie...');
+          if (window.translationManager && window.translationManager.isLoaded) {
+            const key = 'activation_success_redirect';
+            const translated = window.translationManager.translate(key);
+            if (translated && translated !== key) {
+              setStatus(translated);
+            }
+          }
+          // Rediriger vers index.html avec la langue dans l'URL
+          setTimeout(
+            () => location.replace(`index.html?activated=1&lang=${encodeURIComponent(currentLang)}`),
+            800
+          );
+        } catch (e) {
+          setStatus('');
+          if (!errEl.textContent) {
+            const fallback = e?.message || 'Erreur inconnue';
+            if (window.translationManager && window.translationManager.isLoaded) {
+              const translated = window.translationManager.translate(fallback);
+              if (translated && translated !== fallback) {
+                setErr(translated);
+              } else {
+                setErr(fallback);
+              }
+            } else {
+              setErr(fallback);
+            }
+          }
+        } finally {
+          btn.disabled = false;
+        }
+      }
+
+      // Fonction pour afficher le popup de licence expirée
+      function showLicenseExpiredPopup() {
+        const overlay = $('#license-expired-overlay');
+        const popup = $('#license-expired-popup');
+        const titleEl = $('#license-expired-title');
+        const messageEl = $('#license-expired-message');
+        const yesBtn = $('#license-expired-yes');
+        const noBtn = $('#license-expired-no');
+        
+        if (!overlay || !popup) return;
+        
+        // Traductions si disponibles
+        if (window.translationManager && window.translationManager.isLoaded) {
+          const titleKey = 'license_expired_title';
+          const messageKey = 'license_expired_message';
+          const yesKey = 'yes';
+          const noKey = 'no';
+          
+          const translatedTitle = window.translationManager.translate(titleKey);
+          const translatedMessage = window.translationManager.translate(messageKey);
+          const translatedYes = window.translationManager.translate(yesKey);
+          const translatedNo = window.translationManager.translate(noKey);
+          
+          if (translatedTitle && translatedTitle !== titleKey && titleEl) {
+            titleEl.textContent = translatedTitle;
+          }
+          if (translatedMessage && translatedMessage !== messageKey && messageEl) {
+            messageEl.textContent = translatedMessage;
+          }
+          if (translatedYes && translatedYes !== yesKey && yesBtn) {
+            yesBtn.textContent = translatedYes;
+          }
+          if (translatedNo && translatedNo !== noKey && noBtn) {
+            noBtn.textContent = translatedNo;
+          }
+        }
+        
+        // Afficher le popup
+        overlay.classList.remove('hidden');
+        popup.classList.remove('hidden');
+        overlay.style.display = 'block';
+        popup.style.display = 'block';
+      }
+      
+      // Fonction pour masquer le popup de licence expirée
+      function hideLicenseExpiredPopup() {
+        const overlay = $('#license-expired-overlay');
+        const popup = $('#license-expired-popup');
+        
+        if (overlay) {
+          overlay.classList.add('hidden');
+          overlay.style.display = 'none';
+        }
+        if (popup) {
+          popup.classList.add('hidden');
+          popup.style.display = 'none';
+        }
+      }
+      
+      // Gérer le clic sur OUI (rediriger vers la page d'achat)
+      $('#license-expired-yes')?.addEventListener('click', () => {
+        hideLicenseExpiredPopup();
+        const currentLang = getCurrentLang();
+        // Rediriger vers choose-access.html ou index.html avec paramètre pour acheter
+        window.location.href = `choose-access.html?lang=${encodeURIComponent(currentLang)}&reason=expired`;
+      });
+      
+      // Gérer le clic sur NON (fermer le popup)
+      $('#license-expired-no')?.addEventListener('click', () => {
+        hideLicenseExpiredPopup();
+      });
+      
+      // Fermer en cliquant sur l'overlay
+      $('#license-expired-overlay')?.addEventListener('click', (e) => {
+        if (e.target.id === 'license-expired-overlay') {
+          hideLicenseExpiredPopup();
+        }
+      });
+
+      // Bouton + Entrée
+      btn?.addEventListener('click', activate);
+      codeEl?.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') activate(); });
+
+    })();</script></body></html>

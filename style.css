@@ -1,0 +1,1093 @@
+/* style.css */
+
+@import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
+
+/* Empêche toute transparence d’arrière-plan entre les pages.
+   min-height (et non height: 100%) : sinon le document reste calé sur la hauteur
+   d’écran et, avec overflow-x: hidden, le défilement vertical peut échouer
+   (ex. liste longue sur artistes_celebres). */
+html, body {
+  min-height: 100%;
+  margin: 0;
+  background: #ffffff !important;  /* fond opaque */
+}
+
+/* Conteneur racine de l’app (remplace #app par l’id/élément racine réel si différent) */
+#app, main, .app-root {
+  min-height: 100%;
+  background: #ffffff !important;
+  position: relative;
+  z-index: 0;
+}
+
+/* Les écrans plein-viewport (sélection langue, avertissement plateformes, etc.)
+   doivent vraiment couvrir tout et avoir un fond opaque */
+.fullscreen, .modal, .screen, .overlay, .pwa-install, .language-screen, .warning-screen {
+  position: fixed;        /* couvre toute la fenêtre */
+  inset: 0;               /* top:0; right:0; bottom:0; left:0 */
+  background: #ffffff;    /* fond opaque */
+  z-index: 9999;          /* au-dessus du reste */
+}
+
+
+/* Règles globales pour assurer la compatibilité mobile */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: url('images/parchemin.jpg') no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  max-width: 100vw;
+  /* Pas de max-height: 100vh — sinon les pages longues (ex. artistes) coupent le bas sans défilement fiable */
+  overflow-x: hidden;
+}
+
+html {
+  background: url('images/parchemin.jpg') no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Arial', sans-serif;
+  color: #333;
+  background-color: transparent;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+header {
+  padding: 0;
+  background: url('images/parchemin.jpg') center/100% 100% no-repeat;
+  color: #4b2e05;
+  text-align: center;
+  border-bottom: 2px solid #b8860b;
+  position: relative;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  max-width: 100vw;
+  box-sizing: border-box;
+}
+
+header .header-blason {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  margin: 0 18px;
+  max-width: 60px;
+  max-height: 60px;
+}
+
+header h1 {
+  font-family: 'MedievalSharp', Arial, serif;
+  font-size: 1.2rem;
+  margin: 0;
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-shadow: 1px 1px 4px #fffbe6, 0 0 1px #b8860b;
+  display: inline-block;
+  background: rgba(255,255,255,0.7);
+  border-radius: 8px;
+  padding: 4px 12px;
+  border: 1px solid #b8860b;
+  max-width: calc(100vw - 120px);
+  word-wrap: break-word;
+  box-sizing: border-box;
+}
+
+#main-content {
+  display: flex;
+  flex-direction: row;
+  height: 60vh;
+  margin: 10px;
+  position: relative;
+  max-width: calc(100vw - 20px);
+  box-sizing: border-box;
+}
+
+#map-container {
+  flex: 1;
+  min-width: 50%;
+  max-width: 100%;
+  height: 100%;
+  max-width: calc(100vw - 20px);
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  /* Propriétés pour la rotation CSS */
+  transform-origin: center center;
+  transition: transform 0.1s ease-out;
+  /* S'assurer que la carte reste visible pendant la rotation */
+  overflow: hidden;
+  position: relative;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+#info-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-left: 15px;
+  overflow: hidden;
+  max-width: calc(50vw - 20px);
+  box-sizing: border-box;
+}
+
+#point-image {
+  width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  border-radius: 12px;
+  border: 1px solid #aaa;
+  max-width: 100%;
+  max-height: calc(100vh - 200px); /* Hauteur dynamique pour s'adapter à l'écran */
+  height: auto;
+}
+
+#main-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(255,245,245,0.95);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 2px 5px;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.15);
+  z-index: 999;
+  max-width: 100vw;
+  box-sizing: border-box;
+}
+
+#main-footer button {
+  font-size: 18px;
+  padding: 8px;
+  background-color: #c8102e;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+  font-family: 'MedievalSharp', Arial, serif;
+  max-width: calc(25vw - 10px);
+  word-wrap: break-word;
+  box-sizing: border-box;
+}
+
+#main-footer button:hover {
+  background-color: #a30d25;
+  transform: scale(0.95);
+}
+
+/* Popup itinéraire transports */
+#transit-modal {
+  display: flex;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  align-items: center;
+  justify-content: center;
+  z-index: 10005;
+}
+
+.transit-hidden {
+  display: none !important;
+}
+
+.transit-visible {
+  display: flex;
+}
+
+.transit-modal-content {
+  width: min(520px, 92vw);
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  font-family: 'Arial', sans-serif;
+}
+
+.transit-modal-content h3 {
+  margin: 0 0 8px 0;
+  color: #14365c;
+}
+
+.transit-modal-content p {
+  margin: 0 0 10px 0;
+  color: #333;
+}
+
+.transit-link {
+  display: inline-block;
+  margin: 10px 0 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  text-decoration: none;
+  border: 1px solid #ddd;
+  color: #14365c;
+  font-weight: 600;
+  transition: background 0.2s, color 0.2s;
+}
+
+.transit-link:hover {
+  background: #f2f6fb;
+}
+
+.transit-disabled {
+  pointer-events: none;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.transit-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.transit-close {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: none;
+  background: #c8102e;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+#instructions-btn {
+  color: white !important;
+  text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
+}
+
+#audio-controls-fixed {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: yellow;
+  border: 2px solid red;
+  border-radius: 10px;
+  padding: 4px 8px;
+  margin-left: 10px;
+  max-width: calc(100vw - 20px);
+  box-sizing: border-box;
+}
+
+#audio-controls-fixed button {
+  background: none;
+  color: #e60000;
+  font-size: 18px;
+  padding: 4px;
+  border: none;
+  border-radius: 8px;
+  margin: 0 4px;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  transition: background 0.3s;
+  min-width: 32px;
+  min-height: 32px;
+  max-width: 32px;
+  max-height: 32px;
+}
+
+#audio-controls-fixed button:hover {
+  background: #f2f2f2;
+}
+
+#location-name {
+  font-size: 1rem;
+  font-weight: bold;
+  margin: 8px 0 4px;
+  color: #333;
+  max-width: 100%;
+  word-wrap: break-word;
+  box-sizing: border-box;
+}
+
+@media screen and (max-width: 480px) {
+  #location-name {
+    font-size: 0.9rem;
+    line-height: 1.3;
+    word-wrap: break-word;
+    padding: 0 10px;
+    min-height: 2.5em;
+    max-width: calc(100vw - 80px);
+    flex: 1;
+  }
+  
+  #main-content {
+    flex-direction: column;
+    height: auto;
+    min-height: 60vh;
+  }
+  
+  #map-container {
+    min-width: 100%;
+    max-width: 100%;
+    height: 40vh;
+  }
+  
+  #info-container {
+    min-width: 100%;
+    max-width: 100%;
+    padding-left: 0;
+    padding-top: 10px;
+  }
+  
+  #point-image {
+    max-height: calc(100vh - 350px); /* Hauteur adaptée pour les petits écrans */
+    width: 90%;
+    object-fit: contain;
+  }
+  
+  #main-footer {
+    flex-wrap: wrap;
+    padding: 5px;
+  }
+  
+  #main-footer button {
+    font-size: 14px;
+    padding: 6px;
+    max-width: calc(50vw - 10px);
+  }
+  
+  header h1 {
+    font-size: 1rem;
+    padding: 2px 8px;
+  }
+  
+  header .header-blason {
+    width: 40px;
+    height: 40px;
+    margin: 0 8px;
+  }
+}
+
+#location-bar {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0 10px;
+  margin-bottom: 8px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+#location-bar h2 {
+  font-size: 1rem;
+  font-weight: bold;
+  margin: 0;
+  max-width: 100%;
+  word-wrap: break-word;
+  flex: 1;
+}
+
+#location-bar button {
+  font-size: 0.9rem;
+  padding: 6px 10px;
+  background-color: #c8102e;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+  max-width: 35%;
+  word-wrap: break-word;
+  box-sizing: border-box;
+}
+
+#location-bar button:hover {
+  background-color: #a30d25;
+  transform: scale(1.05);
+}
+
+#score {
+  font-weight: bold;
+  margin-left: 10px;
+  color: #c8102e;
+  max-width: 20%;
+  word-wrap: break-word;
+}
+
+#progress-container {
+  height: 10px;
+  background-color: #eee;
+  border-radius: 5px;
+  overflow: hidden;
+  margin: 0 10px 10px;
+  max-width: calc(100vw - 20px);
+  box-sizing: border-box;
+}
+
+#progress-bar {
+  height: 100%;
+  width: 0%;
+  background-color: #e60000;
+  transition: width 0.4s ease;
+}
+
+#media-display {
+  width: 90%;
+  max-height: 90%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 12px;
+  border: 1px solid #aaa;
+  padding: 15px;
+  white-space: pre-line;
+  font-size: 1rem;
+  line-height: 1.4;
+  text-align: justify;
+  position: relative;
+  scroll-behavior: smooth;
+  box-sizing: border-box;
+  background-color: #fff;
+  max-width: calc(100vw - 30px);
+}
+
+footer {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-wrap: wrap;
+  max-width: 100vw;
+  box-sizing: border-box;
+}
+
+footer #audio-player {
+  flex-grow: 1;
+  max-width: 300px;
+  margin: 0 10px;
+  max-width: calc(100vw - 20px);
+}
+
+footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  max-width: 100vw;
+  box-sizing: border-box;
+}
+
+footer button,
+footer audio {
+  margin: 0 10px;
+  max-width: 30%;
+  max-width: calc(30vw - 20px);
+  box-sizing: border-box;
+}
+
+#main-footer audio {
+  max-width: 250px;
+  height: 40px;
+  max-width: calc(100vw - 40px);
+}
+
+#main-footer {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-wrap: wrap;
+  max-width: 100vw;
+  box-sizing: border-box;
+}
+
+#main-footer button,
+#main-footer audio {
+  margin: 0 5px;
+  max-width: calc(25vw - 10px);
+  box-sizing: border-box;
+}
+
+#orientation-warning {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #fff5f5;
+  color: #222;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 1.2rem;
+  z-index: 9999;
+  padding: 20px;
+  box-sizing: border-box;
+  max-width: 100vw;
+  max-height: 100vh;
+}
+
+.back-button {
+  position: fixed;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  z-index: 1000;
+  padding: 10px 14px;
+  background-color: #c8102e;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px 0 0 8px;
+  cursor: pointer;
+  box-shadow: 0 0 6px rgba(0,0,0,0.2);
+  max-width: calc(100vw - 20px);
+  box-sizing: border-box;
+}
+
+.personnage h2 {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 0.5em;
+  max-width: 100%;
+  word-wrap: break-word;
+  box-sizing: border-box;
+}
+.personnage p {
+  margin-top: 0;
+  max-width: 100%;
+  word-wrap: break-word;
+  box-sizing: border-box;
+}
+.personnage {
+  display: block;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.portrait {
+  width: 300px;
+  height: auto;
+  margin-right: 15px;
+  border-radius: 8px;
+  object-fit: cover;
+  max-width: calc(100vw - 30px);
+  max-height: 50vh;
+}
+
+div > button {
+  font-size: 1.3rem;
+  padding: 14px 24px;
+  background-color: #3366cc;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  width: 100%;
+  text-align: center;
+  max-width: calc(100vw - 40px);
+  word-wrap: break-word;
+  box-sizing: border-box;
+}
+
+div > button:hover {
+  background-color: #254a99;
+  transform: scale(1.05);
+}
+
+div[style*="grid-template-columns"] {
+  gap: 25px;
+}
+
+button.small-btn {
+  font-size: 1rem !important;
+  padding: 6px 12px !important;
+  min-width: 70px !important;
+  width: auto !important;
+  border-radius: 5px !important;
+  background-color: #c0002b !important;
+  color: white !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: background-color 0.3s ease !important;
+  max-width: calc(100vw - 20px) !important;
+  word-wrap: break-word !important;
+  box-sizing: border-box !important;
+}
+
+button.small-btn:hover {
+  background-color: #800018 !important;
+}
+
+#splash-screen {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+  max-width: 100vw;
+  max-height: 100vh;
+  box-sizing: border-box;
+}
+
+#splash-logo {
+  width: 150px;
+  height: 150px;
+  animation: rotation 4s linear infinite;
+  display: block;
+  margin-bottom: 1em;
+  max-width: calc(100vw - 40px);
+  max-height: calc(100vh - 200px);
+}
+
+#splash-text {
+  font-family: 'MedievalSharp', cursive;
+  font-size: 1.5rem;
+  color: #4b1e0e;
+  font-weight: 700;
+  text-shadow: 1px 1px 2px #000000aa;
+  max-width: calc(100vw - 40px);
+  word-wrap: break-word;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+#splash-waiting-text {
+  font-family: 'MedievalSharp', cursive;
+  font-size: 1.5rem;
+  color: #4b1e0e;
+  font-weight: 700;
+  text-shadow: 1px 1px 2px #000000aa;
+  max-width: calc(100vw - 40px);
+  word-wrap: break-word;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+#chevauchee-title {
+  font-family: 'MedievalSharp', cursive;
+  font-size: 1.5rem;
+  color: #4b1e0e;
+  font-weight: 700;
+  text-shadow: 1px 1px 2px #000000aa;
+  max-width: calc(100vw - 40px);
+  word-wrap: break-word;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+@keyframes rotation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.popup-confirm button {
+  margin: 10px;
+  padding: 10px 20px;
+  font-size: 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  max-width: calc(100vw - 40px);
+  word-wrap: break-word;
+  box-sizing: border-box;
+}
+
+.popup-confirm .yes {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.popup-confirm .no {
+  background-color: #f44336;
+  color: white;
+}
+
+.buttons {
+  position: absolute;
+  top: 20%;
+  right: 5%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  z-index: 2000;
+  max-width: calc(100vw - 20px);
+  box-sizing: border-box;
+}
+
+#startup-warning {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background: white;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100vw;
+  max-height: 100vh;
+  box-sizing: border-box;
+}
+
+#startup-content {
+  text-align: center;
+  padding: 20px;
+  border: 2px solid #000;
+  background: #f9f9f9;
+  border-radius: 10px;
+  max-width: calc(100vw - 40px);
+  word-wrap: break-word;
+  box-sizing: border-box;
+}
+
+#startup-ok {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 18px;
+  cursor: pointer;
+  max-width: calc(100vw - 40px);
+  word-wrap: break-word;
+  box-sizing: border-box;
+}
+
+/* POPUP STYLE (parchemin) */
+#quiz-popup, #museum-confirm-popup, #home-confirm-popup, #museum-confirm-popup, #quiz-prompt-overlay, #info-popup {
+  font-family: 'MedievalSharp', Arial, serif !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  box-sizing: border-box !important;
+}
+
+#quiz-popup > div, #museum-confirm-popup > div, #home-confirm-popup > div, #quiz-prompt-overlay > div, #info-popup > div {
+  background: url('images/parchemin.jpg') center center/cover repeat;
+  border: 4px solid #b8860b;
+  border-radius: 18px;
+  box-shadow: 0 0 24px #0008;
+  color: #4b2e05;
+  font-family: 'MedievalSharp', Arial, serif !important;
+  max-width: calc(100vw - 40px) !important;
+  max-height: calc(100vh - 40px) !important;
+  word-wrap: break-word !important;
+  box-sizing: border-box !important;
+  overflow-y: auto !important;
+}
+
+/* Fond parchemin restauré sur les sections concernées */
+.parchemin-bg, .content-box {
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.header-img {
+  height: 40px;
+  width: auto;
+  vertical-align: middle;
+  margin: 0 6px;
+  max-width: calc(100vw - 20px);
+  max-height: 40px;
+}
+
+/* Nouveau style pour les conteneurs de contenu (effet verre dépoli) */
+.content-box {
+  background-color: rgba(44, 62, 80, 0.5); /* Couleur de fond semi-transparente */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px); /* Pour Safari */
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 15px;
+  padding: 20px;
+  margin: 20px auto; /* Centrer et espacer */
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  max-width: calc(100vw - 40px);
+  word-wrap: break-word;
+  box-sizing: border-box;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Règle propre et unique pour le conteneur de contenu */
+.main-container {
+  max-width: 1200px; /* Largeur maximale pour les grands écrans */
+  margin: 15px auto; /* Centrage horizontal et marge verticale */
+  padding: 15px;
+  background-color: rgba(255, 255, 255, 0.85); /* Fond blanc semi-transparent pour la lisibilité */
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  max-width: calc(100vw - 30px);
+  word-wrap: break-word;
+  box-sizing: border-box;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+#instructions {
+  width: 80%;
+  margin: 0 auto;
+  max-width: calc(100vw - 40px);
+  word-wrap: break-word;
+  box-sizing: border-box;
+}
+
+.legal-mention {
+  text-align: center;
+  color: #888;
+  font-style: italic;
+  font-size: 0.8em;
+  margin: 0 0 8px 0;
+  user-select: none;
+  position: relative;
+  z-index: 10;
+  max-width: 100%;
+  word-wrap: break-word;
+  box-sizing: border-box;
+}
+
+@media screen and (max-width: 480px) {
+  .legal-mention {
+    font-size: 0.7em;
+    margin: 0 0 6px 0;
+  }
+  
+  #splash-logo {
+    width: 100px;
+    height: 100px;
+  }
+  
+  #splash-text, #splash-waiting-text, #chevauchee-title {
+    font-size: 1.2rem;
+  }
+  
+  .content-box {
+    padding: 15px;
+    margin: 10px auto;
+  }
+  
+  .main-container {
+    padding: 10px;
+    margin: 10px auto;
+  }
+  
+  .header-img {
+    height: 30px;
+    margin: 0 4px;
+  }
+  
+  .popup-confirm button {
+    font-size: 16px;
+    padding: 8px 16px;
+  }
+  
+  #startup-content {
+    padding: 15px;
+  }
+  
+  #startup-ok {
+    font-size: 16px;
+    padding: 8px 16px;
+  }
+}
+
+/* Popup CGU */
+.cgu-modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.cgu-modal.open {
+  display: flex;
+}
+
+.cgu-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.cgu-modal-content {
+  position: relative;
+  background: #ffffff;
+  max-width: 900px;
+  width: 90%;
+  max-height: 80vh;
+  margin: 0 auto;
+  padding: 20px 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  overflow-y: auto;
+  z-index: 1;
+}
+
+.cgu-modal-body {
+  margin-top: 10px;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.cgu-modal-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  border: none;
+  background: transparent;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+.cgu-modal h2 {
+  margin-top: 0;
+  text-align: center;
+}
+
+.cgu-text h3,
+.cgu-text h4 {
+  margin-top: 1.2em;
+  margin-bottom: 0.4em;
+}
+
+.cgu-text p {
+  margin: 0.3em 0;
+}
+
+body.no-scroll {
+  overflow: hidden;
+}
+
+/* Style unifié pour tous les popups (identique à parcours.html) */
+.popup-confirm.hidden { display: none; }
+.popup-confirm {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.95);
+  color: #14365c;
+  border-radius: 16px;
+  padding: 24px 28px;
+  box-shadow: 0 18px 45px rgba(20,54,92,0.35);
+  z-index: 10002;
+  width: min(420px, calc(100vw - 40px));
+  text-align: center;
+  border: 2px solid #14365c;
+}
+.popup-title {
+  font-size: 1.45rem;
+  font-weight: 700;
+  margin-bottom: 18px;
+  color: #14365c;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.25);
+}
+.popup-title small {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-top: 6px;
+  color: #2b6cb0;
+}
+.popup-confirm button {
+  background: #14365c;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  box-shadow: 0 8px 18px rgba(20,54,92,0.25);
+  padding: 14px 32px;
+  font-size: 16px;
+  cursor: pointer;
+}
+.popup-confirm button:hover {
+  background: #2b6cb0;
+}
+.popup-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 15px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.popup-actions button {
+  flex: 1 1 120px;
+  padding: 14px 32px;
+  font-size: 16px;
+}
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+@media (orientation: landscape) {
+  .popup-confirm {
+    width: min(460px, calc(100vw - 80px));
+    padding: 26px 32px;
+  }
+}
+@media screen and (max-width: 480px) {
+  .popup-confirm { 
+    width: min(350px, calc(100vw - 40px)); 
+    padding: 20px 24px; 
+    font-size: 14px; 
+  }
+  .popup-confirm button { 
+    font-size: 14px; 
+    padding: 10px 18px; 
+  }
+}

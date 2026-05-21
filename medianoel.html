@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Media Mons Coeur en Neige</title>
+  
+<!-- Garde d'accès : bloque l'accès si aucun code d'activation valide (clq_short_code) -->
+<script src="js/access-guard.js" defer></script>
+
+
+  <link href="style.css" rel="stylesheet"/>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+      background-color: #f2f2f2;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+    }
+
+    .media-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 12px;
+      max-width: 900px;
+      margin: 20px auto;
+    }
+
+    .media-img {
+      width: 100%;
+      height: auto;
+      border: 4px solid gold;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .tv-frame {
+      background: url('images/tv_frame.png') no-repeat center center;
+      background-size: contain;
+      width: 90vw;
+      max-width: 600px;
+      aspect-ratio: 4 / 3;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .tv-screen {
+      position: absolute;
+      top: 10%;
+      left: 10%;
+      width: 80%;
+      height: 80%;
+    }
+
+    .tv-screen iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .back-button {
+      position: fixed;
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
+      background-color: #c8102e;
+      color: white;
+      padding: 12px 18px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px 0 0 8px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <h1>❄️ Mons Coeur en Neige</h1>
+
+  <div class="media-grid">
+    <img src="images/coeur1.jpg" alt="Noël Mons 1" class="media-img">
+    <img src="images/coeur2.jpg" alt="Noël Mons 2" class="media-img">
+    <img src="images/coeur3.jpg" alt="Noël Mons 3" class="media-img">
+  </div>
+
+  <div class="tv-frame">
+    <div class="tv-screen">
+      <iframe 
+        src="https://www.youtube.com/embed/sTpM_pnVA_o?autoplay=1&mute=0&rel=0&modestbranding=1&showinfo=0" 
+        title="Mons Coeur en Neige"
+        allow="autoplay; encrypted-media"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </div>
+
+  <div class="media-grid">
+    <img src="images/coeur4.jpg" alt="Noël Mons 4" class="media-img">
+    <img src="images/coeur5.jpg" alt="Noël Mons 5" class="media-img">
+    <img src="images/coeur6.jpg" alt="Noël Mons 6" class="media-img">
+  </div>
+
+  <button class="back-button" onclick="window.location.href='evenements.html'">BACK</button>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="fr">
+  <style>html{visibility:hidden}</style>
+<script>
+  // Ne révèle la page que si on DOIT afficher le formulaire manuel.
+  function revealActivationPage() {
+    document.documentElement.style.visibility = 'visible';
+  }
+</script>
+
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>…</title>
+  <style>
+    /* Rien ne doit flasher : on masque tout d’emblée */
+    html,body{background:#fff;height:100%}
+    body{margin:0;visibility:hidden}
+  </style>
+  <script>
+    (function () {
+      // Empêche le retour visuel sur cette page (historique iOS/Safari)
+      try { history.replaceState(null, '', location.pathname + '#redir'); } catch (_) {}
+
+      // Évite tout rendu parasite si le navigateur peint trop tôt
+      function blankPage() {
+        try {
+          document.documentElement.style.background = '#fff';
+          document.body.style.background = '#fff';
+          document.body.innerHTML = '';          // purge tout contenu
+          document.body.style.visibility = 'hidden';
+        } catch (_) {}
+      }
+
+      // Cible unique après paiement / ou si déjà authentifié
+      var AFTER_PAY_URL = 'index.html';
+
+      // lecture de la session Stripe
+      var qs = new URLSearchParams(location.search);
+      var sid = qs.get('session_id');
+
+      // 1) Si on revient de Stripe, on passe immédiatement au post-checkout (invisible)
+      if (sid) {
+        blankPage();
+        location.replace('post-checkout.html?session_id=' + encodeURIComponent(sid));
+        return;
+      }
+
+      // 2) Si on a déjà un token, on repart dans l’app
+      var existing = '';
+      try { existing = localStorage.getItem('clq_token') || ''; } catch(_) {}
+      if (existing) {
+        blankPage();
+        location.replace(AFTER_PAY_URL);
+        return;
+      }
+
+      // 3) Sinon (accès direct par mégarde), on renvoie vers l'app aussi
+      blankPage();
+      // Utiliser replace pour éviter que cette page reste dans l'historique
+      try {
+        history.replaceState(null, '', location.pathname + '#redirected');
+      } catch (_) {}
+      location.replace(AFTER_PAY_URL);
+    })();
+  </script>
+</head>
+<body></body>
+</html>

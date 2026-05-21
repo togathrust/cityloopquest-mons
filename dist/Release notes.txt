@@ -1,0 +1,238 @@
+CityLoop Quest Mons - Release notes
+Version 26.05.06
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.05.05
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.05.04
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.05.03
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.05.02
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.05.01
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.04.03
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.04.02
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.04.01
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.36
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.35
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.34
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.33
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.32
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.31
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.30
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.29
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.28
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.27
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.26
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.25
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.24
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.23
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.22
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.21
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.20
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.19
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.18
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.17
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.16
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.15
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.14
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.13
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.12
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.11
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.10
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.09
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.08
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.07
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.06
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.05
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.04
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.03
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.02
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.03.01
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.02.04
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
+Version 26.02.03
+----------------------------------------
+
+new popup and removal of debug window
+
+CityLoop Quest Mons - Release notes
+Version 26.01.02
+----------------------------------------
+
+Fix Stripe webhook: idempotency + correct status codes
+Update mailer configuration
+Fix webhook idempotence + root GET
+Webhook: idempotence on session_id
+Invoice label: add city name
+Polish invoice PDF layout (A4 one-page)
+
+CityLoop Quest Mons - Release notes
+Version 25.12.05
+----------------------------------------
+
+implémentation email
+implémentation boutons Train/Tram/Bus et Uber
+Correction de bugs mineurs
+
+CityLoop Quest Mons - Release notes
+Version 25.11.04
+----------------------------------------
+
+
+Mise en place de la version Android avec carte fixe
+Bugs dûs à Android en carte mobile en mode web non natif
+
+CityLoop Quest Mons - Release notes
+Version 25.11.03
+----------------------------------------
+
+Modification description Gare de Mons
+
+CityLoop Quest Mons - Release notes
+Version 25.11.02
+----------------------------------------
+
+Mise en place de la Version
+Alerte de géolocalisation, contrôle des paramètres navigateur et appareil
+Modification page d'aide
+Modification page install/web
+
+CityLoop Quest Mons - Release notes
+Version 25.11.1
+----------------------------------------
+
+- Version initiale publiée
+

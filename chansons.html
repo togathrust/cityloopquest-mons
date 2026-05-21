@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Chansons montoises</title>
+<link href="style.css" rel="stylesheet"/>
+<script src="js/access-control.js"></script>
+<script src="translations/translationManager.js"></script>
+<script src="translations/languageSelector.js"></script>
+
+<!-- Garde d'accès : bloque l'accès si aucun code d'activation valide (clq_short_code) -->
+<script src="js/access-guard.js" defer></script>
+
+<style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    .section {
+      max-width: 66%;
+      margin: 20px auto;
+      padding: 15px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+    iframe, audio {
+      display: block;
+      margin: 10px auto;
+      max-width: 100%;
+    }
+    #return-btn {
+      display: block;
+      margin: 30px auto;
+      padding: 12px 20px;
+      font-size: 1.2em;
+      background-color: #2c3e50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    #return-btn:hover {
+      background-color: #1a252f;
+    }
+  </style>
+</head>
+<body>
+<header class="main-header">
+    <div class="header-content">
+        <img src="images/icone titre0.png" alt="Icone 0" class="header-img left">
+        <h1 data-translate="title_chevauchee">CityLoop Quest Mons - La Chevauchée de Saint Georges</h1>
+        <img src="images/icone titre1.png" alt="Icone 1" class="header-img right">
+    </div>
+</header>
+<audio id="culture-player" controls style="display:none"></audio>
+<script>
+let currentCultureAudio = null;
+
+// Fonction pour arrêter tous les médias
+function stopAllMedia() {
+    if (currentCultureAudio) {
+        currentCultureAudio.pause();
+        currentCultureAudio.currentTime = 0;
+        currentCultureAudio.style.display = 'none';
+    }
+
+    const allAudios = document.querySelectorAll('audio');
+    allAudios.forEach(audio => {
+        if (audio !== document.getElementById('culture-player')) {
+            audio.pause();
+            audio.currentTime = 0;
+        }
+    });
+
+    if (window.currentAudio) {
+        window.currentAudio.pause();
+        window.currentAudio.currentTime = 0;
+        window.currentAudio = null;
+    }
+
+    if (window.speechSynthesis && window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+    }
+
+    const youtubeIframes = document.querySelectorAll('iframe[src*="youtube.com"]');
+    youtubeIframes.forEach(iframe => {
+        const originalSrc = iframe.src;
+        iframe.src = '';
+        setTimeout(() => {
+            iframe.src = originalSrc;
+        }, 100);
+    });
+}
+
+function playCultureAudio(src) {
+    stopAllMedia();
+
+    const player = document.getElementById('culture-player');
+    player.pause();
+    player.currentTime = 0;
+    player.src = src;
+    player.style.display = 'block';
+
+    currentCultureAudio = player;
+
+    player.play();
+
+    player.onended = () => {
+        currentCultureAudio = null;
+    };
+}
+
+function playYouTubeVideo(iframe) {
+    stopAllMedia();
+
+    const originalSrc = iframe.src;
+    iframe.src = '';
+    setTimeout(() => {
+        iframe.src = originalSrc;
+    }, 50);
+}
+
+// Initialiser la page chansons
+async function initChansonsPage() {
+  if (window.translationManager && window.translationManager.isLoaded) {
+    if (window.languageSelector) {
+      window.languageSelector.createSelector();
+      window.languageSelector.updateSelectorValue();
+    }
+  } else {
+    setTimeout(initChansonsPage, 100);
+  }
+}
+
+document.addEventListener('languageChanged', function(event) {
+});
+</script>
+<h1 data-translate="chansons_title">🎵 Chansons montoises</h1>
+<div class="section">
+<h2>🎶 Le Chant du Doudou</h2>
+<iframe allowfullscreen="" frameborder="0" src="https://www.youtube.com/embed/ecsgcycNzSc" title="Le Chant du Doudou"></iframe>
+</div>
+<div class="section">
+<h2>🎶 Album Tome 1 Tableau de Procession 'Marcel Gillis'</h2>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/S63yi-wmTQQ?si=jGUA55uE3jqL3GvC" title="Tableau de Procession 'Marcel Gillis'" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+<div class="section">
+<h2>🎶 Album Tome 2 Chansons et monologues 'Marcel Gillis'</h2>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/wmGna_hSAd0?si=pRo-eEqhfXWvt1Rh" title="Chansons et monologues 'Marcel Gillis'" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+<div class="section">
+<h2>🎶 El corbeau eie l'renard 'Marcel Gillis'</h2>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/5s-oQ-MkpUM?si=pj7fkgVIs_buGEqa" title="El corbeau eie l'renard 'Marcel Gillis'" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+<div class="section">
+<h2>🎶 Les Cayaux  'Marcel Gillis'</h2>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/Xoo9rytSiC0?si=iE0ZGAtfV1O1HafQ" title="Les Cayaux 'Marcel Gillis'" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+<div class="section">
+<h2>🎶 El veuf 'Marcel Gillis'</h2>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/JszGEmheCLs?si=b0YKzTXV29qpkysI" title="El veuf 'Marcel Gillis'" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+<div class="section">
+<h2>🎶 Les contributions 'Marcel Gillis'</h2>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/Vw799GaKItY?si=7gXQM7tNyOJ8GdIY" title="Les contributions 'Marcel Gillis'" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+<div class="section">
+<h2>🎶 Ode au Ropieur 'Marcel Gillis'</h2>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/fmNpjSqKoys?si=LZTJNmV4KJ4ikDM6" title="Ode au Ropieur 'Marcel Gillis'" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+<div class="section">
+<h2>🎶 El baton blanc 'Marcel Gillis'</h2>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/QuxI6yaVlgc?si=RPJFc2bZDsbeiFd-" title="El baton blanc 'Marcel Gillis'" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+<div class="section">
+<h2>🎶 L'homme heureux 'Marcel Gillis'</h2>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/L_N670ODa1k?si=WXO9bGgP231QXwYq" title="L'homme heureux 'Marcel Gillis'" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+<div class="section">
+<h2>🎶 Interr' mint d' Ière classe 'Marcel Gillis'</h2>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/Eq7F1gxUBy8?si=i9iI_YB6qu_OdmqW" title="Interr' mint d' Ière classe 'Marcel Gillis'" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+<div class="section">
+<h2>🎶 El curé eyel mort 'Marcel Gillis'</h2>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/X4v03-a9c3Y?si=fTNh-GhRHKn7O4_w" title="El curé eyel mort 'Marcel Gillis'" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+<div class="section">
+<h2>🎶 Ducasse de Messines 'Marcel Gillis'</h2>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/kxL5FP3cqwc?si=UEFpaKwXaHSg_5FT" title="Ducasse de Messines 'Marcel Gillis'" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+<div class="section">
+  <h2>🎶 El cordonnier éié l'banquier 'Marcel Gillis'</h2>
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/msTVOycVbkU?si=cifpDL4Y6CUw9du4" title="El cordonnier éié l'banquier 'Marcel Gillis'" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+  </div>
+<div class="section">
+<h2>🎙️ Jean DEHAM</h2>
+<iframe allowfullscreen="" frameborder="0" src="https://www.youtube.com/embed/on3nASBE8J0" title="Jean DEHAM"></iframe>
+</div>
+<div class="section">
+<h2>🎷 Sydney BECHET – version du Doudou</h2>
+<iframe allowfullscreen="" frameborder="0" src="https://www.youtube.com/embed/eNWKT1YlkZo" title="Sydney Bechet"></iframe>
+</div>
+<div class="section">
+<h2>🎵 Et les Montois ne périront pas</h2>
+<button onclick="playCultureAudio('Chansons/montois_ne_periront_pas.mp3')">▶️ Écouter</button>
+</div>
+<div class="section">
+<h2>🎵 La p'tite gayole</h2>
+<button onclick="playCultureAudio('Chansons/petite_gayole.mp3')">▶️ Écouter</button>
+</div>
+<div class="section">
+<h2>🎵 Et ric, et rac, on va squetter l'barak</h2>
+<p><em>En attente d'enregistrement</em></p>
+</div>
+<div class="section">
+<h2>🎵 Elle n'a pas d'culotte</h2>
+<p><em>En attente d'enregistrement</em></p>
+</div>
+
+<button class="back-button" id="back-button" data-translate="back">BACK</button>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  initChansonsPage();
+
+  const backButton = document.getElementById("back-button");
+  if (backButton) {
+    backButton.addEventListener("click", () => {
+      window.location.href = "culture.html";
+    });
+  }
+});
+</script>
+</body>
+</html>

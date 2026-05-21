@@ -1,0 +1,514 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Choisissez votre Circuit</title><script>(function(){var u=navigator.userAgent||'';document.write('<link rel="manifest" href="'+(/android/i.test(u)?'manifest-android.json':'manifest.json')+'">');})();</script><meta name="theme-color" content="#ffffff"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><link rel="stylesheet" href="carte.css"><link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="circuit.css"><script src="api-base.js"></script><script src="js/access-control.js"></script><script src="js/access-guard.js" defer="defer"></script><script>window.APP_CONFIG = {
+      API_BASE:
+        localStorage.getItem('api_base') ||
+        location.origin.replace(':5173', ':8080')
+    };
+    window.setApiBase = function () {
+      const cur = localStorage.getItem('api_base') || '';
+      const v = prompt('API base (ex: http://192.168.129.13:8080)', cur);
+      if (v) { localStorage.setItem('api_base', v); alert('OK, relance la page.'); }
+    };</script><script src="api-key.js"></script><script src="circuit-data.js"></script><script src="circuit.js"></script><script src="translations/translationManager.js"></script><script src="translations/languageSelector.js"></script><style>body.hidden{overflow:hidden}body.hidden>:not(#startup-warning):not(.eruda-container){display:none}.eruda-container{z-index:100000!important}body,html{background:#fff;max-width:100vw;max-height:100vh;overflow-x:hidden;box-sizing:border-box}#map,.corner-buttons{max-width:100vw;max-height:100vh;box-sizing:border-box}@media screen and (max-width:480px){button.circuit{font-size:.9rem;padding:10px 16px;width:150px;max-width:calc(50vw - 10px);word-wrap:break-word;box-sizing:border-box}.popup-confirm{width:150px;padding:15px 20px;font-size:16px;max-width:calc(100vw - 40px)}.popup-confirm button{font-size:14px;padding:8px 16px;width:80px}#orientation-warning{max-width:100vw;max-height:100vh;box-sizing:border-box}#startup-content{max-width:calc(100vw - 40px);padding:15px}}@media screen and (max-width:320px){button.circuit{font-size:.8rem;padding:8px 12px;width:120px;max-width:calc(50vw - 5px)}.popup-confirm{width:120px;padding:10px 15px;font-size:14px}.popup-confirm button{font-size:12px;padding:6px 12px;width:60px}}.popup-confirm.hidden{display:none}.popup-confirm{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(255,255,255,.95);color:#14365c;border-radius:16px;padding:24px 28px;box-shadow:0 18px 45px rgba(20,54,92,.35);z-index:10002;width:min(420px,calc(100vw - 40px));text-align:center;border:2px solid #14365c}.popup-title{font-size:1.45rem;font-weight:700;margin-bottom:18px;color:#14365c;text-shadow:0 2px 4px rgba(0,0,0,.25)}.popup-title small{display:block;font-size:.9rem;font-weight:500;margin-top:6px;color:#2b6cb0}.popup-confirm button{background:#14365c;color:#fff;border:none;border-radius:12px;font-weight:600;box-shadow:0 8px 18px rgba(20,54,92,.25)}#confirm-popup{top:auto;left:auto;right:16px;bottom:16px;transform:none;width:min(200px,calc(100vw - 32px));padding:10px 12px;text-align:center}#confirm-popup .popup-title{text-align:center;font-size:.95rem;line-height:1.2}#confirm-popup .popup-title small{display:block;font-size:.7rem}#confirm-popup .popup-actions{gap:6px;justify-content:center}#confirm-popup .popup-actions button{padding:4px 8px;font-size:.85rem;min-width:32px}#confirm-popup .popup-actions button{flex:1 1 120px;padding:10px 18px;font-size:1rem}.popup-actions{display:flex;gap:12px;justify-content:center;margin-top:15px;margin-bottom:10px;flex-wrap:wrap}.popup-actions .start-option{flex:1 1 140px}@media (orientation:landscape){.popup-confirm{width:min(460px,calc(100vw - 80px));padding:26px 32px}}</style></head><body><div id="orientation-warning" style="display:none"><div id="startup-content"><p><span data-translate="orientation_message">🔄 Pour une meilleure expérience, veuillez pivoter votre appareil en mode paysage.</span></p></div></div><div id="map"></div><div class="corner-buttons"><button class="circuit grand" data-circuit="grand" onclick="confirmChoice('grand')" data-translate-html="grand_circuit">Grand Circuit<br>10.5km - 5h30</button> <button class="circuit moyen" data-circuit="moyen" onclick="confirmChoice('moyen')" data-translate-html="medium_circuit">Circuit Moyen<br>6km - 4h</button> <button class="circuit petit" data-circuit="petit" onclick="confirmChoice('petit')" data-translate-html="short_circuit">Petit Circuit<br>4km - 3h15</button><div id="confirm-popup" class="popup-confirm hidden"><div id="confirm-popup-text" class="popup-title">Êtes-vous sûr ?<br><small>Vous êtes sur le point de lancer ce parcours.</small></div><div class="popup-actions"><button id="confirm-yes" type="button">Oui</button> <button id="confirm-no" type="button">Non</button></div></div><div id="popup" class="popup-confirm hidden"><div id="popup-text" class="popup-title" data-translate="start_point_prompt">Où souhaitez-vous commencer le parcours ?</div><div class="popup-actions"><button id="start-grand-place" class="start-option" onclick="chooseStartPoint('grand_place')" data-translate="start_point_grand_place">Grand-Place</button> <button id="start-gare" class="start-option" onclick="chooseStartPoint('gare')" data-translate="start_point_gare">Gare Calatrava</button></div></div></div><script src="https://unpkg.com/leaflet/dist/leaflet.js"></script><script>let selectedCircuit = '';
+    let selectedStartPoint = 'grand_place';
+    let map;
+    let polylines = [];
+    let cachedStartDistances = null;
+
+    const START_POINT_INDICES = {
+      grand_place: 1,   // Grand-Place (index 1 dans les circuits -> locations[0])
+      gare: 47          // Gare Calatrava (index 47 -> locations[46])
+    };
+
+    const CIRCUIT_CONFIRM_LABELS = {
+      grand: { key: 'confirm_circuit_name_grand', fallback: 'grand circuit' },
+      moyen: { key: 'confirm_circuit_name_moyen', fallback: 'circuit moyen' },
+      petit: { key: 'confirm_circuit_name_petit', fallback: 'petit circuit' }
+    };
+
+    function getTranslationValue(key, fallback) {
+      if (window.translationManager && typeof window.translationManager.translate === 'function') {
+        const translated = window.translationManager.translate(key);
+        if (translated && translated !== key) {
+          return translated;
+        }
+      }
+      return fallback;
+    }
+
+    function hideStartPopup() {
+      const popup = document.getElementById('popup');
+      if (popup) {
+        popup.classList.add('hidden');
+        popup.style.display = 'none';
+      }
+    }
+
+    function getCircuitConfirmLabel(circuit) {
+      const config = CIRCUIT_CONFIRM_LABELS[circuit];
+      if (!config) return circuit || '';
+      const label = getTranslationValue(config.key, config.fallback);
+      return label;
+    }
+
+    function previewSelectedCircuit() {
+      if (!selectedCircuit || !circuits[selectedCircuit] || !map) {
+        return;
+      }
+
+      clearCircuits();
+
+      const path = circuits[selectedCircuit].map(i => ({ lat: locations[i - 1].lat, lng: locations[i - 1].lng }));
+      const polyline = new google.maps.Polyline({
+        path: path,
+        geodesic: true,
+        strokeColor: getColor(selectedCircuit),
+        strokeOpacity: 1.0,
+        strokeWeight: 5
+      });
+      polyline.setMap(map);
+      polylines.push(polyline);
+
+      const bounds = new google.maps.LatLngBounds();
+      path.forEach(point => bounds.extend(point));
+      map.fitBounds(bounds);
+    }
+
+    // 👉 Nouveau : charge Google Maps avec defer + loading=async (sans exposer la clé)
+    function loadGoogleMapsAPI() {
+      // Récupérer la clé API depuis la variable globale (injectée par api-key.js)
+      const apiKey = window.__GOOGLE_MAPS_API_KEY__;
+      
+      if (apiKey && apiKey.match(/AIza[A-Za-z0-9_-]+/)) {
+        // Clé disponible depuis api-key.js (production)
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&v=weekly&loading=async&callback=initMap`;
+        script.defer = true;
+        script.async = false;
+        document.head.appendChild(script);
+      } else {
+        // Fallback : essayer de charger depuis le fichier (développement uniquement)
+        fetch('Clé API.txt')
+          .then(response => {
+            if (!response.ok) throw new Error('Clé API introuvable.');
+            return response.text();
+          })
+          .then(apiKeyText => {
+            const match = apiKeyText.match(/AIza[A-Za-z0-9_-]+/);
+            if (!match) throw new Error('Format de clé API non valide trouvé dans le fichier.');
+            const apiKey = match[0];
+
+            const script = document.createElement('script');
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&v=weekly&loading=async&callback=initMap`;
+            script.defer = true;
+            script.async = false;
+            document.head.appendChild(script);
+          })
+          .catch(err => {
+            console.error("Impossible de charger Google Maps:", err);
+            const mapDiv = document.getElementById('map');
+            if (mapDiv) mapDiv.innerHTML =
+              '<p style="text-align:center; padding:20px;">Impossible de charger la carte. Veuillez vérifier votre connexion internet.</p>';
+          });
+      }
+    }
+
+    function initMap() {
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat: 50.4545, lng: 3.9524 },
+        zoom: 14
+      });
+      showAllCircuits();
+    }
+
+    function clearCircuits() {
+      polylines.forEach(line => line.setMap(null));
+      polylines = [];
+    }
+
+    function getColor(circuit) {
+      if (circuit === 'grand') return 'blue';
+      if (circuit === 'moyen') return 'orange';
+      if (circuit === 'petit') return 'green';
+    }
+
+    function confirmChoice(circuit) {
+      if (!window.checkPageAccess('parcours.html', circuit)) {
+        return false;
+      }
+
+      selectedCircuit = circuit;
+      selectedStartPoint = 'grand_place';
+      cachedStartDistances = null;
+
+      hideStartPopup();
+      previewSelectedCircuit();
+      showCircuitConfirmation();
+
+      return true;
+    }
+
+    function showCircuitConfirmation() {
+      const confirmPopup = document.getElementById('confirm-popup');
+      if (!confirmPopup) {
+        proceedToStartPointPopup();
+        return;
+      }
+
+      updateConfirmPopupText(selectedCircuit);
+
+      confirmPopup.classList.remove('hidden');
+      confirmPopup.style.display = 'block';
+
+      document.querySelectorAll('.circuit').forEach(btn => btn.disabled = true);
+    }
+
+    function hideCircuitConfirmation() {
+      const confirmPopup = document.getElementById('confirm-popup');
+      if (confirmPopup) {
+        confirmPopup.classList.add('hidden');
+        confirmPopup.style.display = 'none';
+      }
+    }
+
+    function cancelCircuitSelection() {
+      hideCircuitConfirmation();
+      hideStartPopup();
+      showAllCircuits();
+      selectedCircuit = '';
+      selectedStartPoint = 'grand_place';
+      document.querySelectorAll('.circuit').forEach(btn => btn.disabled = false);
+      return false;
+    }
+
+    function proceedToStartPointPopup() {
+      hideCircuitConfirmation();
+
+      if (!selectedCircuit || !circuits[selectedCircuit]) {
+        document.querySelectorAll('.circuit').forEach(btn => btn.disabled = false);
+        return;
+      }
+
+      if (!polylines.length) {
+        previewSelectedCircuit();
+      }
+
+      document.querySelectorAll('.circuit').forEach(btn => btn.disabled = true);
+
+      const popup = document.getElementById('popup');
+      const popupText = document.getElementById('popup-text');
+      if (popupText) {
+        const promptText = getTranslationValue('start_point_prompt', 'Où souhaitez-vous commencer le parcours ?');
+        const subtitleText = getTranslationValue('start_point_prompt_distance', 'Distance à vol d\'oiseau');
+        popupText.innerHTML = `${promptText}<br><small>${subtitleText}</small>`;
+      }
+
+      if (popup) {
+        popup.classList.remove('hidden');
+        popup.style.display = 'block';
+      }
+
+      if (window.translationManager && typeof window.translationManager.applyTranslations === 'function') {
+        window.translationManager.applyTranslations();
+      }
+
+      updatePopupTitle();
+      updateStartPointDistances(true);
+    }
+
+    function updateConfirmPopupText(circuit = selectedCircuit) {
+      const confirmText = document.getElementById('confirm-popup-text');
+      if (confirmText) {
+        const titleBase = getTranslationValue('confirm_circuit_title', 'Êtes-vous sûr ?');
+        const subtitleBase = getTranslationValue('confirm_circuit_subtitle', 'Vous êtes sur le point de lancer ce parcours.');
+        const circuitLabel = circuit ? getCircuitConfirmLabel(circuit) : '';
+        const message = circuitLabel
+          ? getTranslationValue('confirm_circuit_message', 'Vous avez choisi le {circuit}.').replace('{circuit}', circuitLabel)
+          : getTranslationValue('confirm_circuit_message_default', 'Vous avez choisi ce parcours.');
+        confirmText.innerHTML = `${message}<br>${titleBase}<br><small>${subtitleBase}</small>`;
+      }
+
+      const confirmYes = document.getElementById('confirm-yes');
+      if (confirmYes) {
+        confirmYes.textContent = getTranslationValue('confirm_circuit_yes', 'Oui');
+      }
+
+      const confirmNo = document.getElementById('confirm-no');
+      if (confirmNo) {
+        confirmNo.textContent = getTranslationValue('confirm_circuit_no', 'Non');
+      }
+    }
+
+    const confirmYesButton = document.getElementById('confirm-yes');
+    if (confirmYesButton) {
+      confirmYesButton.addEventListener('click', () => {
+        proceedToStartPointPopup();
+      });
+    }
+
+    const confirmNoButton = document.getElementById('confirm-no');
+    if (confirmNoButton) {
+      confirmNoButton.addEventListener('click', () => {
+        cancelCircuitSelection();
+      });
+    }
+
+    function updatePopupTitle() {
+      const popupText = document.getElementById('popup-text');
+      if (!popupText) return;
+
+      const promptKey = 'start_point_prompt';
+      const subtitleKey = 'start_point_prompt_distance';
+      let promptText = 'Où souhaitez-vous commencer le parcours ?';
+      let subtitleText = 'Distance à vol d\'oiseau';
+
+      if (window.translationManager && window.translationManager.isLoaded && typeof window.translationManager.translate === 'function') {
+        const translatedPrompt = window.translationManager.translate(promptKey);
+        if (translatedPrompt && translatedPrompt !== promptKey) {
+          promptText = translatedPrompt;
+        }
+        const translatedSubtitle = window.translationManager.translate(subtitleKey);
+        if (translatedSubtitle && translatedSubtitle !== subtitleKey) {
+          subtitleText = translatedSubtitle;
+        }
+      }
+
+      popupText.innerHTML = `${promptText}<br><small>${subtitleText}</small>`;
+    }
+
+    function resolveCircuitKey(circuit, startPoint) {
+      if (startPoint === 'gare') {
+        const variantKey = `${circuit}_gare`;
+        if (circuits[variantKey]) {
+          return variantKey;
+        }
+      }
+      return circuit;
+    }
+
+    function refreshStartButtonBaseLabels() {
+      ['start-grand-place', 'start-gare'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (!btn) return;
+        const translateKey = btn.getAttribute('data-translate');
+        let baseLabel = '';
+
+        if (translateKey && window.translationManager && typeof window.translationManager.translate === 'function') {
+          const translated = window.translationManager.translate(translateKey);
+          if (translated && translated !== translateKey) {
+            baseLabel = translated.trim();
+          }
+        }
+
+        if (!baseLabel) {
+          const currentText = btn.textContent || '';
+          baseLabel = currentText.split('•')[0].trim();
+        }
+
+        btn.dataset.baseLabel = baseLabel;
+        btn.textContent = baseLabel;
+      });
+    }
+
+    function getStartLocation(key) {
+      const index = START_POINT_INDICES[key];
+      if (!index || !Array.isArray(locations)) return null;
+      return locations[index - 1] || null;
+    }
+
+    function computeDistanceMeters(lat1, lon1, lat2, lon2) {
+      const toRad = (deg) => deg * Math.PI / 180;
+      const R = 6371000; // Rayon terrestre en mètres
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    function formatDistance(meters) {
+      if (!Number.isFinite(meters) || meters < 0) return null;
+      if (meters < 1000) {
+        const rounded = Math.round(meters / 10) * 10;
+        return `${rounded} m`;
+      }
+      const km = meters / 1000;
+      const formatted = km.toFixed(km >= 10 ? 0 : 1);
+      return `${formatted} km`;
+    }
+
+    function applyStartDistanceLabels(distances) {
+      ['grand_place', 'gare'].forEach(key => {
+        const btnId = key === 'grand_place' ? 'start-grand-place' : 'start-gare';
+        const btn = document.getElementById(btnId);
+        if (!btn) return;
+        const baseLabel = btn.dataset.baseLabel || (btn.textContent || '').trim();
+        const distance = distances && distances[key];
+        if (distance && Number.isFinite(distance)) {
+          const formatted = formatDistance(distance);
+          btn.textContent = formatted ? `${baseLabel} • ${formatted}` : baseLabel;
+        } else {
+          btn.textContent = baseLabel;
+        }
+      });
+    }
+
+    function updateStartPointDistances(force = false) {
+      refreshStartButtonBaseLabels();
+
+      // Réinitialiser les libellés avant de recalculer
+      applyStartDistanceLabels(null);
+
+      if (cachedStartDistances && !force) {
+        applyStartDistanceLabels(cachedStartDistances);
+        return;
+      }
+
+      if (!navigator.geolocation) {
+        console.warn('🌐 Géolocalisation indisponible pour le calcul des distances.');
+        applyStartDistanceLabels(null);
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition((position) => {
+        const { latitude, longitude } = position.coords;
+
+        const distances = {
+          grand_place: null,
+          gare: null
+        };
+
+        const grandLoc = getStartLocation('grand_place');
+        if (grandLoc) {
+          distances.grand_place = computeDistanceMeters(latitude, longitude, grandLoc.lat, grandLoc.lng);
+        }
+
+        const gareLoc = getStartLocation('gare');
+        if (gareLoc) {
+          distances.gare = computeDistanceMeters(latitude, longitude, gareLoc.lat, gareLoc.lng);
+        }
+
+        cachedStartDistances = distances;
+        applyStartDistanceLabels(distances);
+      }, (error) => {
+        console.warn('⚠️ Impossible de récupérer la position pour calculer la distance:', error);
+        cachedStartDistances = null;
+        applyStartDistanceLabels(null);
+      }, {
+        // 👉 plus souple pour desktop
+        enableHighAccuracy: false,
+        maximumAge: 60000,
+        timeout: 8000
+      });
+    }
+
+    function chooseStartPoint(startPoint) {
+      selectedStartPoint = startPoint;
+      const resolvedCircuit = resolveCircuitKey(selectedCircuit, startPoint);
+
+      localStorage.setItem('selectedCircuit', selectedCircuit);
+      localStorage.setItem('selectedCircuitStart', startPoint);
+      localStorage.setItem('selectedCircuitResolved', resolvedCircuit);
+
+      // Définir le type de parcours pour le selfie
+      const parcoursType = { grand: 'long', moyen: 'moyen', petit: 'court' }[selectedCircuit];
+      if (parcoursType) {
+        localStorage.setItem('mons_parcoursType', parcoursType);
+      }
+
+      const popup = document.getElementById('popup');
+      popup.style.display = 'none';
+      popup.classList.add('hidden');
+
+      window.location.href = 'main.html';
+    }
+
+    function showAllCircuits() {
+      clearCircuits();
+      const bounds = new google.maps.LatLngBounds();
+
+      ['grand', 'moyen', 'petit'].forEach(circuitName => {
+        const path = circuits[circuitName].map(i => ({ lat: locations[i - 1].lat, lng: locations[i - 1].lng }));
+        const polyline = new google.maps.Polyline({
+          path: path, geodesic: true,
+          strokeColor: getColor(circuitName),
+          strokeOpacity: 1.0, strokeWeight: 5
+        });
+        polyline.setMap(map);
+        polylines.push(polyline);
+        path.forEach(point => bounds.extend(point));
+      });
+
+      if (map) map.fitBounds(bounds);
+
+      document.querySelectorAll('.circuit').forEach(btn => btn.disabled = false);
+
+      const p = document.getElementById('popup');
+      p.classList.add('hidden');
+      p.style.display = 'none';
+    }
+
+    // Charger la carte (deferred script)
+    loadGoogleMapsAPI();
+
+    // Langue + éviter les warnings de traduction trop tôt
+    function waitUntil(cond, {timeout=5000, interval=50}={}) {
+      return new Promise((resolve) => {
+        const t0 = Date.now();
+        const id = setInterval(() => {
+          if (cond() || (Date.now() - t0) > timeout) { clearInterval(id); resolve(); }
+        }, interval);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', async function() {
+      // Langue depuis l’URL si fournie
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlLang = urlParams.get('lang');
+      if (urlLang) {
+        localStorage.setItem('selectedLanguage', urlLang);
+        sessionStorage.setItem('webLanguageSelected', 'true');
+      }
+
+      if (window.languageSelector) {
+        window.languageSelector.createSelector();
+      }
+
+      // Attendre que les traductions soient prêtes avant d’écrire le texte
+      await waitUntil(() => window.translationManager && window.translationManager.isLoaded);
+      updatePopupTitle();
+      updateConfirmPopupText(selectedCircuit);
+    });
+
+    document.addEventListener('languageChanged', () => {
+      updatePopupTitle();
+      updateStartPointDistances(true);
+      updateConfirmPopupText(selectedCircuit);
+    });
+
+    // PWA
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log('Service Worker enregistré sur parcours.html'))
+        .catch(error => console.log('Service Worker échec sur parcours.html:', error));
+    }</script><div id="startup-warning" style="display:none"><div id="startup-content"><p><strong>🖥️ <span data-translate="tip_install_app">Astuce :</span></strong> <span data-translate="tip_install_text">Pour le confort d'utilisation, installer cette application sur votre téléphone ou tablette. Pour cela, cliquez sur exporter puis écran d'accueil. Une connexion internet est néanmoins nécessaire.</span><br><br><span data-translate="orientation_message">🔄 Pour une meilleure expérience, veuillez pivoter votre appareil en mode paysage.</span>.</p><button id="startup-ok">OK</button></div></div><script>function checkOrientation() {
+      if (window.innerWidth > window.innerHeight) {
+        document.getElementById('orientation-warning').style.display = 'none';
+      } else {
+        document.getElementById('orientation-warning').style.display = 'flex';
+        if (window.translationManager && typeof window.translationManager.applyTranslations === 'function') {
+          window.translationManager.applyTranslations();
+        }
+      }
+    }
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
+    window.addEventListener('load', checkOrientation);
+    if (screen.orientation) {
+      screen.orientation.addEventListener('change', checkOrientation);
+    }</script><script>document.addEventListener('DOMContentLoaded', async function() {
+      if (window.translationManager && typeof window.translationManager.init === 'function') {
+        await window.translationManager.init();
+        window.translationManager.applyTranslations();
+      }
+    });</script></body></html>

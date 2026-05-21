@@ -1,0 +1,14 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Hors Connexion</title><script src="js/access-guard.js" defer="defer"></script><style>body{font-family:Arial,sans-serif;text-align:center;margin-top:100px;background-color:#fdd;color:#b30000}</style><script>// Priorité à ce que tu mets en localStorage (pratique pour iPhone),
+    // sinon on dérive :5173 -> :8080 automatiquement.
+    window.APP_CONFIG = {
+      API_BASE:
+        localStorage.getItem('api_base') ||
+        location.origin.replace(':5173', ':8080')
+    };
+  
+    // petit raccourci pour changer l'API depuis le mobile
+    window.setApiBase = function () {
+      const cur = localStorage.getItem('api_base') || '';
+      const v = prompt('API base (ex: http://192.168.129.13:8080)', cur);
+      if (v) { localStorage.setItem('api_base', v); alert('OK, relance la page.'); }
+    };</script></head><body><h1>🚫 Vous êtes hors connexion</h1><p>Hélas ! La Chevauchée de Saint Georges a besoin d'une connexion internet... Dommage !!!.</p></body></html>

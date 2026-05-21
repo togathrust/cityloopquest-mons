@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-translate="mail_title">Contact Mail</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Base API (définit window.APP_CONFIG.API_BASE) -->
+  <script src="api-base.js"></script>
+  <script src="translations/translationManager.js"></script>
+  <script src="translations/languageSelector.js"></script>
+  <script src="js/access-guard.js" defer></script>
+  <style>
+    .mail-container {
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      font-family: 'Arial', sans-serif;
+    }
+    .mail-container h1 {
+      margin-top: 0;
+      color: #14365c;
+      text-align: center;
+    }
+    .mail-container p {
+      line-height: 1.5;
+      color: #333;
+      text-align: justify;
+    }
+    .mail-field {
+      margin: 14px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .mail-field label {
+      font-weight: 600;
+      color: #14365c;
+    }
+    .mail-field textarea {
+      min-height: 160px;
+      resize: vertical;
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-family: 'Arial', sans-serif;
+    }
+    .mail-field input[type="email"] {
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-family: 'Arial', sans-serif;
+    }
+    .mail-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 16px;
+    }
+    .mail-actions button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 700;
+      color: #fff;
+      background: #c8102e;
+      transition: background 0.2s;
+    }
+    .mail-actions button:hover {
+      background: #a20d24;
+    }
+  </style>
+</head>
+<body>
+  <div class="mail-container">
+    <h1 data-translate="mail_title">Mail</h1>
+    <p id="mail-subtitle" data-translate="mail_subtitle">
+      Pour envoyer un mail concernant un retour d'expérience, une remarque, un défaut ou une suggestion, entrez votre texte dans la zone suivante, entrez votre email et cliquez sur "envoyer". Notre équipe vous recontactera au plus tôt le cas échéant.
+    </p>
+
+    <form id="contact-form" novalidate>
+      <div class="mail-field">
+        <label for="mail-text" data-translate="mail_body_label">Votre message</label>
+        <textarea id="mail-text" name="message" data-translate-placeholder="mail_body_placeholder" placeholder="Votre texte..."></textarea>
+      </div>
+
+      <div class="mail-field">
+        <label for="mail-email" data-translate="mail_email_label">Votre email</label>
+        <input id="mail-email" name="email" type="email" data-translate-placeholder="mail_email_placeholder" placeholder="votre@email.com">
+      </div>
+
+      <!-- Honeypot anti-bot -->
+      <input type="text" name="website" value="" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+      <div class="mail-actions">
+        <button id="mail-send" type="submit" data-translate="mail_send">Envoyer</button>
+        <button id="mail-back" type="button" data-translate="back">RETOUR</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const tm = window.translationManager;
+      const setPlaceholders = () => {
+        const body = document.getElementById('mail-text');
+        const email = document.getElementById('mail-email');
+        if (body && tm?.isLoaded) {
+          const txt = tm.translate('mail_body_placeholder');
+          if (txt) body.placeholder = txt;
+        }
+        if (email && tm?.isLoaded) {
+          const txt = tm.translate('mail_email_placeholder');
+          if (txt) email.placeholder = txt;
+        }
+      };
+
+      if (tm && tm.init) {
+        tm.init().then(() => {
+          if (window.languageSelector?.createSelector) {
+            window.languageSelector.createSelector();
+            window.languageSelector.updateSelectorValue();
+          }
+          setPlaceholders();
+        });
+      } else {
+        setPlaceholders();
+      }
+
+      const form = document.getElementById('contact-form');
+      const sendBtn = document.getElementById('mail-send');
+      const backBtn = document.getElementById('mail-back');
+      const bodyEl = document.getElementById('mail-text');
+      const emailEl = document.getElementById('mail-email');
+
+      const t = (key, fallback) => (tm && tm.isLoaded ? tm.translate(key) : fallback);
+
+      function showSentModal() {
+        if (document.getElementById('mail-sent-overlay')) return;
+
+        const overlay = document.createElement('div');
+        overlay.id = 'mail-sent-overlay';
+        overlay.style.position = 'fixed';
+        overlay.style.inset = '0';
+        overlay.style.background = 'rgba(0,0,0,0.6)';
+        overlay.style.display = 'flex';
+        overlay.style.alignItems = 'center';
+        overlay.style.justifyContent = 'center';
+        overlay.style.zIndex = '9999';
+
+        const box = document.createElement('div');
+        box.style.background = '#fff';
+        box.style.padding = '20px 22px';
+        box.style.borderRadius = '12px';
+        box.style.boxShadow = '0 12px 30px rgba(0,0,0,0.25)';
+        box.style.maxWidth = '420px';
+        box.style.width = '90%';
+        box.style.textAlign = 'center';
+        box.style.fontFamily = 'system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif';
+
+        const title = document.createElement('h3');
+        title.textContent = t('mail_sent_title', 'Message envoyé');
+        title.style.marginTop = '0';
+        title.style.color = '#14365c';
+
+        const msg = document.createElement('p');
+        msg.textContent = t(
+          'mail_sent_message',
+          'Votre message a été envoyé.'
+        );
+        msg.style.color = '#444';
+        msg.style.marginBottom = '16px';
+
+        const ok = document.createElement('button');
+        ok.textContent = t('mail_sent_ok', 'OK');
+        ok.style.padding = '10px 18px';
+        ok.style.border = 'none';
+        ok.style.borderRadius = '10px';
+        ok.style.background = '#c8102e';
+        ok.style.color = '#fff';
+        ok.style.fontWeight = '700';
+        ok.style.cursor = 'pointer';
+
+        ok.addEventListener('click', () => {
+          window.location.href = 'instructions.html';
+        });
+
+        overlay.addEventListener('click', (e) => {
+          if (e.target === overlay) {
+            window.location.href = 'instructions.html';
+          }
+        });
+
+        box.appendChild(title);
+        box.appendChild(msg);
+        box.appendChild(ok);
+        overlay.appendChild(box);
+        document.body.appendChild(overlay);
+      }
+
+      async function sendMail(evt) {
+        if (evt) evt.preventDefault();
+        const body = (bodyEl?.value || '').trim();
+        const email = (emailEl?.value || '').trim();
+        if (!body) {
+          alert(t('mail_error_body', 'Le texte de l\'email est manquant'));
+          return;
+        }
+        if (!email) {
+          alert(t('mail_error_email', 'Votre email est manquant'));
+          return;
+        }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          alert(t('mail_error_email_format', 'Format d\'email invalide'));
+          return;
+        }
+
+        // Récupérer la ville et la version
+        const city = 'Mons';
+        const userVersion = localStorage.getItem('user_version') || 'LITE';
+        const versionText = userVersion === 'FULL' ? 'Full' : 'Lite';
+        
+        // Ajouter les informations au début du message
+        const messageWithContext = `Message concernant CityLoopQuest ${city} version ${versionText}\n\n${body}`;
+
+        const endpointBase =
+          (window.APP_CONFIG?.API_BASE && window.APP_CONFIG.API_BASE.replace(/\/+$/, '')) ||
+          (window.API_BASE_URL && window.API_BASE_URL.replace(/\/+$/, '')) ||
+          'https://cityloopquest-api.onrender.com';
+        const endpoint = `${endpointBase}/api/contact`;
+
+        try {
+          const payload = {
+            fromEmail: email,
+            message: messageWithContext
+          };
+          // Ajouter fromName seulement s'il est défini
+          // Ajouter website seulement s'il n'est pas vide
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          if (!res.ok) {
+            throw new Error('send_failed');
+          }
+          form?.reset();
+          showSentModal();
+        } catch (e) {
+          alert(t('mail_send_fail', 'Envoi impossible, réessayez plus tard.'));
+        }
+      }
+
+      if (form) form.addEventListener('submit', sendMail);
+      if (backBtn) backBtn.addEventListener('click', () => {
+        window.location.href = 'instructions.html';
+      });
+    });
+  </script>
+</body>
+</html>
+

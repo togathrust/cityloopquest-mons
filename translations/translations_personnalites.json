@@ -1,0 +1,64 @@
+{
+  "fr": {
+    "mainTitle": "CityLoop Quest Mons - La Chevauchée de Saint Georges",
+    "personnalitesMontoises": "🎓 Personnalités montoises",
+    "artistesCelebres": "🎨 Artistes célèbres",
+    "backButton": "RETOUR"
+  },
+  "en": {
+    "mainTitle": "CityLoop Quest Mons - The Ride of Saint George",
+    "personnalitesMontoises": "🎓 Mons Personalities",
+    "artistesCelebres": "🎨 Famous Artists",
+    "backButton": "BACK"
+  },
+  "nl": {
+    "mainTitle": "CityLoop Quest Mons - De Ruiterstoet van Sint Georges",
+   "personnalitesMontoises": "🎓 Beroemde personen uit Bergen",
+   "artistesCelebres": "🎨 Beroemde kunstenaars",
+   "backButton": "TERUG"
+  },
+  "de": {
+  "mainTitle": "CityLoop Quest Mons - Der Ritt des heiligen Georg",
+  "personnalitesMontoises": "🎓 Persönlichkeiten aus Mons",
+  "artistesCelebres": "🎨 Berühmte Künstler",
+  "backButton": "ZURÜCK"
+},
+"it": {
+"mainTitle": "CityLoop Quest Mons - La Cavalcata di San Giorgio",
+"personnalitesMontoises": "🎓 Personalità di Mons",
+"artistesCelebres": "🎨 Artisti celebri",
+"backButton": "INDIETRO"
+},
+"es": {
+  "mainTitle": "CityLoop Quest Mons - La Cabalgata de San Jorge",
+  "personnalitesMontoises": "🎓 Personalidades de Mons",
+  "artistesCelebres": "🎨 Artistas célebres",
+  "backButton": "VOLVER"
+},
+"pl": {
+  "mainTitle": "CityLoop Quest Mons - Szarża świętego Jerzego",
+  "personnalitesMontoises": "🎓 Osobistości z Mons",
+  "artistesCelebres": "🎨 Słynni artyści",
+  "backButton": "POWRÓT"
+},
+"ar": {
+"mainTitle": "CityLoop Quest Mons - حملة القديس جورج",
+"personnalitesMontoises": "🎓 شخصيات من مونس",
+"artistesCelebres": "🎨 فنانون مشهورون",
+"backButton": "رجوع"
+},
+"cn": {
+"mainTitle": "CityLoop Quest Mons - 圣乔治的骑行",
+"personnalitesMontoises": "🎓 蒙斯人物",
+"artistesCelebres": "🎨 著名艺术家",
+"backButton": "返回"
+},
+
+  "jp": {
+    "mainTitle": "CityLoop Quest Mons - 聖ゲオルギウスの騎行",
+    "personnalitesMontoises": "🎓 モンスの著名人",
+    "artistesCelebres": "🎨 著名な芸術家",
+    "backButton": "戻る"
+  }
+}
+

@@ -1,0 +1,33 @@
+{
+  "target": "browser",
+  "compact": true,
+  "stringArray": true,
+  "stringArrayEncoding": ["rc4"],
+  "rotateStringArray": true,
+  "controlFlowFlattening": true,
+  "controlFlowFlatteningThreshold": 0.75,
+  "deadCodeInjection": true,
+  "deadCodeInjectionThreshold": 0.4,
+  "selfDefending": false,
+  "disableConsoleOutput": false,
+  "renameGlobals": false,
+  "identifierNamesGenerator": "hexadecimal",
+  "numbersToExpressions": true,
+  "simplify": true,
+  "transformObjectKeys": true,
+  "reservedStrings": [
+    "question",
+    "options",
+    "answer"
+  ],
+  "reservedNames": [
+    "ServiceWorkerGlobalScope",
+    "Workbox",
+    "Stripe",
+    "google",
+    "grecaptcha",
+    "navigator",
+    "window",
+    "location"
+  ]
+}

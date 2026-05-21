@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>La Ducasse Rituelle - Les Origines et l'Évolution</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=EB+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="js/access-control.js"></script>
+  <script src="translations/translationManager.js"></script>
+  <script src="translations/languageSelector.js"></script>
+  
+<!-- Garde d'accès : bloque l'accès si aucun code d'activation valide (clq_short_code) -->
+<script src="js/access-guard.js" defer></script>
+
+
+  <style>
+    body {
+      background: url('images/fond_parchemin.jpg') repeat;
+      background-size: 400px;
+      font-family: 'EB Garamond', 'Georgia', serif;
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      color: #3a2a0a;
+    }
+    
+    .back-button {
+      position: fixed;
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
+      z-index: 1000;
+      padding: 10px 14px;
+      background: linear-gradient(135deg, #c8102e, #a00d24);
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px 0 0 8px;
+      cursor: pointer;
+      box-shadow: 0 0 6px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+    }
+    
+    .back-button:hover {
+      background: linear-gradient(135deg, #a00d24, #800a1c);
+      transform: translateY(-50%) scale(1.05);
+    }
+    
+    .content-container {
+      max-width: 900px;
+      margin: 80px auto 30px auto;
+      padding: 0 20px;
+    }
+    
+    .parchemin-content {
+      font-family: 'EB Garamond', 'Georgia', serif;
+      color: #3a2a0a;
+      font-size: 1.15em;
+      line-height: 1.6;
+      width: 80%;
+      margin: 0 auto;
+    }
+    
+    .parchemin-content h1 {
+      font-family: 'MedievalSharp', 'Cinzel Decorative', serif;
+      color: #7c4a02;
+      font-size: 2.2em;
+      margin-top: 0;
+      margin-bottom: 30px;
+      letter-spacing: 1px;
+      text-shadow: 1px 1px 0 #fffbe6;
+      text-align: center;
+    }
+    
+    .parchemin-content h2 {
+      font-family: 'MedievalSharp', 'Cinzel Decorative', serif;
+      color: #7c4a02;
+      font-size: 1.6em;
+      margin-top: 30px;
+      margin-bottom: 15px;
+      letter-spacing: 0.5px;
+      text-shadow: 1px 1px 0 #fffbe6;
+    }
+    
+    .parchemin-content h3 {
+      font-family: 'MedievalSharp', 'Cinzel Decorative', serif;
+      color: #7c4a02;
+      font-size: 1.3em;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      letter-spacing: 0.3px;
+      text-shadow: 1px 1px 0 #fffbe6;
+    }
+    
+    .parchemin-content p {
+      margin-bottom: 15px;
+      text-align: justify;
+    }
+    
+    @media (max-width: 768px) {
+      .parchemin-content {
+        width: 95%;
+        font-size: 1em;
+      }
+      
+      .parchemin-content h1 {
+        font-size: 1.8em;
+      }
+      
+      .parchemin-content h2 {
+        font-size: 1.4em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="main-header">
+    <div class="header-content">
+      <img src="images/icone titre0.png" alt="Icone 0" class="header-img left">
+      <h1>CityLoop Quest Mons - La Chevauchée de Saint Georges</h1>
+      <img src="images/icone titre1.png" alt="Icone 1" class="header-img right">
+    </div>
+  </header>
+
+  <div class="content-container">
+    <div class="parchemin-content" id="content">
+      <!-- Le contenu sera chargé dynamiquement -->
+    </div>
+  </div>
+
+  <button class="back-button" id="back-button"></button>
+
+  <script>
+    let currentLanguage = 'fr';
+    let translations = {};
+
+    // Initialiser le sélecteur de langue personnalisé
+    function initLanguageSelector() {
+      // Supprimer l'ancien sélecteur s'il existe encore
+      const oldSelector = document.querySelector('.language-selector');
+      if (oldSelector) {
+        oldSelector.remove();
+      }
+      
+      if (window.languageSelector) {
+        window.languageSelector.createSelector();
+        window.languageSelector.updateSelectorValue();
+      }
+    }
+
+    // Charger les traductions
+    async function loadTranslations() {
+      try {
+        const response = await fetch('translations/translations_la_ducasse_rituelle_les_origines_et_evolution.json');
+        translations = await response.json();
+        
+        // Restaurer la langue précédemment sélectionnée
+        const savedLanguage = localStorage.getItem('selectedLanguage') || 'fr';
+        currentLanguage = savedLanguage;
+        
+        // Mettre à jour le sélecteur de langue personnalisé
+        if (window.languageSelector) {
+          window.languageSelector.updateSelectorValue();
+        }
+        
+        updateContent();
+      } catch (error) {
+        console.error('Erreur lors du chargement des traductions:', error);
+      }
+    }
+
+    // Mettre à jour le contenu selon la langue
+    function updateContent() {
+      const contentDiv = document.getElementById('content');
+      const langData = translations[currentLanguage];
+      
+      if (langData) {
+        contentDiv.innerHTML = `
+          <h1>${langData.title}</h1>
+          <div>${langData.content}</div>
+        `;
+        
+        // Mettre à jour le titre de l'en-tête
+        const headerTitle = document.querySelector('.header-content h1');
+        if (headerTitle) {
+          headerTitle.textContent = langData.headerTitle || 'La Chevauchée de Saint Georges';
+        }
+        
+        // Mettre à jour le bouton retour
+        const backButton = document.getElementById('back-button');
+        if (backButton && langData.backButton) {
+          backButton.textContent = langData.backButton;
+        } else {
+        }
+      } else {
+        console.error('Aucune donnée trouvée pour la langue:', currentLanguage);
+        contentDiv.innerHTML = '<h1>Erreur</h1><p>Aucune traduction trouvée pour la langue: ' + currentLanguage + '</p>';
+      }
+    }
+
+    // Gestionnaire du bouton retour
+    document.getElementById('back-button').addEventListener('click', function() {
+      window.location.href = "folklore.html";
+    });
+
+    // Écouter les changements de langue
+    document.addEventListener('languageChanged', function(event) {
+      currentLanguage = event.detail.language;
+      updateContent();
+    });
+
+    // Charger les traductions au chargement de la page
+    document.addEventListener('DOMContentLoaded', function() {
+      // Vérifier l'accès à la page
+      if (!window.checkPageAccess('la_ducasse_rituelle_les_origines_et_lévolution.html')) {
+        return;
+      }
+      
+      // Forcer la mise à jour du cache en ajoutant un timestamp
+      ('🔄 Chargement de la page origines et évolution avec nouveau sélecteur');
+      
+      loadTranslations();
+      initLanguageSelector();
+      
+      // Vérifier que le nouveau sélecteur est bien présent
+      setTimeout(() => {
+        const newSelector = document.getElementById('language-selector');
+        if (newSelector) {
+        } else {
+        }
+      }, 1000);
+    });
+  </script>
+</body>
+</html>

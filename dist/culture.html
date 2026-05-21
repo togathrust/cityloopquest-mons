@@ -1,0 +1,244 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Espace Culturel Montois</title><link rel="stylesheet" href="style.css"><script src="translations/translationManager.js"></script><script src="translations/languageSelector.js"></script><script src="api-base.js"></script><script src="js/access-control.js"></script><script src="js/access-guard.js" defer="defer"></script></head><body><header class="main-header"><div class="header-content"><img src="images/icone titre0.png" alt="Icone 0" class="header-img left"><h1 data-translate="title_chevauchee">CityLoop Quest Mons - La Chevauchée de Saint Georges</h1><img src="images/icone titre1.png" alt="Icone 1" class="header-img right"></div></header><main style="text-align:center;padding:20px"><h2 data-translate="culture_subtitle">Explorez le patrimoine culturel de Mons</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:600px;margin:auto"><button data-culture-target="chansons.html" data-requires-full="0" data-translate="culture_btn_1">🎵 Chansons</button> <button data-culture-target="musees.html" data-requires-full="0" data-translate="culture_btn_3">🏛️ Musées</button> <button data-culture-target="personnalites.html" data-requires-full="1" data-translate="culture_btn_4">👤 Personnalités</button> <button data-culture-target="histoire-ville.html" data-requires-full="1" data-translate="culture_btn_2">📜 Histoire de la Ville</button> <button data-culture-target="folklore.html" data-requires-full="1" data-translate="culture_btn_5">🎭 Folklore</button> <button data-culture-target="evenements.html" data-requires-full="1" data-translate="culture_btn_6">🎉 Évènements/Photos/Vidéos</button> <button id="btn-histoire-doudou" data-translate="culture_btn_histoire_doudou">Histoire du doudou</button> <button id="btn-parler-montois" data-translate="culture_btn_parler_montois">Parler montois</button> <button id="btn-infos-contacts" data-translate="culture_btn_infos_contacts">Infos / Contacts</button></div><div style="margin-top:40px"></div></main><button class="back-button" id="back-button" data-translate="back">BACK</button><script>// ----------------- INIT PAGE / LANGUE -----------------
+function initCulturePage() {
+  if (window.translationManager?.isLoaded) {
+    window.languageSelector?.createSelector?.();
+    window.languageSelector?.updateSelectorValue?.();
+  } else {
+    setTimeout(initCulturePage, 100);
+  }
+}
+
+// ----------------- NAVIGATION CULTURE -----------------
+function goToCulturePage(target, requiresFull) {
+  const version = window.accessControl?.currentVersion;
+
+  if (requiresFull) {
+    // délégué au contrôleur central
+    if (window.checkPageAccess && !window.checkPageAccess(target)) return;
+  }
+  window.location.href = target;
+}
+
+// ----------------- POPUPS -----------------
+
+// 🔒 Histoire du doudou (protégé via feature “histoire_doudou”)
+function showHistoireDoudouPopup() {
+  if (document.getElementById('popup-histoire-doudou')) return;
+
+  const overlay = document.createElement('div');
+  overlay.id = 'popup-histoire-doudou';
+  Object.assign(overlay.style, {
+    position:'fixed', top:0, left:0, width:'100vw', height:'100vh',
+    background:'rgba(0,0,0,0.7)', display:'flex', alignItems:'center',
+    justifyContent:'center', zIndex:9999
+  });
+
+  const box = document.createElement('div');
+  Object.assign(box.style, {
+    background:'#fffbe6', border:'4px solid #b8860b', borderRadius:'18px',
+    boxShadow:'0 0 24px #0008', padding:'18px 8px 8px', maxWidth:'90vw',
+    width:'700px', maxHeight:'90vh', textAlign:'center', position:'relative',
+    display:'flex', flexDirection:'column'
+  });
+
+  const backBtn = document.createElement('button');
+  backBtn.textContent = window.translationManager?.translate('back') || '⬅️ Retour';
+  Object.assign(backBtn.style, {
+    background:'#c8102e', color:'#fff', fontWeight:'bold', border:'none',
+    borderRadius:'8px', padding:'10px 18px', fontSize:'1em', cursor:'pointer',
+    marginBottom:'10px', alignSelf:'flex-start'
+  });
+  backBtn.onclick = () => document.body.removeChild(overlay);
+  box.appendChild(backBtn);
+
+  const iframe = document.createElement('iframe');
+  iframe.src = 'https://www.beljike.be/beljike-langues-cultures-walon-culture-creyativite-sociale-folklore-fiesses-avou-one-date-maiy-asincion-trinite-el-doudou-mont/';
+  Object.assign(iframe.style, { width:'100%', height:'70vh', border:'none', borderRadius:'12px' });
+  box.appendChild(iframe);
+
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+}
+
+// 🔓 Parler montois : toujours accessible
+function showParlerMontoisPopup() {
+  if (document.getElementById('popup-parler-montois')) return;
+
+  const overlay = document.createElement('div');
+  overlay.id = 'popup-parler-montois';
+  Object.assign(overlay.style, {
+    position:'fixed', top:0, left:0, width:'100vw', height:'100vh',
+    background:'rgba(0,0,0,0.7)', display:'flex', alignItems:'center',
+    justifyContent:'center', zIndex:9999
+  });
+
+  const box = document.createElement('div');
+  Object.assign(box.style, {
+    background:'#fffbe6', border:'4px solid #b8860b', borderRadius:'18px',
+    boxShadow:'0 0 24px #0008', padding:'32px 24px 24px', maxWidth:'90vw',
+    width:'500px', maxHeight:'90vh', overflowY:'auto', textAlign:'left', position:'relative'
+  });
+
+  const backBtn = document.createElement('button');
+  backBtn.textContent = window.translationManager?.translate('back') || '⬅️ Retour';
+  Object.assign(backBtn.style, {
+    background:'#c8102e', color:'#fff', fontWeight:'bold', border:'none',
+    borderRadius:'8px', padding:'10px 18px', fontSize:'1em', cursor:'pointer', marginBottom:'18px'
+  });
+  backBtn.onclick = () => document.body.removeChild(overlay);
+  box.appendChild(backBtn);
+
+  const yt = document.createElement('iframe');
+  yt.src = 'https://www.youtube.com/embed/KqFTCMchOgg?si=a7u_TrB0vIJZGyI5';
+  yt.width = '100%'; yt.height = '315'; yt.frameBorder = '0';
+  yt.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+  yt.referrerPolicy = 'strict-origin-when-cross-origin'; yt.allowFullscreen = true;
+  Object.assign(yt.style, { borderRadius:'12px', marginBottom:'20px' });
+  box.appendChild(yt);
+
+  const currentLang = window.translationManager?.getCurrentLanguage?.() || 'fr';
+  const phrases = window.translationManager?.translations?.[currentLang]?.phrases || [];
+  const labels = {
+    lang: window.translationManager?.translate('montois_in_french') || 'En français :',
+    mt:   window.translationManager?.translate('montois_in_montois') || 'En montois :'
+  };
+  const key = ['fr','en','nl','de','it','es','pl','cn','ar','jp'].includes(currentLang) ? currentLang : 'fr';
+
+  if (phrases.length) {
+    phrases.forEach(p => {
+      const langDiv = document.createElement('div');
+      langDiv.style.fontWeight = 'bold';
+      langDiv.style.marginTop  = '10px';
+      langDiv.textContent = `${labels.lang} "${p[key]}"`;
+      box.appendChild(langDiv);
+
+      const mt = document.createElement('div');
+      mt.style.marginLeft = '18px';
+      mt.style.marginBottom = '8px';
+      mt.style.color = '#b8860b';
+      mt.textContent = `${labels.mt} "${p.mt}"`;
+      box.appendChild(mt);
+    });
+  } else {
+    const err = document.createElement('div');
+    err.textContent = 'Les traductions ne sont pas disponibles pour le moment.';
+    err.style.color = '#c8102e';
+    err.style.fontWeight = 'bold';
+    err.style.textAlign = 'center';
+    err.style.padding = '20px';
+    box.appendChild(err);
+  }
+
+  const more = document.createElement('div');
+  Object.assign(more.style, {
+    marginTop:'20px', paddingTop:'20px', borderTop:'2px solid #b8860b',
+    textAlign:'center', fontSize:'0.9em', fontStyle:'italic', color:'#333'
+  });
+  const txt = window.translationManager?.translate('montois_more_info')
+    || "Visitez le site https://www.beljike.be/mots-courants-wallon-lexique/ pour plus d'informations et de phrases en Montois";
+  more.innerHTML = txt.replace('https://www.beljike.be/mots-courants-wallon-lexique/',
+    '<a href="https://www.beljike.be/mots-courants-wallon-lexique/" target="_blank" style="color:#b8860b;font-weight:bold;text-decoration:underline;">https://www.beljike.be/mots-courants-wallon-lexique/</a>');
+  box.appendChild(more);
+
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+}
+
+// 🔓 Infos / Contacts : toujours accessible
+function showInfosContactsPopup() {
+  if (document.getElementById('popup-infos-contacts')) return;
+
+  const overlay = document.createElement('div');
+  overlay.id = 'popup-infos-contacts';
+  Object.assign(overlay.style, {
+    position:'fixed', top:0, left:0, width:'100vw', height:'100vh',
+    background:'rgba(0,0,0,0.7)', display:'flex', alignItems:'center',
+    justifyContent:'center', zIndex:9999
+  });
+
+  const box = document.createElement('div');
+  Object.assign(box.style, {
+    background:'#fffbe6', border:'4px solid #b8860b', borderRadius:'18px',
+    boxShadow:'0 0 24px #0008', padding:'32px 24px 24px', maxWidth:'90vw',
+    width:'500px', maxHeight:'90vh', overflowY:'auto', textAlign:'left', position:'relative'
+  });
+
+  const backBtn = document.createElement('button');
+  backBtn.textContent = window.translationManager?.translate('back') || '⬅️ Retour';
+  Object.assign(backBtn.style, {
+    background:'#c8102e', color:'#fff', fontWeight:'bold', border:'none',
+    borderRadius:'8px', padding:'10px 18px', fontSize:'1em', cursor:'pointer', marginBottom:'18px'
+  });
+  backBtn.onclick = () => document.body.removeChild(overlay);
+  box.appendChild(backBtn);
+
+  fetch('data/contacts.json')
+    .then(r => r.json())
+    .then(all => {
+      const lang = localStorage.getItem('selectedLanguage') || 'fr';
+      const contacts = all[lang] || all['fr'] || [];
+      contacts.forEach(entry => {
+        const title = document.createElement('div');
+        title.innerHTML = entry.title;
+        Object.assign(title.style, { fontSize:'1.1em', margin:'18px 0 6px', color:'#b30000', fontWeight:'bold' });
+        box.appendChild(title);
+
+        const ul = document.createElement('ul');
+        Object.assign(ul.style, { margin:'0 0 10px 18px', padding:'0 0 0 10px', listStyle:'disc inside' });
+        for (const k in entry.info) {
+          const li = document.createElement('li');
+          li.innerHTML = `<b>${k} :</b> ${entry.info[k]}`;
+          li.style.marginBottom = '2px';
+          ul.appendChild(li);
+        }
+        box.appendChild(ul);
+      });
+    })
+    .catch(() => {
+      const err = document.createElement('div');
+      err.textContent = 'Erreur de chargement des contacts.';
+      err.style.color = 'red';
+      err.style.marginTop = '20px';
+      box.appendChild(err);
+    });
+
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+}
+
+// ----------------- Changement de langue -----------------
+document.addEventListener('languageChanged', (evt) => {
+  ['popup-parler-montois','popup-histoire-doudou','popup-infos-contacts'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) document.body.removeChild(el);
+  });
+});
+
+// ----------------- DOM READY -----------------
+document.addEventListener('DOMContentLoaded', () => {
+  initCulturePage();
+
+  // Back
+  document.getElementById('back-button')?.addEventListener('click', () => {
+    window.location.href = 'main.html';
+  });
+
+  // Boutons de navigation culture
+  document.querySelectorAll('[data-culture-target]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.getAttribute('data-culture-target');
+      const requiresFull = btn.getAttribute('data-requires-full') === '1';
+      goToCulturePage(target, requiresFull);
+    });
+  });
+
+  // Popups
+  document.getElementById('btn-histoire-doudou')?.addEventListener('click', () => {
+    // 🔒 protégé via feature
+    if (window.checkFeatureAccess && !window.checkFeatureAccess('histoire_doudou')) return;
+    showHistoireDoudouPopup();
+  });
+
+  document.getElementById('btn-parler-montois')?.addEventListener('click', showParlerMontoisPopup);
+  document.getElementById('btn-infos-contacts')?.addEventListener('click', showInfosContactsPopup);
+});</script></body></html>
