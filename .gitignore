@@ -1,6 +1,18 @@
 # Local Netlify folder
 .netlify
 
+# Visual Studio
+.vs/
+
+# Cache généré (enrichissement POI)
+data/pois_geocoded_cache.json
+
+# Dépendances
+node_modules/
+
+# Build (regénéré par `npm run build`, publié par Netlify)
+dist/
+
 # Fichiers sensibles - clés API
 .env
 .env.local

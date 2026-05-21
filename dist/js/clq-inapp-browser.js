@@ -1,1 +1,0 @@
-!function(){function n(){"function"==typeof window.clqNeedsSafariForGeo&&window.clqNeedsSafariForGeo()&&"function"==typeof window.clqShowInAppSafariOverlay&&window.clqShowInAppSafariOverlay()}"loading"===document.readyState?document.addEventListener("DOMContentLoaded",n):n()}();

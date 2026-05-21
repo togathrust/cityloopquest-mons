@@ -1,8 +1,0 @@
-# Local Netlify folder
-.netlify
-
-# Fichiers sensibles - clés API
-.env
-.env.local
-Clé API.txt
-api-key.js

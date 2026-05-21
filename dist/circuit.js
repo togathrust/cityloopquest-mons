@@ -1,1 +1,0 @@
-function confirmYes(){localStorage.setItem("selectedCircuit",selectedCircuit);const e={grand:"long",moyen:"moyen",petit:"court"}[selectedCircuit];localStorage.setItem("mons_parcoursType",e),setTimeout(()=>{window.location.href="main.html"},500)}

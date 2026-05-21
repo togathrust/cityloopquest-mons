@@ -1,1 +1,0 @@
-window.APP_VERSION="26.05.06";
