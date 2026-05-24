@@ -3,6 +3,17 @@ const API_BASE =
   (window.API_BASE_URL && window.API_BASE_URL.replace(/\/+$/, '')) ||
   'https://cityloopquest-api.onrender.com';
 
+function getCityStoragePrefix() {
+  if (window.CLQ_CITY && window.CLQ_CITY.storagePrefix) {
+    return window.CLQ_CITY.storagePrefix;
+  }
+
+  const hostAndPath = `${window.location.hostname || ''} ${window.location.pathname || ''}`.toLowerCase();
+  if (hostAndPath.includes('mons')) return 'mons';
+  if (hostAndPath.includes('bruxelles') || hostAndPath.includes('bxl')) return 'bruxelles';
+  return 'murcia';
+}
+
 // 🔹 Helper : savoir si on est sur la page d'accueil / sélection de langue
 function isLandingPage() {
   const path = window.location.pathname || '';
@@ -377,7 +388,7 @@ class AccessControl {
       throw new Error('whoami_parse_error');
     }
 
-    const city = me.city_slug || 'murcia';
+    const city = me.city_slug || getCityStoragePrefix();
     const activation_code = (me.short_code || '').toLowerCase(); // short_code de la licence LITE
 
     if (!activation_code) {
@@ -479,11 +490,11 @@ class AccessControl {
           ? window.currentIndex
           : null,
       completedQuizQuestions: JSON.parse(
-        localStorage.getItem('murcia_completedQuizQuestions') || '{}',
+        localStorage.getItem(`${getCityStoragePrefix()}_completedQuizQuestions`) || '{}',
       ),
       score: typeof window.score !== 'undefined' ? window.score : null,
       selectedCircuit: localStorage.getItem('selectedCircuit') || null,
-      quizEnabled: localStorage.getItem('murcia_quizEnabled') === 'true',
+      quizEnabled: localStorage.getItem(`${getCityStoragePrefix()}_quizEnabled`) === 'true',
       lastUrl: completeUrl,
       currentPath: currentPath,
       currentSearch: currentSearch,
@@ -514,7 +525,7 @@ class AccessControl {
       }
 
       localStorage.setItem(
-        'murcia_completedQuizQuestions',
+        `${getCityStoragePrefix()}_completedQuizQuestions`,
         JSON.stringify(s.completedQuizQuestions || {}),
       );
 
@@ -523,7 +534,7 @@ class AccessControl {
       }
 
       localStorage.setItem(
-        'murcia_quizEnabled',
+        `${getCityStoragePrefix()}_quizEnabled`,
         s.quizEnabled ? 'true' : 'false',
       );
 

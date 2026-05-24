@@ -41,8 +41,16 @@
     return (nine.match(/.{1,3}/g) || [nine]).join('-'); // xxx-xxx-xxx
   }
 
-  function hasValidShortCode() {
+  function hasValidAccess() {
     try {
+      if (
+        localStorage.getItem('clq_has_access') === '1' ||
+        localStorage.getItem('clq_token') ||
+        localStorage.getItem('jwt')
+      ) {
+        return true;
+      }
+
       const stored = localStorage.getItem(SHORT_CODE_KEY);
       if (!stored) return false;
 
@@ -115,7 +123,7 @@
   }
 
   // Exécution du garde dès le chargement du script
-  if (!hasValidShortCode()) {
+  if (!hasValidAccess()) {
     showBlockedPopupAndRedirect();
   }
 })();
