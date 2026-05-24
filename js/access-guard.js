@@ -1,33 +1,31 @@
-// Désactiver totalement la garde d'accès sur la page d'accueil (sélection de langue)
+/**
+ * js/access-guard.js
+ * Garde d'accès : bloque l'affichage des pages si aucun code d'activation valide (clq_short_code).
+ *
+ * ⚠️ BYPASS TESTS LOCAUX (désactivation temporaire pour développement) :
+ * - Sur localhost / 127.0.0.1 : la garde est automatiquement désactivée
+ * - Avec ?dev=1 dans l'URL : désactivation (ex. pour tester depuis mobile sur le réseau)
+ * - En production (domaine déployé) : la garde reste ACTIVE, aucune action requise
+ *
+ * RAPPEL DÉPLOIEMENT : En production (domaine déployé), la garde est automatiquement ACTIVE.
+ */
+
 (function () {
   const path = window.location.pathname || '';
   const file = (path.split('/').pop() || '').toLowerCase();
 
   // Sur Netlify, quand on arrive par la racine, file peut être '' → on considère que c'est index.html
   if (file === '' || file === 'index.html' || file === 'index.htm') {
-    // On ne fait rien sur la landing page
-    // console.log('[ACCESS-GUARD] désactivé sur la page drapeaux');
     return;
   }
 
-// Ne rien faire sur la page d'accueil / sélection de langue
-(function () {
-  const path = window.location.pathname || '';
-  const file = path.split('/').pop() || 'index.html';
-
-  if (
-    file === '' ||
-    file === 'index.html' ||
-    file === 'index.htm'
-  ) {
-    // On sort du IIFE → aucune logique de garde sur la landing page
-    return;
+  // Bypass pour tests locaux : localhost OU paramètre ?dev=1
+  const isLocalDev =
+    /^localhost$|^127\.0\.0\.1$|^\[::1\]$/.test(window.location.hostname) ||
+    window.location.search.includes('dev=1');
+  if (isLocalDev) {
+    return; // Ne pas bloquer - tests locaux uniquement
   }
-
-})();
-
-
-// js/access-guard.js
 (function () {
   const SHORT_CODE_KEY = 'clq_short_code';
 

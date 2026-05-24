@@ -59,8 +59,6 @@ self.addEventListener('fetch', (event) => {
       isHtmlDocument ||
       path.endsWith('/app.js') ||
       path.endsWith('app.js') ||
-      path.endsWith('/checkout.js') ||
-      path.endsWith('checkout.js') ||
       path.endsWith('/version.js') ||
       path.endsWith('version.js') ||
       path.endsWith('/main.html') ||
@@ -73,7 +71,7 @@ self.addEventListener('fetch', (event) => {
     if (mustNetworkFirst) {
       event.respondWith((async () => {
         try {
-          const fresh = await fetch(req, { cache: 'reload' });
+          const fresh = await fetch(req);
           const runtime = await caches.open(RUNTIME);
           runtime.put(req, fresh.clone());
           return fresh;

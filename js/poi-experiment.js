@@ -1,10 +1,10 @@
-/* Experimental POI explorer for CLQ Mons (no production wiring yet). */
+/* Experimental POI explorer for CLQ Murcia (no production wiring yet). */
 (function () {
   "use strict";
 
-  const DEFAULT_CENTER = { lat: 50.4543, lng: 3.9526 }; // Mons
+  const DEFAULT_CENTER = { lat: 37.9833, lng: -1.1299 }; // Murcia
   const FALLBACK_LANG = "fr";
-  const LS_LAST_POS = "mons_lastKnownPosition";
+  const LS_LAST_POS = "murcia_lastKnownPosition";
   const SUPPORTED_LANGS = ["fr", "en", "nl", "de", "it", "es", "pl", "ar", "zh", "ja"];
   /** Zoom lorsqu'un POI est choisi (liste ou marqueur). */
   const ZOOM_POI_FOCUS = 17;
@@ -729,8 +729,8 @@
   }
 
   async function loadPois() {
-    const res = await fetch("data/pois_mons_experiment.json");
-    if (!res.ok) throw new Error("Impossible de charger pois_mons_experiment.json");
+    const res = await fetch("data/pois_murcia_experiment.json");
+    if (!res.ok) throw new Error("Impossible de charger pois_murcia_experiment.json");
     const data = await res.json();
     const basePois = Array.isArray(data.pois) ? data.pois : [];
     const community = await loadCommunityPois();
@@ -759,7 +759,7 @@
   }
 
   async function loadMasterListPois() {
-    // Sections C–J : points non encore géoconfirmés — voir data/pois_mons_masterlist_v1.txt
+    // Sections C–J : points non encore géoconfirmés — voir data/pois_murcia_masterlist_v1.txt
     return [];
   }
 
@@ -799,8 +799,8 @@
   function updateTourSavedSummary() {
     const el = document.getElementById("tour-saved-summary");
     if (!el) return;
-    const idxRaw = localStorage.getItem("mons_currentIndex");
-    const scoreRaw = localStorage.getItem("mons_score");
+    const idxRaw = localStorage.getItem("murcia_currentIndex");
+    const scoreRaw = localStorage.getItem("murcia_score");
     const idxNum = idxRaw !== null && idxRaw !== "" ? parseInt(idxRaw, 10) : NaN;
     const step = !Number.isNaN(idxNum) ? String(idxNum + 1) : "?";
     const scoreNum = scoreRaw !== null && scoreRaw !== "" ? parseInt(scoreRaw, 10) : NaN;

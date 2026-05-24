@@ -10,7 +10,6 @@ function confirmYes() {
   // Définir le type de parcours pour le selfie
   const parcoursType = {
     grand: 'long',
-    moyen: 'moyen',
     petit: 'court'
   }[selectedCircuit];
   localStorage.setItem('mons_parcoursType', parcoursType);

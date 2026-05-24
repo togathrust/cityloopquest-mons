@@ -1,21 +1,25 @@
 /**
- * Géoloc main.html — Android : clic → getCurrentPosition natif (geste utilisateur).
+ * Géoloc main.html — iOS : watchPosition dans le geste utilisateur (pas getCurrentPosition).
  */
 (function () {
     var OVERLAY_ID = "main-geo-activation-overlay";
     var BTN_ID = "main-geo-activation-btn";
     var GEO_OPTS = {
         enableHighAccuracy: true,
-        timeout: 20000,
-        maximumAge: 0,
-    };
-    var ANDROID_GEO_OPTS = {
-        enableHighAccuracy: true,
-        timeout: 8000,
+        timeout: 25000,
         maximumAge: 0,
     };
     var geoRequestInFlight = false;
-    var androidGeoWatchdogTimer = null;
+    var geoRequestStartedAt = 0;
+    var gestureLockUntil = 0;
+
+    function isMobileDevice() {
+        return /iPhone|iPod|iPad|Android.*Mobile/i.test(navigator.userAgent || "");
+    }
+
+    function isIosDevice() {
+        return /iPhone|iPod|iPad/i.test(navigator.userAgent || "");
+    }
 
     function overlayEl() {
         return document.getElementById(OVERLAY_ID);
@@ -48,13 +52,13 @@
         if (title) {
             title.textContent = t(
                 "main_geo_activate_title",
-                "Autorisation de localisation"
+                "Activer la géolocalisation"
             );
         }
         if (msg) {
             msg.textContent = t(
                 "main_geo_activate_message",
-                "Appuyez sur le bouton pour afficher la demande de localisation du navigateur, puis choisissez « Autoriser »."
+                "Appuyez sur le bouton. Sur iPhone, autorisez la bannière Safari « Autoriser » si elle apparaît."
             );
         }
         if (btn) {
@@ -65,79 +69,35 @@
         }
     }
 
-    function isAndroidDevice() {
-        return /android/i.test(navigator.userAgent || "");
-    }
-
-    function setPromptMessage(message, buttonText) {
+    function setOverlayError(err) {
         var msg = document.getElementById("main-geo-activation-message");
         var btn = document.getElementById(BTN_ID);
-        if (msg) msg.textContent = message;
-        if (btn && buttonText) btn.textContent = buttonText;
-    }
-
-    function showAndroidPermissionBlocked() {
+        if (!msg) return;
+        var code = err && typeof err.code === "number" ? err.code : -1;
+        var text;
+        if (code === 1) {
+            text =
+                "Accès refusé. Réglages → Confidentialité → Localisation → Safari → « Lors de l’utilisation de l’app », puis réessayez.";
+        } else if (code === 2) {
+            text = "Position indisponible. Activez le GPS du téléphone et réessayez.";
+        } else if (code === 3) {
+            text = "Délai dépassé. Sortez à l’extérieur si possible et réessayez.";
+        } else {
+            text =
+                "Impossible d’obtenir la position. Vérifiez la localisation pour Safari, puis réessayez.";
+        }
+        msg.textContent = text;
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = "Réessayer";
+        }
         showPrompt();
-        setPromptMessage(
-            "La localisation est bloquée ou indisponible. Ouvrez Paramètres → Applications → Chrome (ou cette app) → Autorisations → Position, mettez « Autoriser », puis revenez et appuyez sur le bouton.",
-            "Réessayer la localisation"
-        );
-    }
-
-    function showAndroidLocationPending() {
-        setPromptMessage(
-            "Demande en cours… Si la fenêtre Android « Autoriser la position » apparaît, acceptez-la.",
-            "Demande en cours..."
-        );
-    }
-
-    function getNativeGetCurrentPosition() {
-        if (typeof window.clqNativeGetCurrentPosition === "function") {
-            return window.clqNativeGetCurrentPosition;
-        }
-        if (navigator.geolocation) {
-            return navigator.geolocation.getCurrentPosition.bind(
-                navigator.geolocation
-            );
-        }
-        return null;
-    }
-
-    function clearAndroidGeoWatchdog() {
-        if (androidGeoWatchdogTimer) {
-            clearTimeout(androidGeoWatchdogTimer);
-            androidGeoWatchdogTimer = null;
-        }
-    }
-
-    function startAndroidGeoWatchdog() {
-        clearAndroidGeoWatchdog();
-        androidGeoWatchdogTimer = setTimeout(function () {
-            if (!geoRequestInFlight) return;
-            geoRequestInFlight = false;
-            showAndroidPermissionBlocked();
-            if (typeof window.clqOnMainGeoFailed === "function") {
-                try {
-                    window.clqOnMainGeoFailed();
-                } catch (e) {
-                    /* ignore */
-                }
-            }
-            try {
-                window.dispatchEvent(new CustomEvent("clq:main-geo-failed"));
-            } catch (e) {
-                /* ignore */
-            }
-        }, 9000);
     }
 
     function clearMainGeoOnLeave() {
         geoRequestInFlight = false;
-        clearAndroidGeoWatchdog();
         try {
-            localStorage.removeItem("geoPermissionGranted");
             sessionStorage.removeItem("clq_pending_geo_position");
-            sessionStorage.setItem("clq_main_geo_reset", "1");
         } catch (e) {
             /* ignore */
         }
@@ -146,38 +106,18 @@
         }
     }
 
-    function persistPosition(position) {
+    function deliverPositionDesktop(position) {
         try {
-            sessionStorage.setItem(
-                "clq_pending_geo_position",
-                JSON.stringify({
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude,
-                    ts: Date.now(),
-                })
-            );
+            localStorage.setItem("appLaunchedBefore", "true");
         } catch (e) {
             /* ignore */
         }
-    }
-
-    function deliverPosition(position) {
-        clearAndroidGeoWatchdog();
-        persistPosition(position);
         hidePrompt();
-        try {
-            localStorage.setItem("geoPermissionGranted", "true");
-            localStorage.setItem("appLaunchedBefore", "true");
-            sessionStorage.removeItem("clq_main_geo_reset");
-        } catch (e) {
-            /* ignore */
+        if (typeof window.clqResetGeoWrapperState === "function") {
+            window.clqResetGeoWrapperState();
         }
         if (typeof window.clqOnMainGeoActivated === "function") {
-            try {
-                window.clqOnMainGeoActivated(position);
-            } catch (e) {
-                /* ignore */
-            }
+            window.clqOnMainGeoActivated(position);
         }
         try {
             window.dispatchEvent(
@@ -188,106 +128,154 @@
         }
     }
 
-    function onGeoError(error) {
+    function onGeoError(err) {
         geoRequestInFlight = false;
-        clearAndroidGeoWatchdog();
+        window.__clqGeoUserInitiated = false;
         try {
+            localStorage.removeItem("geoPermissionGranted");
+            sessionStorage.removeItem("clq_geo_session_ok");
+        } catch (e) {
+            /* ignore */
+        }
+        setOverlayError(err);
+        try {
+            window.dispatchEvent(
+                new CustomEvent("clq:main-geo-failed", { detail: err || null })
+            );
+        } catch (e) {
+            /* ignore */
+        }
+    }
+
+    function getNativeGetCurrentPosition() {
+        var native = window.__clqGeoNative;
+        if (native && typeof native.getCurrentPosition === "function") {
+            return native.getCurrentPosition.bind(native);
+        }
+        if (
+            navigator.geolocation &&
+            typeof navigator.geolocation.getCurrentPosition === "function"
+        ) {
+            return navigator.geolocation.getCurrentPosition.bind(
+                navigator.geolocation
+            );
+        }
+        return null;
+    }
+
+    function setWaitingUi() {
+        var btn = document.getElementById(BTN_ID);
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = "…";
+        }
+        var msg = document.getElementById("main-geo-activation-message");
+        if (msg) {
+            msg.textContent = isIosDevice()
+                ? "Recherche du GPS… Si une bannière Safari apparaît, touchez « Autoriser ». Ne quittez pas cet écran."
+                : "Demande en cours : choisissez « Autoriser » sur le téléphone.";
+        }
+    }
+
+    function invokeGeolocationRequest() {
+        if (
+            typeof window.clqNeedsSafariForGeo === "function" &&
+            window.clqNeedsSafariForGeo() &&
+            typeof window.clqShowInAppSafariOverlay === "function"
+        ) {
+            window.clqShowInAppSafariOverlay();
+            return;
+        }
+
+        var now = Date.now();
+        if (now < gestureLockUntil) return;
+        gestureLockUntil = now + 800;
+
+        if (geoRequestInFlight && now - geoRequestStartedAt < 28000) {
+            return;
+        }
+
+        geoRequestInFlight = true;
+        geoRequestStartedAt = now;
+        window.__clqGeoUserInitiated = true;
+        setWaitingUi();
+
+        try {
+            sessionStorage.removeItem("clq_geo_session_ok");
             localStorage.removeItem("geoPermissionGranted");
         } catch (e) {
             /* ignore */
         }
-        if (isAndroidDevice()) {
-            showAndroidPermissionBlocked();
-        } else {
-            showPrompt();
-            translateLabels();
-        }
-        if (typeof window.clqOnMainGeoFailed === "function") {
-            try {
-                window.clqOnMainGeoFailed();
-            } catch (e) {
-                /* ignore */
-            }
-        }
-        try {
-            window.dispatchEvent(new CustomEvent("clq:main-geo-failed"));
-        } catch (e) {
-            /* ignore */
-        }
-    }
 
-    function invokeNativeGetCurrentPosition() {
+        if (isMobileDevice()) {
+            var startWatch = function () {
+                if (typeof window.clqStartGeolocationWatchFromGesture === "function") {
+                    window.clqStartGeolocationWatchFromGesture();
+                } else {
+                    onGeoError({ code: 2 });
+                }
+            };
+            if (typeof window.clqEnsureCompassPermission === "function") {
+                window.clqEnsureCompassPermission(startWatch);
+            } else {
+                startWatch();
+            }
+            return;
+        }
+
         var getPos = getNativeGetCurrentPosition();
         if (!getPos) {
-            onGeoError();
+            onGeoError({ code: 2 });
             return;
         }
-        if (isAndroidDevice()) {
-            showAndroidLocationPending();
-            startAndroidGeoWatchdog();
+
+        try {
+            getPos(
+                function (position) {
+                    geoRequestInFlight = false;
+                    window.__clqGeoUserInitiated = false;
+                    deliverPositionDesktop(position);
+                },
+                function (err) {
+                    onGeoError(err || { code: -1 });
+                },
+                GEO_OPTS
+            );
+        } catch (e) {
+            console.error("[CLQ-GEO] getCurrentPosition:", e);
+            onGeoError({ code: 2 });
         }
-        if (typeof window.clqResetGeoWrapperState === "function") {
-            window.clqResetGeoWrapperState();
-        }
-        getPos(
-            function (position) {
-                geoRequestInFlight = false;
-                deliverPosition(position);
-            },
-            function (error) {
-                geoRequestInFlight = false;
-                onGeoError(error);
-            },
-            isAndroidDevice() ? ANDROID_GEO_OPTS : GEO_OPTS
-        );
     }
 
-    function callGetCurrentPosition() {
-        if (geoRequestInFlight) return;
-        if (!navigator.geolocation) {
-            onGeoError();
-            return;
+    function activateFromUserGesture(e) {
+        if (e) {
+            if (e.preventDefault) e.preventDefault();
+            if (e.stopPropagation) e.stopPropagation();
         }
-        geoRequestInFlight = true;
-        // Android : appel synchrone dans le clic (pas de await/query avant getCurrentPosition)
-        invokeNativeGetCurrentPosition();
-    }
-
-    function tryAndroidAutoActivateIfGranted() {
-        if (!isAndroidDevice()) return;
-        if (!navigator.permissions || !navigator.permissions.query) return;
-        navigator.permissions
-            .query({ name: "geolocation" })
-            .then(function (status) {
-                if (status && status.state === "granted") {
-                    callGetCurrentPosition();
-                }
-            })
-            .catch(function () {});
+        invokeGeolocationRequest();
+        return false;
     }
 
     function bindButton() {
         var btn = document.getElementById(BTN_ID);
         if (!btn) return;
-        if (btn.dataset.clqGeoBound !== "1") {
-            btn.dataset.clqGeoBound = "1";
-            btn.addEventListener("click", function () {
-                callGetCurrentPosition();
-            });
-        }
+        btn.dataset.clqGeoBound = "1";
+        btn.onclick = activateFromUserGesture;
     }
 
     function showMainGeoButton() {
+        geoRequestInFlight = false;
+        var btn = document.getElementById(BTN_ID);
+        if (btn) btn.disabled = false;
         bindButton();
         translateLabels();
         showPrompt();
-        tryAndroidAutoActivateIfGranted();
     }
 
     window.clqClearMainGeoOnLeave = clearMainGeoOnLeave;
     window.clqShowMainGeoPrompt = showMainGeoButton;
     window.clqHideMainGeoPrompt = hidePrompt;
-    window.clqActivateMainGeolocation = callGetCurrentPosition;
+    window.clqActivateMainGeolocation = activateFromUserGesture;
     window.clqRequestGeolocationOnMainEnter = showMainGeoButton;
 
     window.addEventListener("pagehide", clearMainGeoOnLeave);

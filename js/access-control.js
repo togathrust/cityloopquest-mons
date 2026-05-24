@@ -40,8 +40,8 @@ class AccessControl {
   // Définir les pages restreintes pour la version LITE
   getRestrictedPages() {
     return {
-      // Circuits restreints : en LITE → "moyen" et "grand" interdits
-      'parcours.html': { type: 'circuit', restricted: ['moyen', 'grand'] },
+      // Circuits restreints : en LITE → "grand" réservé FULL uniquement (petit accessible à tous)
+      'parcours.html': { type: 'circuit', restricted: ['grand'] },
 
       // Pages / contenus culturels restreints en LITE
       // "chansons.html" est volontairement NON restreinte
@@ -59,7 +59,7 @@ class AccessControl {
     return {
       // Popup Histoire du doudou → RESTREINT en LITE
       histoire_doudou: true,
-      // Note: parler_montois et infos_contacts sont libres (non listés)
+      // Note: parler_murcien et infos_contacts sont libres (non listés)
     };
   }
 
@@ -377,7 +377,7 @@ class AccessControl {
       throw new Error('whoami_parse_error');
     }
 
-    const city = me.city_slug || 'mons';
+    const city = me.city_slug || 'murcia';
     const activation_code = (me.short_code || '').toLowerCase(); // short_code de la licence LITE
 
     if (!activation_code) {
@@ -479,11 +479,11 @@ class AccessControl {
           ? window.currentIndex
           : null,
       completedQuizQuestions: JSON.parse(
-        localStorage.getItem('mons_completedQuizQuestions') || '{}',
+        localStorage.getItem('murcia_completedQuizQuestions') || '{}',
       ),
       score: typeof window.score !== 'undefined' ? window.score : null,
       selectedCircuit: localStorage.getItem('selectedCircuit') || null,
-      quizEnabled: localStorage.getItem('mons_quizEnabled') === 'true',
+      quizEnabled: localStorage.getItem('murcia_quizEnabled') === 'true',
       lastUrl: completeUrl,
       currentPath: currentPath,
       currentSearch: currentSearch,
@@ -514,7 +514,7 @@ class AccessControl {
       }
 
       localStorage.setItem(
-        'mons_completedQuizQuestions',
+        'murcia_completedQuizQuestions',
         JSON.stringify(s.completedQuizQuestions || {}),
       );
 
@@ -523,7 +523,7 @@ class AccessControl {
       }
 
       localStorage.setItem(
-        'mons_quizEnabled',
+        'murcia_quizEnabled',
         s.quizEnabled ? 'true' : 'false',
       );
 

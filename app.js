@@ -49,14 +49,15 @@ if (window.__APP_JS_DISABLED__) {
     // Code normal de app.js
 }
 
-let nextButton, prevButton, homeButton, cultureButton, audioBtn, poiInterestBtn, doudouBtn, pauseBtn, stopBtn, restartBtn, quizResumeBtn;
-
+let nextButton, prevButton, homeButton, cultureButton, audioBtn, poiInterestBtn, pauseBtn, stopBtn, restartBtn, quizResumeBtn;
 let quizSessionUiButtons = null;
-let quizResumeAwaitingAudio = false;
 const QUIZ_OVERLAY_ID = 'quiz-question-overlay';
 
+/** Accès bracket : compatible obfuscation (transformObjectKeys) + JSON quiz. */
 function getQuizQuestionFields(q) {
-  if (!q || typeof q !== 'object') return { question: '', options: [], answer: 0 };
+  if (!q || typeof q !== 'object') {
+    return { question: '', options: [], answer: 0 };
+  }
   return {
     question: String(q['question'] || ''),
     options: Array.isArray(q['options']) ? q['options'] : [],
@@ -67,13 +68,17 @@ function getQuizQuestionFields(q) {
 function showQuizQuestionPopup({ title, question, options, stopLabel, onStop, onOptionClick }) {
   const existing = document.getElementById(QUIZ_OVERLAY_ID);
   if (existing) existing.remove();
+
   const overlay = document.createElement('div');
   overlay.id = QUIZ_OVERLAY_ID;
   overlay.className = 'quiz-question-overlay-root';
+
   const box = document.createElement('div');
   box.className = 'quiz-question-box';
+
   const header = document.createElement('div');
   header.className = 'quiz-question-header';
+
   if (typeof onStop === 'function') {
     const stopBtn = document.createElement('button');
     stopBtn.type = 'button';
@@ -82,19 +87,23 @@ function showQuizQuestionPopup({ title, question, options, stopLabel, onStop, on
     stopBtn.addEventListener('click', () => onStop());
     header.appendChild(stopBtn);
   }
+
   const icons = document.createElement('div');
   icons.className = 'quiz-question-icons';
-  icons.textContent = '\u2694\ufe0f \ud83d\udc09';
+  icons.textContent = '⚔️ 🐉';
   header.appendChild(icons);
   box.appendChild(header);
+
   const titleElem = document.createElement('div');
   titleElem.className = 'quiz-question-title';
   titleElem.textContent = title;
   box.appendChild(titleElem);
+
   const msgElem = document.createElement('div');
   msgElem.className = 'quiz-question-text';
   msgElem.textContent = question;
   box.appendChild(msgElem);
+
   const answersWrap = document.createElement('div');
   answersWrap.className = 'quiz-question-answers';
   (options || []).forEach((opt, idx) => {
@@ -109,6 +118,7 @@ function showQuizQuestionPopup({ title, question, options, stopLabel, onStop, on
     answersWrap.appendChild(button);
   });
   box.appendChild(answersWrap);
+
   overlay.appendChild(box);
   document.body.appendChild(overlay);
 }
@@ -122,27 +132,180 @@ let initializationInProgress = false;
 let isUpdating = false;
 let score = 0;
 let quizEnabled = false;
+let quizResumeAwaitingAudio = false;
+/** Index du point dont le descriptif audio est en cours (null si autre son). */
+let poiDescriptionAudioIndex = null;
 let map;
 let markers = [];
 let directionsService;
 let directionsRenderer;
 let currentIndex = 0;
 
-// Verrouillage du bouton "suivant" : on exige l'écoute de l'audio du point courant
+function getAudioHeardIndices() {
+    try {
+        const saved = localStorage.getItem('mons_audio_heard_indices');
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed)) return parsed.map(Number).filter(n => !Number.isNaN(n));
+        }
+    } catch (_) { /* ignore */ }
+    const legacy = localStorage.getItem('mons_audio_clicked_index');
+    if (legacy != null && legacy !== '') {
+        const n = Number(legacy);
+        return Number.isNaN(n) ? [] : [n];
+    }
+    return [];
+}
+
+function getAudioCompletedIndices() {
+    try {
+        const saved = localStorage.getItem('mons_audio_completed_indices');
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed)) {
+                return parsed.map(Number).filter((n) => !Number.isNaN(n));
+            }
+        }
+    } catch (_) { /* ignore */ }
+    return [];
+}
+
+function markAudioCompletedForIndex(idx) {
+    const set = new Set(getAudioCompletedIndices());
+    set.add(Number(idx));
+    localStorage.setItem(
+        'mons_audio_completed_indices',
+        JSON.stringify([...set])
+    );
+}
+
+function isPointAudioCompletedForQuiz(idx) {
+    if (isTourFreeRoam()) return true;
+    return getAudioCompletedIndices().includes(Number(idx));
+}
+
+function markAudioHeardForIndex(idx) {
+    const set = new Set(getAudioHeardIndices());
+    set.add(Number(idx));
+    const arr = [...set];
+    localStorage.setItem('mons_audio_heard_indices', JSON.stringify(arr));
+    localStorage.setItem('mons_audio_clicked_index', String(idx));
+}
+
+/** Débloque « suivant » dès que le descriptif du point a été démarré (🎧). */
+function unlockPointNavigationAfterAudioStart(idx) {
+    markAudioHeardForIndex(idx);
+    syncNextButtonState();
+}
+
+function ensureNextButtonRef() {
+    if (!nextButton) {
+        nextButton = document.getElementById('next-btn');
+    }
+}
+
+function isPoiTourDescriptionSrc(src) {
+    if (!src || src === 'Chansons/air_doudou.mp3') return false;
+    const loc = getLocationAtIndex(currentIndex);
+    return !!(loc && loc.audio && src === loc.audio);
+}
+
+function handlePoiDescriptionAudioEnded(idx) {
+    markAudioCompletedForIndex(idx);
+    unlockPointNavigationAfterAudioStart(idx);
+
+    if (!quizEnabled || Number(idx) !== Number(currentIndex)) {
+        return;
+    }
+    const loc = getLocationAtIndex(idx);
+    if (!loc || !loc.name || completedQuizQuestions[loc.name]) {
+        quizResumeAwaitingAudio = false;
+        return;
+    }
+
+    if (quizResumeAwaitingAudio) {
+        quizResumeAwaitingAudio = false;
+        setTimeout(() => showQuizForCurrentPoint(() => {}), 300);
+    }
+}
+
+function maybeFinalizePoiAudioOnStop(audioEl) {
+    if (poiDescriptionAudioIndex === null || !audioEl) return;
+    const idx = poiDescriptionAudioIndex;
+    const dur = audioEl.duration;
+    if (dur && isFinite(dur) && dur > 0 && audioEl.currentTime / dur >= 0.92) {
+        poiDescriptionAudioIndex = null;
+        handlePoiDescriptionAudioEnded(idx);
+    }
+}
+
+function isTourFreeRoam() {
+    return localStorage.getItem('tourCompleted') === 'true';
+}
+
+function isPointUnlockedForNext(idx) {
+    if (isTourFreeRoam()) return true;
+    return getAudioHeardIndices().includes(Number(idx));
+}
+
+/** Quiz autorisé dès que le descriptif a été démarré (🎧), pas besoin d’attendre la fin. */
+function canStartQuizAtCurrentPoint() {
+    return isPointUnlockedForNext(currentIndex);
+}
+
+function showQuizListenBeforePopup(onClose) {
+    showStyledPopup(
+        translateClq('quiz_listen_before_title', 'Descriptif audio'),
+        translateClq(
+            'quiz_listen_before_message',
+            "Appuyez sur le bouton audio (🎧) pour démarrer le descriptif de ce point avant de poursuivre avec le quiz."
+        ),
+        onClose || null
+    );
+}
+
+function enableTourExplorationMode() {
+    [nextButton, prevButton, audioBtn].forEach((button) => {
+        if (button) {
+            button.disabled = false;
+            button.style.opacity = '';
+            button.style.cursor = '';
+        }
+    });
+    if (map) {
+        map.setOptions({ gestureHandling: 'greedy', zoomControl: true });
+    }
+    syncNextButtonState();
+}
+
+// Verrouillage du bouton "suivant" : audio requis uniquement à la première visite du point
 function syncNextButtonState() {
     try {
+        ensureNextButtonRef();
         if (!nextButton) return;
-        // En fin de parcours / mode musée, on laisse les fonctions existantes gérer
-        if (localStorage.getItem('tourCompleted') === 'true') {
+
+        const tourLen = filteredLocations ? filteredLocations.length : 0;
+        if (tourLen === 0) {
             nextButton.disabled = true;
             return;
         }
-        const audioIdx = localStorage.getItem('mons_audio_clicked_index');
-        nextButton.disabled = String(audioIdx) !== String(currentIndex);
-    } catch (_) {
+
+        const atLastPoint = Number(currentIndex) >= tourLen - 1;
+        const shouldDisable = isTourFreeRoam()
+            ? atLastPoint
+            : !isPointUnlockedForNext(currentIndex);
+
+        nextButton.disabled = shouldDisable;
+        if (!shouldDisable) {
+            nextButton.style.opacity = '';
+            nextButton.style.cursor = '';
+        }
+    } catch (err) {
+        console.warn('syncNextButtonState:', err);
         if (nextButton) nextButton.disabled = true;
     }
 }
+
 let completedQuizQuestions = (() => {
     const saved = localStorage.getItem("mons_completedQuizQuestions");
     // Si on n'a pas de circuit sélectionné, c'est un nouveau parcours, donc on réinitialise
@@ -157,11 +320,30 @@ console.log('[DEBUG] app.js chargé sur', window.location.href);
 
 
 // === Config API (via api-base.js) ===
-const API_BASE =
-  (window.APP_CONFIG && window.APP_CONFIG.API_BASE) ||
-  localStorage.getItem('api_base') ||
-  window.location.origin.replace(':5173', ':8080');
+function getAppApiBase() {
+  if (window.APP_CONFIG && window.APP_CONFIG.API_BASE) {
+    return String(window.APP_CONFIG.API_BASE).replace(/\/+$/, '');
+  }
+  const port = String(location.port || '');
+  if (port === '5173' || port === '5174') {
+    return location.origin.replace(/\/+$/, '');
+  }
+  try {
+    const stored = localStorage.getItem('api_base');
+    if (stored && typeof stored === 'string') {
+      return stored.replace(/\/+$/, '');
+    }
+  } catch (_) {}
+  return 'https://cityloopquest-api.onrender.com';
+}
 
+const API_BASE = getAppApiBase();
+
+async function fetchApi(path, opts) {
+  const url = `${getAppApiBase()}${path}`;
+  return fetch(url, Object.assign({ cache: 'no-store' }, opts || {}));
+}
+window.fetchApi = fetchApi;
 
 // === Helpers stockage ===
 function getToken() {
@@ -246,12 +428,14 @@ async function attachActivationForm() {
 
 // === Au chargement de la page ===
 window.addEventListener('DOMContentLoaded', async () => {
-  // Si un token existe déjà, on peut cacher le bloc d'activation (optionnel)
-  const probe = await probeToken();
-  if (probe) {
-    const section = document.getElementById('activation');
-    if (section) section.style.display = 'none';
-    // Tu peux charger directement le contenu chiffré ici si tu veux
+  try {
+    const probe = await probeToken();
+    if (probe) {
+      const section = document.getElementById('activation');
+      if (section) section.style.display = 'none';
+    }
+  } catch (e) {
+    console.warn('[CLQ] probeToken:', e);
   }
   await attachActivationForm();
 });
@@ -290,7 +474,777 @@ let isDoudouSongPlaying = false; // Pour savoir si c'est la chanson du Doudou
 let steps = [];
 let currentStepIndex = 0;
 let watchId = null;
+let guidanceWatchActive = false;
+let geoFixConfirmed = false;
+let routeGpsThrottleEnabled = false;
+let routeRequestSeq = 0;
+let compassListenersAttached = false;
+let lastWatchPositionAt = 0;
+
+function isIOSDevice() {
+    return (
+        /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+    );
+}
+
+function isAndroidDevice() {
+    return /android/i.test(navigator.userAgent);
+}
+
+function getCurrentUserLatLng() {
+    if (!userPositionMarker) return null;
+    const p = userPositionMarker.getPosition();
+    if (!p) return null;
+    return { lat: p.lat(), lng: p.lng() };
+}
+
+/** Arrête le suivi GPS et libère la route (évite fuites mémoire WebKit iOS). */
+function stopGuidanceTracking() {
+    if (watchId !== null && navigator.geolocation) {
+        try {
+            navigator.geolocation.clearWatch(watchId);
+        } catch (e) {
+            /* ignore */
+        }
+        watchId = null;
+    }
+    guidanceWatchActive = false;
+    routeMarkers.forEach((marker) => marker.setMap(null));
+    routeMarkers = [];
+    if (directionsRenderer) {
+        try {
+            directionsRenderer.setDirections({ routes: [] });
+        } catch (e) {
+            /* ignore */
+        }
+    }
+    routeRequestSeq += 1;
+    isUpdating = false;
+    lastRouteFitKey = null;
+    resetMapRotation();
+}
+
+function attachCompassListenersOnce() {
+    if (compassListenersAttached) return;
+    const isAndroid = /android/i.test(navigator.userAgent);
+    if (isAndroid && "ondeviceorientationabsolute" in window) {
+        window.addEventListener("deviceorientationabsolute", handleOrientation, true);
+    } else {
+        window.addEventListener("deviceorientation", handleOrientation, true);
+    }
+    window.addEventListener("orientationchange", handleOrientationChange);
+    compassListenersAttached = true;
+}
+
+function clearGoogleMapCssRotation(mapDiv) {
+    if (!mapDiv) return;
+    const gmStyle = mapDiv.querySelector('.gm-style');
+    if (!gmStyle) return;
+    gmStyle.style.transform = '';
+    gmStyle.style.transformOrigin = '';
+    gmStyle.style.willChange = '';
+    gmStyle.querySelectorAll('.gmnoprint, .gm-style-cc, .gm-style-mtc').forEach(
+        function (el) {
+            el.style.transform = '';
+            el.style.transformOrigin = '';
+        }
+    );
+}
+
+function resetMapRotation() {
+    const mapContainer = document.getElementById('map-container');
+    if (mapContainer) {
+        mapContainer.style.transform = '';
+        mapContainer.style.transition = '';
+    }
+    const mapDiv = document.getElementById('map');
+    if (!mapDiv) return;
+    mapDiv.style.transform = '';
+    mapDiv.style.transition = '';
+    clearGoogleMapCssRotation(mapDiv);
+    if (map) {
+        try {
+            if (typeof map.setHeading === 'function') {
+                map.setHeading(0);
+            } else {
+                map.setOptions({ heading: 0 });
+            }
+        } catch (e) {
+            /* ignore */
+        }
+    }
+    navHeadingSmoothed = null;
+    mapHeadingNativeActive = false;
+    if (userPositionMarker) {
+        const icon = userPositionMarker.getIcon();
+        if (icon) {
+            icon.rotation = 0;
+            userPositionMarker.setIcon(icon);
+            currentArrowRotation = 0;
+        }
+    }
+}
+
+/** Mode navigation : carte tourne (cap marche), flèche fixe vers le haut. */
+let navHeadingSmoothed = null;
+let mapHeadingNativeActive = false;
+let lastPosForCourse = null;
+const NAV_COURSE_MIN_DIST_M = 2;
+
+/**
+ * Rotation navigation : tourne .gm-style (tuiles + itinéraire), pas le cadre #map-container.
+ * Les contrôles Google (.gmnoprint) sont contre-rotés pour rester droits.
+ */
+function applyMapNavigationRotation(heading) {
+    if (!map || heading == null || isNaN(heading)) return;
+    const h = ((heading % 360) + 360) % 360;
+    const mapContainer = document.getElementById('map-container');
+    const mapDiv = document.getElementById('map');
+    if (mapContainer) {
+        mapContainer.style.transform = '';
+    }
+    if (mapDiv) {
+        mapDiv.style.transform = '';
+    }
+    if (typeof map.setHeading === 'function') {
+        try {
+            map.setHeading(0);
+        } catch (e) {
+            /* ignore */
+        }
+    }
+    mapHeadingNativeActive = false;
+
+    const mapRotateDeg = getMapGmStyleRotateCssDeg(h);
+    const controlRotateDeg = -mapRotateDeg;
+    const gmStyle = mapDiv && mapDiv.querySelector('.gm-style');
+    if (gmStyle) {
+        gmStyle.style.transformOrigin = '50% 50%';
+        gmStyle.style.transform = 'rotate(' + mapRotateDeg + 'deg)';
+        gmStyle.style.willChange = 'transform';
+        gmStyle.querySelectorAll('.gmnoprint, .gm-style-cc, .gm-style-mtc').forEach(
+            function (el) {
+                el.style.transformOrigin = '50% 50%';
+                el.style.transform = 'rotate(' + controlRotateDeg + 'deg)';
+            }
+        );
+    }
+
+    if (userPositionMarker) {
+        const icon = userPositionMarker.getIcon();
+        if (icon) {
+            icon.rotation = h;
+            userPositionMarker.setIcon(icon);
+            currentArrowRotation = h;
+        }
+    }
+}
+
+/**
+ * Mode navigation : la carte tourne (sens du téléphone / marche),
+ * la flèche reste vers le haut de l'écran.
+ */
+function applyWalkNavigationHeading(rawHeading) {
+    if (!map || rawHeading == null || isNaN(rawHeading)) return;
+    const h = ((rawHeading % 360) + 360) % 360;
+    if (navHeadingSmoothed == null) {
+        navHeadingSmoothed = h;
+    } else {
+        let d = h - navHeadingSmoothed;
+        d = ((d + 540) % 360) - 180;
+        const ad = Math.abs(d);
+        const alpha = ad > 60 ? 0.88 : ad > 25 ? 0.62 : 0.38;
+        navHeadingSmoothed = (navHeadingSmoothed + alpha * d + 360) % 360;
+    }
+    try {
+        applyMapNavigationRotation(navHeadingSmoothed);
+    } catch (e) {
+        /* ignore */
+    }
+}
+
+function updateCourseHeadingFromMovement(pos) {
+    if (!lastPosForCourse) {
+        lastPosForCourse = { lat: pos.lat, lng: pos.lng };
+        return null;
+    }
+    const dist = calculateDistanceBetweenPositions(lastPosForCourse, pos);
+    if (dist < NAV_COURSE_MIN_DIST_M) {
+        return gpsHeading;
+    }
+    const course = norm360(
+        calculateAzimuth(lastPosForCourse, { lat: pos.lat, lng: pos.lng })
+    );
+    lastPosForCourse = { lat: pos.lat, lng: pos.lng };
+    return course;
+}
+
+function getRouteDestination() {
+    if (localStorage.getItem('museumMode') === 'true') {
+        try {
+            const museum = JSON.parse(localStorage.getItem('museumData'));
+            if (museum && typeof museum.lat === 'number' && typeof museum.lng === 'number') {
+                return museum;
+            }
+        } catch (e) {
+            /* ignore */
+        }
+        return null;
+    }
+    if (typeof filteredLocations !== 'undefined' &&
+        Array.isArray(filteredLocations) &&
+        currentIndex >= 0 &&
+        currentIndex < filteredLocations.length) {
+        return filteredLocations[currentIndex];
+    }
+    return null;
+}
+
+function buildWalkingDirectionsUrl(destLat, destLng, originLat, originLng) {
+    let url = `https://www.google.com/maps/dir/?api=1&destination=${destLat},${destLng}&travelmode=walking`;
+    if (typeof originLat === 'number' && typeof originLng === 'number' &&
+        !isNaN(originLat) && !isNaN(originLng)) {
+        url += `&origin=${originLat},${originLng}`;
+    }
+    return url;
+}
+
+function openGoogleMapsWalkingNavigation() {
+    const dest = getRouteDestination();
+    if (!dest) return;
+    const userPos = getCurrentUserLatLng();
+    if (typeof window.clqOpenGoogleMapsBridge === 'function') {
+        window.clqOpenGoogleMapsBridge({
+            destLat: dest.lat,
+            destLng: dest.lng,
+            originLat: userPos ? userPos.lat : null,
+            originLng: userPos ? userPos.lng : null,
+            travelmode: 'walking'
+        });
+        return;
+    }
+    const url = buildWalkingDirectionsUrl(
+        dest.lat,
+        dest.lng,
+        userPos ? userPos.lat : null,
+        userPos ? userPos.lng : null
+    );
+    window.location.assign(url);
+}
+
+function setupGoogleMapsNavButton() {
+    const btn = document.getElementById('google-maps-nav-btn');
+    if (!btn) return;
+    const tm = window.translationManager;
+    const t = (key, fallback) => (tm && tm.isLoaded ? tm.translate(key) : fallback);
+    btn.title = t('maps_walking_nav_title', 'Guidage à pied dans Google Maps');
+    btn.addEventListener('click', () => {
+        if (typeof markGuidancePauseForLeave === 'function') {
+            markGuidancePauseForLeave();
+        }
+        openGoogleMapsWalkingNavigation();
+    });
+}
+
+function updatePointPhotoForCurrentIndex() {
+    if (localStorage.getItem('museumMode') === 'true') return;
+    const imageElement = document.getElementById('point-image');
+    if (!imageElement || !Array.isArray(filteredLocations)) return;
+    const current = filteredLocations[currentIndex];
+    if (!current || !current.name) return;
+    applyPointImage(imageElement, current);
+    const textContainer = document.getElementById('media-display');
+    if (textContainer && textContainer.style.display === 'block') {
+        return;
+    }
+    imageElement.style.display = 'block';
+    if (textContainer) {
+        textContainer.style.display = 'none';
+    }
+}
+
+function refreshRouteToCurrentDestination() {
+    lastRouteCalculationPos = null;
+    lastRouteCalculationTime = 0;
+    lastRouteFitKey = null;
+    updatePointPhotoForCurrentIndex();
+    const pos = getCurrentUserLatLng();
+    if (pos) {
+        calculateRouteFromPosition(pos, "Votre position");
+        lastRouteCalculationPos = { lat: pos.lat, lng: pos.lng };
+        lastRouteCalculationTime = Date.now();
+    } else if (typeof startPoint !== "undefined" && startPoint) {
+        calculateRouteFromPosition(startPoint, "Point de départ");
+    }
+}
+
+function markGuidancePauseForLeave() {
+    sessionStorage.setItem(
+        "clq_guidance_was_active",
+        guidanceWatchActive || localStorage.getItem("geoPermissionGranted") === "true" ? "1" : "0"
+    );
+}
+
+function isPrivateLanHost() {
+    try {
+        const h = String(location.hostname || '');
+        return /^192\.168\./.test(h) || /^10\./.test(h) || /^172\.(1[6-9]|2\d|3[01])\./.test(h);
+    } catch (_) {
+        return false;
+    }
+}
+
+/** GPS navigateur : OK en HTTPS ou sur localhost ; souvent refusé en http://192.168.x.x sur mobile. */
+function canUseDeviceGeolocation() {
+    if (!navigator.geolocation) return false;
+    if (window.isSecureContext) return true;
+    const h = String(location.hostname || '').toLowerCase();
+    return h === 'localhost' || h === '127.0.0.1';
+}
+window.clqCanUseGeolocation = canUseDeviceGeolocation;
+
+function applyGuidanceWithoutGps() {
+    localStorage.setItem('geoPermissionGranted', 'false');
+    routeGpsThrottleEnabled = true;
+
+    const tm = window.translationManager;
+    const hintKey = 'geo_http_dev_hint';
+    const fallbackHint =
+        'Carte sans GPS live : itinéraire depuis le départ. Sur mobile, ouvrez le site en https:// (voir terminal npm run dev).';
+    const hint =
+        tm && tm.isLoaded && typeof tm.translate === 'function'
+            ? tm.translate(hintKey)
+            : fallbackHint;
+    const display = document.getElementById('location-name');
+    if (display) {
+        display.textContent = hint !== hintKey ? hint : fallbackHint;
+    }
+
+    const saved = readLastKnownUserPosition();
+    if (saved && map) {
+        updateUserMarker(saved);
+        calculateRouteFromPosition(saved, 'Dernière position');
+        return;
+    }
+    if (typeof startPoint !== 'undefined' && startPoint && map) {
+        calculateRouteFromPosition(startPoint, 'Point de départ');
+    }
+}
+
+function getNativeGeolocation() {
+    return window.__clqGeoNative || navigator.geolocation;
+}
+
+function isGeolocationFixTrustworthy(position) {
+    if (!position || !position.coords) return false;
+    const acc = position.coords.accuracy;
+    if (acc !== null && acc !== undefined && !isNaN(acc) && acc > 900) {
+        return false;
+    }
+    const ts = position.timestamp;
+    if (typeof ts === 'number' && Date.now() - ts > 90000) {
+        return false;
+    }
+    return true;
+}
+
+function updateGeoOverlayWaitingMessage(position) {
+    const msg = document.getElementById('main-geo-activation-message');
+    if (!msg || !isMainGeoPromptVisible()) return;
+    const acc =
+        position && position.coords && position.coords.accuracy != null
+            ? Math.round(position.coords.accuracy)
+            : null;
+    if (acc !== null && acc > 900) {
+        msg.textContent =
+            'Position trop imprécise ou localisation refusée. Réglages → Confidentialité → Localisation → Safari → « Lors de l’utilisation de l’app », puis réessayez.';
+        return;
+    }
+    msg.textContent =
+        acc !== null
+            ? `Acquisition GPS… (${acc} m). Autorisez la bannière Safari si elle apparaît.`
+            : 'Acquisition GPS… Autorisez la bannière Safari si elle apparaît.';
+}
+
+/** Première position fiable : ferme le popup géoloc et lance le guidage. */
+function confirmGeolocationFix(position) {
+    if (geoFixConfirmed || !position || !position.coords) return;
+    geoFixConfirmed = true;
+    sessionStorage.setItem('clq_geo_session_ok', '1');
+    localStorage.setItem('geoPermissionGranted', 'true');
+
+    const pos = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+    };
+    routeGpsThrottleEnabled = false;
+    lastRouteCalculationPos = null;
+    lastRouteCalculationTime = 0;
+
+    if (map) {
+        map.set('userHasPanned', false);
+        updateUserMarker(pos, true);
+        calculateRouteFromPosition(pos, 'Votre position');
+        lastRouteCalculationPos = { lat: pos.lat, lng: pos.lng };
+        lastRouteCalculationTime = Date.now();
+        routeGpsThrottleEnabled = true;
+    }
+
+    if (typeof window.clqHideMainGeoPrompt === 'function') {
+        window.clqHideMainGeoPrompt();
+    }
+    try {
+        window.dispatchEvent(
+            new CustomEvent('clq:main-geo-activated', { detail: position })
+        );
+    } catch (e) {
+        /* ignore */
+    }
+
+    if (typeof activateCompass === 'function') {
+        activateCompass();
+    }
+    if (typeof restoreCompassState === 'function') {
+        restoreCompassState();
+    }
+}
+
+/** iOS : watchPosition doit être lancé dans le geste utilisateur (pas getCurrentPosition). */
+window.clqStartGeolocationWatchFromGesture = function () {
+    geoFixConfirmed = sessionStorage.getItem('clq_geo_session_ok') === '1';
+    guidanceWatchActive = false;
+    routeGpsThrottleEnabled = false;
+    if (watchId !== null && navigator.geolocation) {
+        try {
+            navigator.geolocation.clearWatch(watchId);
+        } catch (e) {
+            /* ignore */
+        }
+        watchId = null;
+    }
+    startGeolocationWatch();
+};
+
+/** Suivi GPS continu (watchPosition) — appelé après autorisation. */
+function startGeolocationWatch() {
+    if (!document.getElementById('map') || !canUseDeviceGeolocation()) {
+        return false;
+    }
+    const geo = getNativeGeolocation();
+    if (!geo || typeof geo.watchPosition !== 'function') {
+        return false;
+    }
+
+    if (watchId !== null) {
+        try {
+            const clearFn = geo.clearWatch || navigator.geolocation.clearWatch.bind(navigator.geolocation);
+            clearFn(watchId);
+        } catch (e) {
+            /* ignore */
+        }
+        watchId = null;
+    }
+
+    const ios = isIOSDevice();
+    const watchOptions = {
+        enableHighAccuracy: true,
+        timeout: ios ? 30000 : 15000,
+        maximumAge: 0,
+    };
+
+    watchId = geo.watchPosition(
+        (position) => {
+            lastWatchPositionAt = Date.now();
+
+            if (!geoFixConfirmed) {
+                if (!isGeolocationFixTrustworthy(position)) {
+                    updateGeoOverlayWaitingMessage(position);
+                    return;
+                }
+                confirmGeolocationFix(position);
+            }
+
+            const pos = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+            };
+
+            const isAndroidGPS = /android/i.test(navigator.userAgent);
+            const speed = position.coords.speed;
+            const heading = position.coords.heading;
+            lastDeviceSpeed =
+                speed !== null && speed !== undefined && !isNaN(speed)
+                    ? speed
+                    : lastDeviceSpeed;
+
+            if (isAndroidGPS) {
+                if (speed !== null && speed !== undefined) {
+                    if (speed > 0.5) {
+                        movingVotes++;
+                        stillVotes = 0;
+                    } else if (speed < 0.2) {
+                        stillVotes++;
+                        movingVotes = 0;
+                    }
+                    if (movingVotes >= 1) androidMode = 'MOVING';
+                    if (stillVotes >= 1) androidMode = 'STATIONARY';
+                }
+                if (heading !== null && heading !== undefined && !isNaN(heading)) {
+                    gpsHeading = norm360(heading);
+                    if (androidMode === 'MOVING') bearingTarget = gpsHeading;
+                }
+            } else if (heading !== null && heading !== undefined && !isNaN(heading)) {
+                gpsHeading = norm360(heading);
+            }
+
+            if (guidanceWatchActive) {
+                if (gpsHeading == null || isNaN(gpsHeading)) {
+                    const course = updateCourseHeadingFromMovement(pos);
+                    if (course != null && !isNaN(course)) {
+                        gpsHeading = course;
+                    }
+                } else {
+                    lastPosForCourse = { lat: pos.lat, lng: pos.lng };
+                }
+                if (
+                    gpsHeading != null &&
+                    !isNaN(gpsHeading) &&
+                    isUserMovingForHeading()
+                ) {
+                    applyWalkNavigationHeading(gpsHeading);
+                }
+            }
+
+            updateUserMarker(pos, true);
+
+            if (!routeGpsThrottleEnabled) {
+                calculateRouteFromPosition(pos, 'Votre position');
+                routeGpsThrottleEnabled = true;
+                lastRouteCalculationPos = { lat: pos.lat, lng: pos.lng };
+                lastRouteCalculationTime = Date.now();
+            } else {
+                const now = Date.now();
+                const shouldRecalculate =
+                    !lastRouteCalculationPos ||
+                    calculateDistanceBetweenPositions(lastRouteCalculationPos, pos) > ROUTE_RECALC_MIN_DIST_M ||
+                    now - lastRouteCalculationTime > ROUTE_RECALC_MIN_INTERVAL_MS;
+                if (shouldRecalculate) {
+                    lastRouteCalculationPos = { lat: pos.lat, lng: pos.lng };
+                    lastRouteCalculationTime = now;
+                    calculateRouteFromPosition(pos, 'Votre position');
+                }
+            }
+        },
+        (error) => {
+            console.error('❌ Erreur watchPosition :', error);
+            geoFixConfirmed = false;
+            localStorage.removeItem('geoPermissionGranted');
+            sessionStorage.removeItem('clq_geo_session_ok');
+            if (typeof window.clqShowMainGeoPrompt === 'function') {
+                window.clqShowMainGeoPrompt();
+            }
+            const msg = document.getElementById('main-geo-activation-message');
+            if (msg && isMainGeoPromptVisible()) {
+                if (error && error.code === 1) {
+                    msg.textContent =
+                        'Accès refusé. Réglages → Confidentialité → Localisation → Safari → Autoriser, puis réessayez.';
+                } else {
+                    msg.textContent =
+                        'GPS indisponible. Activez la localisation pour Safari et réessayez.';
+                }
+            }
+        },
+        watchOptions
+    );
+    guidanceWatchActive = true;
+    geoPermissionRequested = true;
+    return true;
+}
+
+/** Desktop : après getCurrentPosition. Mobile utilise clqStartGeolocationWatchFromGesture. */
+function handleMainGeoActivated(position) {
+    if (isHandheldPhone()) {
+        return;
+    }
+    routeGpsThrottleEnabled = false;
+    lastRouteCalculationPos = null;
+    lastRouteCalculationTime = 0;
+    guidanceWatchActive = false;
+    geoFixConfirmed = false;
+
+    if (typeof window.clqHideMainGeoPrompt === 'function') {
+        window.clqHideMainGeoPrompt();
+    }
+
+    if (position && position.coords && map) {
+        confirmGeolocationFix(position);
+    } else {
+        startGeolocationWatch();
+    }
+
+    setTimeout(() => {
+        if (typeof checkOrientationAndShowPopup === 'function') {
+            checkOrientationAndShowPopup();
+        }
+    }, 400);
+}
+
+function handleMainGeoFailed() {
+    if (typeof window.clqShowMainGeoPrompt === 'function') {
+        window.clqShowMainGeoPrompt();
+    }
+}
+
+window.clqOnMainGeoActivated = handleMainGeoActivated;
+window.clqOnMainGeoFailed = handleMainGeoFailed;
+
+function isMainGeoPromptVisible() {
+    const overlay = document.getElementById('main-geo-activation-overlay');
+    return !!(overlay && !overlay.hasAttribute('hidden'));
+}
+
+/** Affiche le popup parchemin ; la géoloc ne démarre qu’au clic (iOS). */
+function requestGeolocationWithUserGesture() {
+    if (!document.getElementById('map')) {
+        return;
+    }
+    if (
+        typeof window.clqNeedsSafariForGeo === 'function' &&
+        window.clqNeedsSafariForGeo()
+    ) {
+        if (typeof window.clqShowInAppSafariOverlay === 'function') {
+            window.clqShowInAppSafariOverlay();
+        }
+        return;
+    }
+    if (!canUseDeviceGeolocation()) {
+        applyGuidanceWithoutGps();
+        return;
+    }
+    if (typeof window.clqResetGeoWrapperState === 'function') {
+        window.clqResetGeoWrapperState();
+    }
+    geoPermissionRequested = false;
+
+    if (typeof window.clqShowMainGeoPrompt === 'function') {
+        window.clqShowMainGeoPrompt();
+        return;
+    }
+    promptGeolocationOnMain();
+}
+
+/** Si la permission OS est déjà « accordée », démarrer sans popup (desktop). */
+function tryResumeGrantedGeolocation() {
+    if (!document.getElementById('map') || !canUseDeviceGeolocation()) {
+        applyGuidanceWithoutGps();
+        return;
+    }
+    const onNeedButton = () => requestGeolocationWithUserGesture();
+
+    if (isHandheldPhone()) {
+        if (sessionStorage.getItem('clq_geo_session_ok') === '1') {
+            geoFixConfirmed = true;
+            startGeolocationWatch();
+        } else {
+            onNeedButton();
+        }
+        return;
+    }
+
+    if (navigator.permissions && navigator.permissions.query) {
+        navigator.permissions
+            .query({ name: 'geolocation' })
+            .then((status) => {
+                if (status.state === 'granted') {
+                    const geo = getNativeGeolocation();
+                    if (!geo || typeof geo.getCurrentPosition !== 'function') {
+                        onNeedButton();
+                        return;
+                    }
+                    geo.getCurrentPosition(
+                        (position) => handleMainGeoActivated(position),
+                        () => onNeedButton(),
+                        { enableHighAccuracy: true, timeout: 12000, maximumAge: 5000 }
+                    );
+                } else {
+                    onNeedButton();
+                }
+            })
+            .catch(() => onNeedButton());
+        return;
+    }
+    onNeedButton();
+}
+
+/** Secours si le script main-geo-prompt.js est absent. */
+function promptGeolocationOnMain() {
+    if (!document.getElementById('map')) {
+        return;
+    }
+    if (!canUseDeviceGeolocation()) {
+        applyGuidanceWithoutGps();
+        return;
+    }
+    window.__clqGeoUserInitiated = true;
+    const geo = getNativeGeolocation();
+    if (!geo || typeof geo.getCurrentPosition !== 'function') {
+        applyGuidanceWithoutGps();
+        return;
+    }
+    geo.getCurrentPosition(
+        (position) => {
+            window.__clqGeoUserInitiated = false;
+            handleMainGeoActivated(position);
+        },
+        () => {
+            window.__clqGeoUserInitiated = false;
+            requestGeolocationWithUserGesture();
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+}
+
+function requestGeolocationLikeBrussels() {
+    requestGeolocationWithUserGesture();
+}
+
+window.beginMainGeolocationAfterMapReady = requestGeolocationWithUserGesture;
+
+function resumeGeolocationLikeBrussels() {
+    if (!document.getElementById("map")) {
+        return;
+    }
+    if (watchId !== null && navigator.geolocation) {
+        try {
+            navigator.geolocation.clearWatch(watchId);
+        } catch (e) {
+            /* ignore */
+        }
+        watchId = null;
+    }
+    guidanceWatchActive = false;
+    geoPermissionRequested = false;
+    routeGpsThrottleEnabled = false;
+
+    if (isHandheldPhone() && sessionStorage.getItem('clq_geo_session_ok') !== '1') {
+        requestGeolocationWithUserGesture();
+        updateLocation();
+        return;
+    }
+
+    const geoPermissionGranted =
+        localStorage.getItem("geoPermissionGranted") === "true";
+    if (geoPermissionGranted && startGeolocationWatch()) {
+        updateLocation();
+    } else {
+        requestGeolocationLikeBrussels();
+        updateLocation();
+    }
+}
+
 let gpsHeading = null; // Heading basé sur le mouvement GPS (plus fiable que le magnétomètre sur Android)
+let lastDeviceSpeed = null;
 let smoothedAndroidHeading = null; // Heading lissé pour Android (éviter les sauts)
 let magnetometerOffset = null; // Offset calibré entre magnétomètre et GPS (pour fusion hybride)
 let lastGPSCalibrationTime = 0; // Timestamp de la dernière calibration GPS
@@ -303,13 +1257,6 @@ let bearingTarget = 0; // Cap cible
 let bearingSmoothed = 0; // Cap lissé pour affichage
 let lastMapUpdateTime = 0; // Timestamp dernière update carte
 let headingWindow = []; // Fenêtre glissante pour médiane
-let androidStablePosition = null;
-let androidStablePositionAt = 0;
-const ANDROID_GPS_MAX_ACCURACY_M = 65;
-const ANDROID_GPS_MIN_MOVE_M = 3;
-const ANDROID_GPS_MIN_JUMP_M = 35;
-const ANDROID_GPS_MAX_WALK_SPEED_MPS = 3.2;
-const ANDROID_MAP_HEADING_OFFSET_DEG = 90;
 let totalDistance = 0; // distance totale parcourue (en mètres)
 let currentPointDistance = ''; // distance au point actuel (texte formaté)
 let currentPointDuration = ''; // durée au point actuel (texte formaté)
@@ -317,6 +1264,12 @@ let userPositionMarker = null; // Marqueur pour la position de l'utilisateur
 let routeMarkers = []; // Pour stocker les marqueurs de départ/arrivée
 let lastRouteCalculationPos = null; // Dernière position utilisée pour le calcul de route
 let lastRouteCalculationTime = 0; // Timestamp du dernier calcul de route
+let lastRouteFitKey = null; // Évite de recadrer la carte à chaque recalcul GPS
+const ROUTE_RECALC_MIN_DIST_M = 60;
+const ROUTE_RECALC_MIN_INTERVAL_MS = 45000;
+const MONS_LAST_KNOWN_POSITION_KEY = 'mons_lastKnownPosition';
+let lastKnownPositionPersistTime = 0;
+const LAST_KNOWN_POSITION_PERSIST_MS = 12000;
 let distanceAlreadyAddedForCurrentPoint = false; // Flag pour éviter d'ajouter la distance plusieurs fois
 let androidPoiBearingSmoothed = null;   // POI vers le haut (bearing lissé)
 let androidHeadingSmoothed = null;      // Direction de marche lissée
@@ -329,117 +1282,12 @@ let museumGuidanceStarted = false;
 let firstInstructionGiven = false;
 
 let mapLoadInitiated = false;
+let pendingMapCallbacks = [];
 let geoPermissionRequested = false; // Pour éviter les redemandes d'autorisation
 let orientationPermissionRequested = false; // Pour éviter les redemandes d'autorisation d'orientation
 
-// Synchroniser la variable de session avec le localStorage
-if (localStorage.getItem('geoPermissionGranted') === 'true') {
+if (localStorage.getItem("geoPermissionGranted") === "true") {
     geoPermissionRequested = true;
-}
-
-/** Android uniquement — ne modifie pas la détection iOS. */
-function isAndroidDevice() {
-    return /android/i.test(navigator.userAgent || "");
-}
-
-function androidVerifyGeoPermission(callback) {
-    if (!isAndroidDevice()) {
-        callback(true);
-        return;
-    }
-    if (!navigator.permissions || !navigator.permissions.query) {
-        callback(localStorage.getItem("geoPermissionGranted") === "true");
-        return;
-    }
-    navigator.permissions
-        .query({ name: "geolocation" })
-        .then((status) => {
-            if (status.state === "granted") {
-                localStorage.setItem("geoPermissionGranted", "true");
-                callback(true);
-            } else {
-                try {
-                    localStorage.removeItem("geoPermissionGranted");
-                } catch (_) {}
-                callback(false);
-            }
-        })
-        .catch(() =>
-            callback(localStorage.getItem("geoPermissionGranted") === "true")
-        );
-}
-
-function requestMainGeolocationWithGesture(successCallback, errorCallback, options) {
-    const opts =
-        options || { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 };
-    if (!isAndroidDevice()) {
-        navigator.geolocation.getCurrentPosition(
-            successCallback,
-            errorCallback,
-            opts
-        );
-        return;
-    }
-    window.clqOnMainGeoActivated = function (position) {
-        if (typeof window.clqHideMainGeoPrompt === "function") {
-            window.clqHideMainGeoPrompt();
-        }
-        if (successCallback) successCallback(position);
-    };
-    window.clqOnMainGeoFailed = function () {
-        if (errorCallback) errorCallback(new Error("PERMISSION_DENIED"));
-    };
-    if (typeof window.clqResetGeoWrapperState === "function") {
-        window.clqResetGeoWrapperState();
-    }
-    if (typeof window.clqShowMainGeoPrompt === "function") {
-        window.clqShowMainGeoPrompt();
-    } else {
-        navigator.geolocation.getCurrentPosition(
-            successCallback,
-            errorCallback,
-            opts
-        );
-    }
-}
-
-function beginMainGeolocationFlow() {
-    const geoOpts = {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0,
-    };
-    const onSuccess = (position) => {
-        if (isAndroidDevice() && position && position.coords) {
-            const pos = getFilteredAndroidPosition(position);
-            if (!pos) {
-                if (typeof startPoint !== 'undefined' && startPoint) {
-                    calculateRouteFromPosition(startPoint, 'Point de départ');
-                }
-                setTimeout(() => updateLocation(), 500);
-                return;
-            }
-            updateUserMarker(pos);
-            resetAndroidMapAndMarkerForGoogleGuidance();
-            applyMapViewForGuidance(pos);
-            calculateRouteFromPosition(pos, "Votre position");
-        }
-        setTimeout(() => updateLocation(), 500);
-    };
-    const onError = () => {
-        const display = document.getElementById("location-name");
-        if (display) {
-            display.textContent =
-                "Géolocalisation impossible. Affichage depuis le point de départ.";
-        }
-        calculateRouteFromPosition(startPoint, "Point de départ");
-    };
-    geoPermissionRequested = false;
-    if (isAndroidDevice()) {
-        requestMainGeolocationWithGesture(onSuccess, onError, geoOpts);
-    } else {
-        getUserPosition(onSuccess, onError, geoOpts);
-    }
 }
 
 // --- Détection et redirection PWA ---
@@ -511,7 +1359,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
     
-    // Réinitialiser les flags de session au démarrage de l'application
+    // Identique à Bruxelles : réinitialiser les flags de session à chaque chargement de page
     mapLoadInitiated = false;
     geoPermissionRequested = false;
     orientationPermissionRequested = false;
@@ -608,12 +1456,44 @@ function normalizeFileName(name) {
         .toLowerCase();
 }
 
+function encodeAssetPath(assetPath) {
+    return String(assetPath)
+        .split("/")
+        .map(function (part) {
+            return encodeURIComponent(part);
+        })
+        .join("/");
+}
+
+/** Chemin image explicite (circuit-data.js : champ image). */
+function getPointImagePath(location) {
+    if (!location) return null;
+    if (location.image) return location.image;
+    if (location.audio) {
+        return location.audio
+            .replace(/^audio\//i, "images/")
+            .replace(/\.mp3$/i, ".jpg");
+    }
+    return null;
+}
+
+function applyPointImage(imageElement, location) {
+    if (!imageElement || !location) return;
+    const assetPath = getPointImagePath(location);
+    if (!assetPath) return;
+    imageElement.alt = location.name || "";
+    imageElement.onerror = null;
+    imageElement.src = encodeAssetPath(assetPath);
+}
+
 function stopAllAudio() {
     if (currentAudio) {
+        maybeFinalizePoiAudioOnStop(currentAudio);
         currentAudio.pause();
         currentAudio.currentTime = 0;
         currentAudio = null;
     }
+    poiDescriptionAudioIndex = null;
 
     // Vider le texte mémorisé
     currentDescriptionText = "";
@@ -715,6 +1595,12 @@ function playExclusiveAudio(src, textFile = null, imageElement = null, originalI
 
     // Obtenir le chemin audio selon la langue
     const audioPath = getAudioPath(src);
+
+    if (isPoiTourDescriptionSrc(src)) {
+        poiDescriptionAudioIndex = currentIndex;
+    } else if (src !== 'Chansons/air_doudou.mp3') {
+        poiDescriptionAudioIndex = null;
+    }
     
     // Sauvegarder la position actuelle si l'audio existe déjà et est en pause
     let savedCurrentTime = 0;
@@ -734,63 +1620,81 @@ function playExclusiveAudio(src, textFile = null, imageElement = null, originalI
         }, { once: true });
     }
     
+    function onDescriptionAudioEnded() {
+        currentAudio = null;
+        if (textContainer) {
+            textContainer.scrollTop = 0;
+        }
+        const pauseBtnEl = document.getElementById('pause-btn');
+        if (pauseBtnEl) {
+            pauseBtnEl.textContent = '▶️';
+        }
+        if (src !== 'Chansons/air_doudou.mp3') {
+            const imageElement = document.getElementById('point-image');
+            if (imageElement && textContainer) {
+                imageElement.style.display = 'block';
+                textContainer.style.display = 'none';
+            }
+            if (
+                poiDescriptionAudioIndex !== null &&
+                poiDescriptionAudioIndex === currentIndex
+            ) {
+                const idx = poiDescriptionAudioIndex;
+                poiDescriptionAudioIndex = null;
+                handlePoiDescriptionAudioEnded(idx);
+            }
+        }
+
+        if (src !== 'Chansons/air_doudou.mp3' && currentIndex < filteredLocations.length - 1) {
+            const currentLang = window.translationManager
+                ? window.translationManager.getCurrentLanguage()
+                : 'fr';
+            const continueAudioPath = `audio/continue_${currentLang}.mp3`;
+            const continueAudio = new Audio(continueAudioPath);
+            continueAudio.addEventListener('error', () => {
+                console.warn(`⚠️ Fichier continue ${continueAudioPath} non trouvé`);
+            });
+            continueAudio.play();
+        }
+    }
+
+    function bindEndedHandler(audioEl) {
+        audioEl.addEventListener('ended', onDescriptionAudioEnded, { once: true });
+    }
+
+    function bindPoiDescriptionStartedUnlock(audioEl) {
+        if (!isPoiTourDescriptionSrc(src)) return;
+        const idx = currentIndex;
+        const onPlay = () => unlockPointNavigationAfterAudioStart(idx);
+        audioEl.addEventListener('play', onPlay, { once: true });
+    }
+
     // Gestion d'erreur si le fichier audio n'existe pas
-    currentAudio.addEventListener('error', (e) => {
+    currentAudio.addEventListener('error', () => {
         console.warn(`⚠️ Fichier audio ${audioPath} non trouvé, utilisation du fichier original`);
-        currentAudio = new Audio(src); // Utiliser le fichier original
+        const fallback = new Audio(src);
+        currentAudio = fallback;
+        bindEndedHandler(fallback);
+        bindPoiDescriptionStartedUnlock(fallback);
         if (savedCurrentTime > 0) {
-            currentAudio.addEventListener('loadedmetadata', () => {
-                if (savedCurrentTime > 0 && savedCurrentTime < currentAudio.duration) {
-                    currentAudio.currentTime = savedCurrentTime;
+            fallback.addEventListener('loadedmetadata', () => {
+                if (savedCurrentTime > 0 && savedCurrentTime < fallback.duration) {
+                    fallback.currentTime = savedCurrentTime;
                 }
             }, { once: true });
         }
-        currentAudio.play();
+        fallback.play();
     });
-    
+
+    bindEndedHandler(currentAudio);
+    bindPoiDescriptionStartedUnlock(currentAudio);
     currentAudio.play();
 
     // Mettre à jour le bouton play/pause
     const pauseBtn = document.getElementById('pause-btn');
     if (pauseBtn) {
-        pauseBtn.textContent = "⏸️";
+        pauseBtn.textContent = '⏸️';
     }
-
-    // Ajouter les événements pour gérer la fin de l'audio
-    currentAudio.addEventListener('ended', () => {
-        currentAudio = null;
-        if (textContainer) {
-            textContainer.scrollTop = 0;
-        }
-        // Mettre à jour le bouton play/pause
-        const pauseBtn = document.getElementById('pause-btn');
-        if (pauseBtn) {
-            pauseBtn.textContent = "▶️";
-        }
-        // Ne pas modifier l'affichage si c'était l'air du doudou
-        if (src !== "Chansons/air_doudou.mp3") {
-            const imageElement = document.getElementById("point-image");
-            if (imageElement && textContainer) {
-                imageElement.style.display = "block";
-                textContainer.style.display = "none";
-            }
-        }
-        
-        // Enchaîner avec le fichier "continue" si ce n'est pas le dernier point et si ce n'est pas l'air du doudou
-        if (src !== "Chansons/air_doudou.mp3" && currentIndex < filteredLocations.length - 1) {
-            // Obtenir la langue actuelle
-            const currentLang = window.translationManager ? window.translationManager.getCurrentLanguage() : 'fr';
-            const continueAudioPath = `audio/continue_${currentLang}.mp3`;
-            
-            
-            // Créer et jouer l'audio "continue"
-            const continueAudio = new Audio(continueAudioPath);
-            continueAudio.addEventListener('error', (e) => {
-                console.warn(`⚠️ Fichier continue ${continueAudioPath} non trouvé`);
-            });
-            continueAudio.play();
-        }
-    });
 
     // Ne pas modifier l'affichage si c'est l'air du doudou
     if (textFile && imageElement && textContainer && src !== "Chansons/air_doudou.mp3") {
@@ -845,14 +1749,32 @@ function hideSplashScreen() {
 }
 
 function loadGoogleMaps(callback) {
-    // Si la carte est déjà chargée, on exécute le callback et on sort
+    if (typeof callback === "function") {
+        pendingMapCallbacks.push(callback);
+    }
+
+    const flushMapCallbacks = () => {
+        const queue = pendingMapCallbacks.slice();
+        pendingMapCallbacks.length = 0;
+        queue.forEach((cb) => {
+            try {
+                cb();
+            } catch (e) {
+                console.error("Erreur callback loadGoogleMaps:", e);
+            }
+        });
+    };
+
+    // Si la carte est déjà chargée, on exécute les callbacks et on sort
     if (window.google && window.google.maps) {
-        if(callback) callback();
+        flushMapCallbacks();
         return;
     }
 
-    // Si le chargement a déjà été lancé, on ne fait rien pour éviter les doublons
-    if(mapLoadInitiated) return;
+    // Chargement déjà lancé : les callbacks seront exécutés à la fin du chargement
+    if (mapLoadInitiated) {
+        return;
+    }
     mapLoadInitiated = true;
     
     // Le reste de la fonction de chargement...
@@ -865,15 +1787,22 @@ function loadGoogleMaps(callback) {
             mapDiv.innerHTML = `<div style="padding: 20px; text-align: center; color: #666;"><h3>Carte non disponible</h3><p>Vérifiez votre connexion.</p></div>`;
         }
         updateDisplayFallback();
+        if (document.getElementById("map") && !window.mainLogicInitialized) {
+            window.mainLogicInitialized = true;
+            try {
+                initializeMainLogic();
+            } catch (e) {
+                console.error("initializeMainLogic après erreur carte:", e);
+            }
+        }
+        flushMapCallbacks();
     };
 
     const mapLoadTimeout = setTimeout(handleMapError, 8000);
 
     window.initMap = function () {
         clearTimeout(mapLoadTimeout);
-        if (callback) {
-            callback();
-        }
+        flushMapCallbacks();
     };
 
     // Récupérer la clé API depuis la variable globale (injectée par api-key.js)
@@ -945,6 +1874,24 @@ function setupTransitButton(locationsList, getIndexFn) {
   closeBtn.addEventListener("click", closeModal);
   modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
 
+  linkEl.addEventListener("click", (e) => {
+    if (linkEl.classList.contains("transit-disabled")) {
+      e.preventDefault();
+      return;
+    }
+    const href = linkEl.getAttribute("href");
+    if (!href || href === "#") {
+      e.preventDefault();
+      return;
+    }
+    e.preventDefault();
+    if (typeof window.clqOpenGoogleMapsFromUrl === "function") {
+      window.clqOpenGoogleMapsFromUrl(href);
+    } else {
+      window.location.assign(href);
+    }
+  });
+
   transitBtn.addEventListener("click", () => {
     const idx = typeof getIndexFn === 'function' ? getIndexFn() : 0;
     const poi = locationsList && locationsList[idx];
@@ -1001,53 +1948,93 @@ function setupUberButton(locationsList, getIndexFn) {
 
 function openUberDeepLink(lat, lng, name) {
   const encodedName = encodeURIComponent(name);
-  const latStr = encodeURIComponent(String(lat));
-  const lngStr = encodeURIComponent(String(lng));
-  // Crochets en %5B %5D : certains parseurs (Safari) rejettent uber://… avec dropoff[…] dans l’URL.
-  // On n’utilise plus uber:// : sans app installée, Safari affiche « l’adresse n’est pas valide ».
-  // Le lien universel https://m.uber.com/ul/ ouvre l’app si présente, sinon le flux web.
-  const q =
-    `action=setPickup` +
+  const deeplink =
+    `uber://?action=setPickup` +
     `&pickup=my_location` +
-    `&dropoff%5Blatitude%5D=${latStr}` +
-    `&dropoff%5Blongitude%5D=${lngStr}` +
-    `&dropoff%5Bnickname%5D=${encodedName}` +
-    `&dropoff%5Bformatted_address%5D=${encodedName}`;
-  const url = `https://m.uber.com/ul/?${q}`;
-  const opened = window.open(url, '_blank', 'noopener,noreferrer');
-  if (!opened) {
-    window.location.href = url;
-  }
+    `&dropoff[latitude]=${lat}` +
+    `&dropoff[longitude]=${lng}` +
+    `&dropoff[nickname]=${encodedName}` +
+    `&dropoff[formatted_address]=${encodedName}`;
+
+  // Web fallback : m.uber.com avec paramètres dropoff
+  const fallback =
+    `https://m.uber.com/ul/?action=setPickup` +
+    `&pickup=my_location` +
+    `&dropoff[latitude]=${lat}` +
+    `&dropoff[longitude]=${lng}` +
+    `&dropoff[nickname]=${encodedName}` +
+    `&dropoff[formatted_address]=${encodedName}`;
+  let didFallback = false;
+  const timer = setTimeout(() => {
+    if (!didFallback) {
+      window.open(fallback, '_blank', 'noopener');
+      didFallback = true;
+    }
+  }, 1200);
+  window.location.href = deeplink;
+  window.addEventListener('pagehide', () => clearTimeout(timer), { once: true });
 }
 
 function startMap() {
-    // Vérifier si la carte est déjà initialisée et si on revient sur la page
     const wasInitialized = localStorage.getItem('mapInitialized') === 'true';
-    
+
     if (initializationInProgress) {
         return;
     }
-    
-    if (mapInitialized && wasInitialized) {
-        // Cacher le splash screen car la carte est déjà prête
+
+    // Instance Maps déjà présente (double startMap ou retour bfcache)
+    if (map && typeof map.getCenter === 'function') {
         hideSplashScreen();
-        // Restaurer l'état sans réinitialiser la carte
         if (!window.mainLogicInitialized) {
             initializeMainLogic();
             window.mainLogicInitialized = true;
         }
         return;
     }
-    
+
+    if (mapInitialized && wasInitialized) {
+        hideSplashScreen();
+        if (!window.mainLogicInitialized) {
+            initializeMainLogic();
+            window.mainLogicInitialized = true;
+        }
+        return;
+    }
+
     initializationInProgress = true;
 
+    const mapCenter =
+        typeof startPoint !== 'undefined' && startPoint
+            ? { lat: startPoint.lat, lng: startPoint.lng }
+            : { lat: 37.9834, lng: -1.1302 };
+
     loadGoogleMaps(() => {
-        // Le callback est simple : on initialise la carte et on met à jour l'affichage.
-        // PAS d'appel récursif ici.
-        
+        try {
+        if (!window.google || !window.google.maps) {
+            console.error('Google Maps API non chargée (vérifier api-key.js)');
+            initializationInProgress = false;
+            return;
+        }
+
+        if (map && typeof map.getCenter === 'function') {
+            initializationInProgress = false;
+            hideSplashScreen();
+            if (!window.mainLogicInitialized) {
+                initializeMainLogic();
+                window.mainLogicInitialized = true;
+            }
+            return;
+        }
+
+        const mapEl = document.getElementById('map');
+        if (!mapEl) {
+            initializationInProgress = false;
+            return;
+        }
+
         const mapOptions = {
             zoom: 16,
-            center: { lat: 50.4543, lng: 3.9526 },
+            center: mapCenter,
             mapTypeId: 'roadmap', // Vue classique avec routes
             mapTypeControl: false,
             streetViewControl: false,
@@ -1056,7 +2043,6 @@ function startMap() {
             // Options pour le guidage par rotation
             heading: 0, // Rotation initiale de la carte
             tilt: 0, // Vue de dessus (0 = 2D, 45 = 3D)
-            renderingType: google.maps.RenderingType ? google.maps.RenderingType.VECTOR : undefined,
             // Options pour le centrage automatique
             gestureHandling: 'cooperative', // Permet le centrage automatique
             // Désactiver le zoom automatique pour éviter les conflits
@@ -1067,7 +2053,7 @@ function startMap() {
             userHasPanned: false
         };
         
-        map = new google.maps.Map(document.getElementById('map'), mapOptions);
+        map = new google.maps.Map(mapEl, mapOptions);
         
         // Initialiser les services de directions
         directionsService = new google.maps.DirectionsService();
@@ -1106,6 +2092,10 @@ function startMap() {
             initializeMainLogic();
             window.mainLogicInitialized = true;
         }
+        } catch (e) {
+            console.error('Erreur création carte Google Maps:', e);
+            initializationInProgress = false;
+        }
     });
 }
 
@@ -1125,79 +2115,51 @@ function isGeoLocationGranted() {
     return localStorage.getItem('geoPermissionGranted') === 'true';
 }
 
-const CLQ_TRANSIENT_POSITION_MAX_AGE_MS = 30 * 60 * 1000;
-const CLQ_STORED_ARRAY_MAX_ITEMS = 200;
-
-function pruneJsonArrayStorageKey(key, maxItems = CLQ_STORED_ARRAY_MAX_ITEMS) {
+function persistLastKnownUserPosition(pos) {
+    if (!pos || typeof pos.lat !== 'number' || typeof pos.lng !== 'number' || isNaN(pos.lat) || isNaN(pos.lng)) return;
+    const now = Date.now();
+    if (now - lastKnownPositionPersistTime < LAST_KNOWN_POSITION_PERSIST_MS) return;
+    lastKnownPositionPersistTime = now;
     try {
-        const raw = localStorage.getItem(key);
-        if (!raw) return;
-        const value = JSON.parse(raw);
-        if (!Array.isArray(value)) {
-            localStorage.removeItem(key);
-            return;
-        }
-        if (value.length > maxItems) {
-            localStorage.setItem(key, JSON.stringify(value.slice(-maxItems)));
-        }
+        localStorage.setItem(MONS_LAST_KNOWN_POSITION_KEY, JSON.stringify({ lat: pos.lat, lng: pos.lng, ts: now }));
     } catch (e) {
-        localStorage.removeItem(key);
+        /* quota / mode privé */
     }
 }
 
-function prunePendingGeoPosition() {
+function readLastKnownUserPosition() {
     try {
-        const raw = sessionStorage.getItem('clq_pending_geo_position');
-        if (!raw) return;
-        const value = JSON.parse(raw);
-        const ts = typeof value.ts === 'number' ? value.ts : 0;
-        if (!ts || Date.now() - ts > CLQ_TRANSIENT_POSITION_MAX_AGE_MS) {
-            sessionStorage.removeItem('clq_pending_geo_position');
-        }
-    } catch (e) {
-        sessionStorage.removeItem('clq_pending_geo_position');
-    }
-}
-
-function pruneClqNavigationStorage() {
-    prunePendingGeoPosition();
-    pruneJsonArrayStorageKey('mons_visitedPoints');
-    try {
-        sessionStorage.removeItem('clq_main_geo_reset');
-    } catch (e) {
-        /* ignore */
-    }
-}
-
-function releaseTransientMapResourcesForLeave() {
-    pruneClqNavigationStorage();
-    try {
-        sessionStorage.setItem(
-            'clq_guidance_was_active',
-            watchId !== null || localStorage.getItem('geoPermissionGranted') === 'true' ? '1' : '0'
-        );
-    } catch (e) {
-        /* ignore */
-    }
-    if (watchId !== null && navigator.geolocation) {
-        try {
-            navigator.geolocation.clearWatch(watchId);
-        } catch (e) {
-            /* ignore */
-        }
-        watchId = null;
-    }
-    try {
-        routeMarkers.forEach((marker) => marker.setMap(null));
-        routeMarkers = [];
-        if (directionsRenderer) {
-            directionsRenderer.setDirections({ routes: [] });
+        const raw = localStorage.getItem(MONS_LAST_KNOWN_POSITION_KEY);
+        if (!raw) return null;
+        const o = JSON.parse(raw);
+        if (typeof o.lat === 'number' && typeof o.lng === 'number' && !isNaN(o.lat) && !isNaN(o.lng)) {
+            return { lat: o.lat, lng: o.lng };
         }
     } catch (e) {
         /* ignore */
     }
-    androidStablePosition = null;
-    androidStablePositionAt = 0;
+    return null;
+}
+
+/** Sauvegarde index, score et dernière position GPS avant navigation vers une autre page (POI, culture, etc.). */
+function snapshotTourStateForExternalPage() {
+    localStorage.setItem('mons_currentIndex', String(currentIndex));
+    localStorage.setItem('mons_score', String(score));
+    try {
+        if (userPositionMarker && userPositionMarker.getPosition) {
+            const p = userPositionMarker.getPosition();
+            if (p) {
+                const lat = typeof p.lat === 'function' ? p.lat() : p.lat;
+                const lng = typeof p.lng === 'function' ? p.lng() : p.lng;
+                if (typeof lat === 'number' && typeof lng === 'number') {
+                    localStorage.setItem(MONS_LAST_KNOWN_POSITION_KEY, JSON.stringify({ lat, lng, ts: Date.now() }));
+                    lastKnownPositionPersistTime = Date.now();
+                }
+            }
+        }
+    } catch (e) {
+        /* ignore */
+    }
 }
 
 // (Suppression de la fonction startGuidance et de tout le guidage vocal)
@@ -1215,21 +2177,27 @@ function updateLocation() {
         if (imageElement) {
             const current = filteredLocations[currentIndex];
             if (current) {
-                const imageFileName = normalizeFileName(current.name);
-                const imagePath = `images/${imageFileName}.jpg`;
-                imageElement.src = imagePath;
-                imageElement.alt = current.name;
+                applyPointImage(imageElement, current);
             }
         }
     }
 
-    // Vérifier si on a déjà une position utilisateur
+    syncNextButtonState();
+
+    // Vérifier si on a déjà une position utilisateur (marqueur en mémoire ou dernière position sauvegardée)
     let initialRouteCalculated = false;
     if (userPositionMarker) {
         const lastKnownPos = userPositionMarker.getPosition();
         if (lastKnownPos) {
             const pos = { lat: lastKnownPos.lat(), lng: lastKnownPos.lng() };
             calculateRouteFromPosition(pos, "Votre position");
+            initialRouteCalculated = true;
+        }
+    } else if (map) {
+        const savedPos = readLastKnownUserPosition();
+        if (savedPos) {
+            updateUserMarker(savedPos);
+            calculateRouteFromPosition(savedPos, "Votre position");
             initialRouteCalculated = true;
         }
     }
@@ -1243,111 +2211,33 @@ function updateLocation() {
         }
     }
 
-    // Suivre la position GPS en continu pour obtenir le heading basé sur le mouvement (comme Google Maps)
-if (navigator.geolocation) {
-    // Arrêter un éventuel watchPosition précédent
-    if (watchId !== null) {
-        navigator.geolocation.clearWatch(watchId);
+    if (!canUseDeviceGeolocation()) {
+        if (!initialRouteCalculated) {
+            applyGuidanceWithoutGps();
+        }
+        return;
     }
 
-    watchId = navigator.geolocation.watchPosition(
-        (position) => {
-            let pos = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
-            };
+    if (isMainGeoPromptVisible()) {
+        return;
+    }
 
-            const isAndroidGPS = /android/i.test(navigator.userAgent);
-            const speed   = position.coords.speed;
-            const heading = position.coords.heading;
-
-            if (isAndroidGPS) {
-                // Hystérésis : seuils TRÈS bas pour réactivité maximale
-                if (speed !== null && speed !== undefined) {
-                    if (speed > 0.5) {        // ~2 km/h = marche lente
-                        movingVotes++;
-                        stillVotes = 0;
-                    } else if (speed < 0.2) { // ~0.7 km/h = quasi-immobile
-                        stillVotes++;
-                        movingVotes = 0;
-                    }
-
-                    // Activation IMMÉDIATE (1 seul vote suffit)
-                    if (movingVotes >= 1) {
-                        androidMode = 'MOVING';
-                    }
-                    if (stillVotes >= 1) {
-                        androidMode = 'STATIONARY';
-                    }
-                }
-
-                if (heading !== null && heading !== undefined && !isNaN(heading)) {
-                    // ✅ toujours normaliser / mettre à jour gpsHeading
-                    gpsHeading = norm360(heading);
-
-                    // En mode MOVING, on met aussi à jour bearingTarget
-                    if (androidMode === 'MOVING') {
-                        bearingTarget = gpsHeading;
-                    }
-                }
-            } else {
-                // iOS ou autre : comportement classique
-                if (heading !== null && heading !== undefined && !isNaN(heading)) {
-                    gpsHeading = norm360(heading);
-                }
+    if (!guidanceWatchActive || watchId === null) {
+        const started = startGeolocationWatch();
+        if (!started && !initialRouteCalculated && !routeGpsThrottleEnabled) {
+            const display = document.getElementById('location-name');
+            if (display) {
+                const geolocationImpossible = window.translationManager
+                    ? window.translationManager.translate('geolocation_impossible')
+                    : 'Géolocalisation impossible. Affichage depuis le point de départ.';
+                display.textContent = geolocationImpossible;
             }
-
-            if (isAndroidGPS) {
-                const filteredPos = getFilteredAndroidPosition(position);
-                if (!filteredPos) {
-                    if (!initialRouteCalculated && typeof startPoint !== 'undefined' && startPoint) {
-                        calculateRouteFromPosition(startPoint, "Point de départ");
-                    }
-                    return;
-                }
-                pos = filteredPos;
+            if (typeof startPoint !== 'undefined' && startPoint) {
+                calculateRouteFromPosition(startPoint, 'Point de départ');
+                routeGpsThrottleEnabled = true;
             }
-
-            updateUserMarker(pos);
-
-            // ➜ Sur Android : carte POI vers le haut + flèche = direction de marche
-            updateAndroidPoiUpGuidance();
-
-
-            if (!initialRouteCalculated) {
-                calculateRouteFromPosition(pos, "Votre position");
-            } else {
-                const now = Date.now();
-                const shouldRecalculate =
-                    !lastRouteCalculationPos ||
-                    calculateDistanceBetweenPositions(lastRouteCalculationPos, pos) > 20 ||
-                    (now - lastRouteCalculationTime) > 10000;
-
-                if (shouldRecalculate) {
-                    lastRouteCalculationPos = { lat: pos.lat, lng: pos.lng };
-                    lastRouteCalculationTime = now;
-                    calculateRouteFromPosition(pos, "Votre position");
-                }
-            }
-        },
-        (error) => {
-            console.error("❌ Erreur watchPosition :", error);
-            if (!initialRouteCalculated) {
-                const display = document.getElementById("location-name");
-                if (display) {
-                    display.textContent = "Géolocalisation impossible. Affichage depuis le point de départ.";
-                }
-                calculateRouteFromPosition(startPoint, "Point de départ");
-            }
-        },
-        {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0
         }
-    );
-}
-
+    }
 }
 
 // --- Filtres pour stabiliser la boussole ---
@@ -1369,30 +2259,39 @@ function angularDiff(target, current) {
     return diff;
 }
 
-function updateUserMarker(pos) {
+function updateUserMarker(pos, fromGpsWatch) {
+    if (!map || !pos) return;
+    const latLng =
+        typeof google !== 'undefined' && google.maps && google.maps.LatLng
+            ? new google.maps.LatLng(pos.lat, pos.lng)
+            : pos;
+
     if (userPositionMarker) {
-        userPositionMarker.setPosition(pos);
-        
-        // Restaurer la rotation de la flèche si la boussole est active
-        if (isCompassActive) {
-            const icon = userPositionMarker.getIcon();
-            if (icon) {
-                icon.rotation = currentArrowRotation;
-                userPositionMarker.setIcon(icon);
+        userPositionMarker.setMap(map);
+        userPositionMarker.setPosition(latLng);
+
+        if (isCompassActive || guidanceWatchActive) {
+            if (navHeadingSmoothed != null && !isNaN(navHeadingSmoothed)) {
+                applyMapNavigationRotation(navHeadingSmoothed);
             }
         }
-        
-        // Centrer la carte sur l'utilisateur et adapter le zoom (zoom 17 si proche du point, sinon 16)
-        if (map) {
-            const now = Date.now();
-            if (!lastMapUpdateTime || (now - lastMapUpdateTime) > 3000) { // Maximum toutes les 3 secondes
-                applyMapViewForGuidance(pos);
-                lastMapUpdateTime = now;
-            }
+
+        const now = Date.now();
+        const mapInterval =
+            fromGpsWatch || guidanceWatchActive
+                ? isIOSDevice()
+                    ? 1000
+                    : 800
+                : isIOSDevice()
+                  ? 4500
+                  : 3000;
+        if (!lastMapUpdateTime || now - lastMapUpdateTime > mapInterval) {
+            applyMapViewForGuidance(pos);
+            lastMapUpdateTime = now;
         }
     } else {
         userPositionMarker = new google.maps.Marker({
-            position: pos,
+            position: latLng,
             map: map,
             icon: {
                 path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
@@ -1412,24 +2311,11 @@ function updateUserMarker(pos) {
             lastMapUpdateTime = Date.now();
         }
     }
+    persistLastKnownUserPosition(pos);
 }
 
 function calculateRouteFromPosition(pos, fromName = "Votre position") {
-    let destination;
-    if (localStorage.getItem('museumMode') === 'true') {
-        try {
-            const museum = JSON.parse(localStorage.getItem("museumData"));
-            if (museum && museum.lat && museum.lng) {
-                destination = museum;
-            }
-        } catch (e) {
-            console.error("Erreur lors du calcul de l'itinéraire vers le musée:", e);
-            return;
-        }
-    } else {
-        destination = filteredLocations[currentIndex];
-    }
-
+    const destination = getRouteDestination();
     if (destination) {
         calculateRoute(pos, destination, fromName, destination.name);
     }
@@ -1443,18 +2329,21 @@ const ZOOM_LEVEL_DEFAULT = 16;
 // Centre la carte sur l'utilisateur et adapte le zoom selon la distance au point suivant
 function applyMapViewForGuidance(userPos) {
     if (!map) return;
-    if (map.get('userHasPanned')) {
-        if (isAndroidDevice() && typeof map.panTo === 'function') {
-            map.panTo(userPos);
-        } else {
-            map.setCenter(userPos);
-        }
+    const center =
+        typeof google !== 'undefined' && google.maps && google.maps.LatLng
+            ? new google.maps.LatLng(userPos.lat, userPos.lng)
+            : userPos;
+    if (map.get('userHasPanned') && !guidanceWatchActive) {
+        map.panTo(center);
         return;
     }
-    if (isAndroidDevice() && typeof map.panTo === 'function') {
-        map.panTo(userPos);
-    } else {
-        map.setCenter(userPos);
+    map.panTo(center);
+    if (
+        guidanceWatchActive &&
+        navHeadingSmoothed != null &&
+        !isNaN(navHeadingSmoothed)
+    ) {
+        applyMapNavigationRotation(navHeadingSmoothed);
     }
     let destination = null;
     if (localStorage.getItem('museumMode') === 'true') {
@@ -1467,53 +2356,8 @@ function applyMapViewForGuidance(userPos) {
     }
     if (destination) {
         const dist = calculateDistanceBetweenPositions(userPos, destination);
-        const nextZoom = dist <= GUIDANCE_ZOOM_RADIUS_M ? ZOOM_LEVEL_NEAR : ZOOM_LEVEL_DEFAULT;
-        if (map.getZoom && map.getZoom() !== nextZoom) {
-            map.setZoom(nextZoom);
-        }
+        map.setZoom(dist <= GUIDANCE_ZOOM_RADIUS_M ? ZOOM_LEVEL_NEAR : ZOOM_LEVEL_DEFAULT);
     }
-}
-
-function getCurrentUserLatLng() {
-    if (!userPositionMarker) return null;
-    const p = userPositionMarker.getPosition();
-    if (!p) return null;
-    return { lat: p.lat(), lng: p.lng() };
-}
-
-function resetAndroidMapAndMarkerForGoogleGuidance(heading) {
-    if (!isAndroidDevice()) return;
-    const mapDiv = document.getElementById('map');
-    if (mapDiv) {
-        const gmStyle = mapDiv.querySelector('.gm-style');
-        if (gmStyle) {
-            gmStyle.style.transform = '';
-            gmStyle.style.transformOrigin = '';
-            gmStyle.style.transition = '';
-        }
-    }
-    const headingValue = typeof heading === 'number' && !isNaN(heading)
-        ? norm360(heading + ANDROID_MAP_HEADING_OFFSET_DEG)
-        : (typeof gpsHeading === 'number' && !isNaN(gpsHeading) ? norm360(gpsHeading + ANDROID_MAP_HEADING_OFFSET_DEG) : null);
-    if (headingValue !== null && map && typeof map.setHeading === 'function') {
-        androidHeadingSmoothed = androidHeadingSmoothed === null
-            ? headingValue
-            : emaAngle(androidHeadingSmoothed, headingValue, 0.55);
-        try {
-            if (typeof map.setTilt === 'function') map.setTilt(0);
-            map.setHeading(androidHeadingSmoothed);
-        } catch (e) {
-            /* Google Maps raster fallback: heading may be ignored. */
-        }
-    }
-    if (userPositionMarker && userPositionMarker.getIcon) {
-        const icon = userPositionMarker.getIcon();
-        if (icon && icon.rotation !== 0) {
-            icon.rotation = 0;
-            userPositionMarker.setIcon(icon);
-        }
-    }
-    currentArrowRotation = 0;
 }
 
 // Fonction utilitaire pour calculer la distance entre deux positions (en mètres)
@@ -1532,96 +2376,62 @@ function calculateDistanceBetweenPositions(pos1, pos2) {
     return R * c;
 }
 
-function getFilteredAndroidPosition(position) {
-    const raw = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
-    };
-    if (!isAndroidDevice()) return raw;
-
-    const now = Date.now();
-    const accuracy = typeof position.coords.accuracy === 'number'
-        ? position.coords.accuracy
-        : null;
-
-    if (accuracy !== null && accuracy > ANDROID_GPS_MAX_ACCURACY_M) {
-        return androidStablePosition;
-    }
-
-    if (!androidStablePosition) {
-        androidStablePosition = raw;
-        androidStablePositionAt = now;
-        return raw;
-    }
-
-    const distance = calculateDistanceBetweenPositions(androidStablePosition, raw);
-    const elapsedSeconds = Math.max((now - androidStablePositionAt) / 1000, 1);
-    const impliedSpeed = distance / elapsedSeconds;
-    const reportedSpeed = typeof position.coords.speed === 'number'
-        ? position.coords.speed
-        : null;
-    const allowedJump = Math.max(
-        ANDROID_GPS_MIN_JUMP_M,
-        (accuracy || 20) * 2.5
-    );
-
-    if (
-        distance > allowedJump &&
-        impliedSpeed > ANDROID_GPS_MAX_WALK_SPEED_MPS &&
-        (reportedSpeed === null || reportedSpeed < ANDROID_GPS_MAX_WALK_SPEED_MPS)
-    ) {
-        return androidStablePosition;
-    }
-
-    if (distance < ANDROID_GPS_MIN_MOVE_M) {
-        return androidStablePosition;
-    }
-
-    const alpha = accuracy === null
-        ? 0.35
-        : accuracy <= 15
-            ? 0.65
-            : accuracy <= 35
-                ? 0.4
-                : 0.2;
-
-    androidStablePosition = {
-        lat: androidStablePosition.lat + (raw.lat - androidStablePosition.lat) * alpha,
-        lng: androidStablePosition.lng + (raw.lng - androidStablePosition.lng) * alpha
-    };
-    androidStablePositionAt = now;
-    return androidStablePosition;
-}
-
 function calculateRoute(from, to, fromName, toName) {
-    // Éviter les calculs simultanés
     if (isUpdating) {
         return;
     }
-    
+
+    const requestId = ++routeRequestSeq;
     isUpdating = true;
 
-    // Effacer les anciens marqueurs de route
-    routeMarkers.forEach(marker => marker.setMap(null));
+    routeMarkers.forEach((marker) => marker.setMap(null));
     routeMarkers = [];
 
-    // Supprimer le rendu du trajet précédent
     if (directionsRenderer) {
-        directionsRenderer.setDirections({routes: []});
+        directionsRenderer.setDirections({ routes: [] });
     }
 
     const request = {
         origin: from,
         destination: to,
-        travelMode: 'WALKING'
+        travelMode: "WALKING",
     };
 
     directionsService.route(request, (result, status) => {
-        if (status == 'OK') {
+        if (requestId !== routeRequestSeq) {
+            isUpdating = false;
+            return;
+        }
+        if (status == "OK") {
+            if (!guidanceWatchActive) {
+                resetMapRotation();
+            }
             directionsRenderer.setDirections(result);
 
+            const route = result.routes[0];
+            const leg = route.legs[0];
+            const fitKey = `${to.lat},${to.lng}`;
+            const followGpsLive = guidanceWatchActive && userPositionMarker;
+            if (
+                map &&
+                route.bounds &&
+                fitKey !== lastRouteFitKey &&
+                !map.get('userHasPanned') &&
+                !followGpsLive
+            ) {
+                lastRouteFitKey = fitKey;
+                map.fitBounds(route.bounds, { top: 72, right: 48, bottom: 96, left: 48 });
+            } else if (followGpsLive) {
+                const livePos = getCurrentUserLatLng();
+                if (livePos) {
+                    applyMapViewForGuidance(livePos);
+                }
+                if (gpsHeading != null && !isNaN(gpsHeading)) {
+                    applyWalkNavigationHeading(gpsHeading);
+                }
+            }
+
             // Créer uniquement le marqueur d'arrivée
-            const leg = result.routes[0].legs[0];
             const destinationMarker = new google.maps.Marker({
                 position: leg.end_location,
                 map: map,
@@ -1723,13 +2533,15 @@ function advanceToNextPoint() {
             selfieBtn.style.display = 'block';
         }
         
+        markAudioHeardForIndex(currentIndex);
         // Avancer normalement vers le dernier point
         currentIndex++;
         steps = [];
         currentStepIndex = 0;
         localStorage.setItem("mons_currentIndex", currentIndex);
         localStorage.setItem("mons_score", score);
-        updateLocation();
+        localStorage.setItem('tourCompleted', 'true');
+        refreshRouteToCurrentDestination();
         syncNextButtonState();
         return; 
     }
@@ -1748,14 +2560,18 @@ function advanceToNextPoint() {
             visitedPoints.push(currentIndex);
             localStorage.setItem('mons_visitedPoints', JSON.stringify(visitedPoints));
         }
-        
+
+        markAudioHeardForIndex(currentIndex);
         currentIndex++;
         steps = [];
         currentStepIndex = 0;
         // Sauvegarde systématique de l'état
         localStorage.setItem("mons_currentIndex", currentIndex);
         localStorage.setItem("mons_score", score);
-        updateLocation();
+        if (currentIndex >= filteredLocations.length - 1) {
+            localStorage.setItem('tourCompleted', 'true');
+        }
+        refreshRouteToCurrentDestination();
         syncNextButtonState();
     } else {
         alert("Vous avez atteint la fin du parcours !");
@@ -2105,7 +2921,6 @@ async function handleResetWithCodeCheck() {
     window.location.href = "language-selection.html";
 }
 
-
 function translateClq(key, fallback) {
   if (window.translationManager && window.translationManager.isLoaded) {
     const v = window.translationManager.translate(key);
@@ -2117,23 +2932,6 @@ function translateClq(key, fallback) {
 function getLocationAtIndex(idx) {
   if (idx === 0) return startPoint;
   return filteredLocations[idx];
-}
-
-function isPointUnlockedForNext(idx) {
-  const audioIdx = localStorage.getItem('mons_audio_clicked_index');
-  return String(audioIdx) === String(idx);
-}
-
-function canStartQuizAtCurrentPoint() {
-  return isPointUnlockedForNext(currentIndex);
-}
-
-function showQuizListenBeforePopup(onClose) {
-  showStyledPopup(
-    translateClq('quiz_listen_before_title', 'Descriptif audio'),
-    translateClq('quiz_listen_before_message', 'Appuyez sur le bouton audio pour demarrer le descriptif de ce point avant de poursuivre avec le quiz.'),
-    onClose || null
-  );
 }
 
 function clearQuizCompletionFromIndex(fromIdx) {
@@ -2179,11 +2977,22 @@ function stopQuizPermanently() {
 
 function confirmStopQuizPermanently() {
   showUniversalPopup({
-    title: translateClq('quiz_stop_confirm_title', 'Arreter le quiz ?'),
-    message: translateClq('quiz_stop_confirm_message', "Le quiz ne vous sera plus propose pendant le parcours.<br><br>Vous pourrez le reactiver a tout moment en appuyant sur le bouton <b>Quiz</b> dans la barre de menu en bas de l'ecran."),
+    title: translateClq('quiz_stop_confirm_title', 'Arrêter le quiz ?'),
+    message: translateClq(
+      'quiz_stop_confirm_message',
+      'Le quiz ne vous sera plus proposé pendant le parcours.<br><br>Vous pourrez le réactiver à tout moment en appuyant sur le bouton <b>Quiz</b> dans la barre de menu en bas de l\'écran.'
+    ),
     buttons: [
-      { label: translateClq('no', 'Non'), color: '#888', onClick: null },
-      { label: translateClq('yes', 'Oui'), color: '#b30000', onClick: () => stopQuizPermanently() }
+      {
+        label: translateClq('no', 'Non'),
+        color: '#888',
+        onClick: null
+      },
+      {
+        label: translateClq('yes', 'Oui'),
+        color: '#b30000',
+        onClick: () => stopQuizPermanently()
+      }
     ]
   });
 }
@@ -2191,9 +3000,16 @@ function confirmStopQuizPermanently() {
 function resumeQuizFromFooter() {
   showUniversalPopup({
     title: translateClq('quiz_resume_confirm_title', 'Reprendre le quiz ?'),
-    message: translateClq('quiz_resume_confirm_message', 'Voulez-vous reprendre le quiz a ce point ? Les questions seront proposees pour ce lieu et les points suivants.'),
+    message: translateClq(
+      'quiz_resume_confirm_message',
+      'Voulez-vous reprendre le quiz à ce point ? Les questions seront proposées pour ce lieu et les points suivants.'
+    ),
     buttons: [
-      { label: translateClq('no', 'Non'), color: '#888', onClick: null },
+      {
+        label: translateClq('no', 'Non'),
+        color: '#888',
+        onClick: null
+      },
       {
         label: translateClq('yes', 'Oui'),
         color: '#2ecc40',
@@ -2306,6 +3122,7 @@ function showQuizPrompt(callback) {
 
 // === Ajout : gestion du quiz par point ===
 function showQuizForCurrentPoint(callback) {
+  // Vérifier si le quiz est activé
   if (!quizEnabled) {
     callback();
     return;
@@ -2318,28 +3135,51 @@ function showQuizForCurrentPoint(callback) {
 
   const currentLocation = currentIndex === 0 ? startPoint : filteredLocations[currentIndex];
   const pointName = currentLocation.name;
-
+  
+  
+  // Log de la langue sélectionnée dans le localStorage
+  
+  
+  // S'assurer que le gestionnaire de traductions est prêt
   if (!window.translationManager) {
     setTimeout(() => showQuizForCurrentPoint(callback), 100);
     return;
   }
-
+  
+  // Utiliser le fichier de traductions du quiz
   const currentLang = window.translationManager.getCurrentLanguage();
   const quizTranslations = window.quizTranslations || {};
   const langData = quizTranslations[currentLang] || quizTranslations['fr'] || {};
   let questions = langData[pointName];
-  if (!questions || questions.length === 0) questions = window.quizData ? window.quizData[pointName] : null;
-  if (!questions || questions.length === 0) { callback(); return; }
-  if (completedQuizQuestions[pointName]) { callback(); return; }
-
+  
+  // Fallback vers l'ancien système si les traductions ne sont pas disponibles
+  if (!questions || questions.length === 0) {
+    questions = window.quizData ? window.quizData[pointName] : null;
+  }
+  
+  
+  if (!questions || questions.length === 0) {
+    callback();
+    return;
+  }
+  if (completedQuizQuestions[pointName]) {
+    callback();
+    return;
+  }
+  
+  
+  // Marquer qu'un quiz est en cours
   currentQuizInProgress = true;
+  
+  // Mettre à jour l'affichage pour refléter le nouveau maxScore
   updateCurrentDisplay();
-  const btns = [nextButton, prevButton, homeButton, cultureButton, audioBtn, poiInterestBtn, doudouBtn, pauseBtn, stopBtn, restartBtn];
+  
+  // Désactiver tous les boutons sauf quiz
+  const btns = [nextButton, prevButton, homeButton, cultureButton, audioBtn, poiInterestBtn, pauseBtn, stopBtn, restartBtn];
   quizSessionUiButtons = btns;
   btns.forEach(btn => { if (btn) btn.disabled = true; });
   let questionIndex = 0;
   let localScore = 0;
-
   function finishQuizPoint() {
     score += localScore;
     completedQuizQuestions[pointName] = true;
@@ -2356,19 +3196,24 @@ function showQuizForCurrentPoint(callback) {
   function afterAnswerFeedback(isGood, fields) {
     if (isGood) localScore += 10;
     new Audio(isGood ? 'audio/correct.mp3' : 'audio/incorrect.mp3').play();
+
     const feedbackImg = document.createElement('img');
-    feedbackImg.src = 'images/' + (isGood ? 'correct' : 'incorrect') + '.png';
-    feedbackImg.alt = isGood ? 'Bonne reponse' : 'Mauvaise reponse';
+    feedbackImg.src = `images/${isGood ? 'correct' : 'incorrect'}.png`;
+    feedbackImg.alt = isGood ? 'Bonne réponse' : 'Mauvaise réponse';
     feedbackImg.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:120px;height:120px;z-index:10000';
     document.body.appendChild(feedbackImg);
+
     let correctAnswerContainer = null;
     if (!isGood) {
       correctAnswerContainer = document.createElement('div');
       correctAnswerContainer.style.cssText = 'position:fixed;top:calc(50% + 80px);left:50%;transform:translate(-50%,-50%);z-index:10000;text-align:center;background:rgba(0,0,0,0.8);border-radius:15px;padding:15px;color:#FFD700;font-family:MedievalSharp,Arial,serif;font-size:16px;font-weight:bold;min-width:280px';
-      const correctAnswerText = window.translationManager ? window.translationManager.translate('correct_answer') : 'Bonne reponse :';
-      correctAnswerContainer.innerHTML = correctAnswerText + ' <br>' + (fields.options[fields.answer] || '');
+      const correctAnswerText = window.translationManager
+        ? window.translationManager.translate('correct_answer')
+        : 'Bonne réponse :';
+      correctAnswerContainer.innerHTML = `${correctAnswerText} <br>${fields.options[fields.answer] || ''}`;
       document.body.appendChild(correctAnswerContainer);
     }
+
     const delay = isGood ? 1000 : 3000;
     setTimeout(() => {
       if (feedbackImg.parentNode) feedbackImg.remove();
@@ -2383,12 +3228,14 @@ function showQuizForCurrentPoint(callback) {
   function showQuestion() {
     const fields = getQuizQuestionFields(questions[questionIndex]);
     showQuizQuestionPopup({
-      title: 'Question ' + (questionIndex + 1) + ' / 3',
+      title: `Question ${questionIndex + 1} / 3`,
       question: fields.question,
       options: fields.options,
       stopLabel: translateClq('quiz_stop_short', 'Stop'),
       onStop: () => confirmStopQuizPermanently(),
-      onOptionClick: (idx) => afterAnswerFeedback(idx === fields.answer, fields)
+      onOptionClick: (idx) => {
+        afterAnswerFeedback(idx === fields.answer, fields);
+      }
     });
   }
   showQuestion();
@@ -2401,7 +3248,6 @@ async function initApp() {
             window.location.pathname.includes('language-selection')) {
             return;
         }
-        pruneClqNavigationStorage();
         
         // Récupérer la langue choisie dans le localStorage AVANT d'initialiser le gestionnaire
         const lang = localStorage.getItem('selectedLanguage');
@@ -2460,7 +3306,8 @@ async function initApp() {
 function initializeMainLogic() {
     // Cette fonction contient la logique qui doit s'exécuter après le chargement de la carte
     // (ou son échec)
-    
+    ensureNextButtonRef();
+
     // Restaurer l'état de l'application depuis le localStorage
     const savedCurrentIndex = localStorage.getItem("mons_currentIndex");
     const savedScore = localStorage.getItem("mons_score");
@@ -2478,8 +3325,6 @@ function initializeMainLogic() {
     if (savedQuizEnabled !== null) {
         quizEnabled = savedQuizEnabled === 'true';
     }
-
-    updateQuizFooterButton();
     
     // Restaurer les questions de quiz déjà traitées
     if (savedCompletedQuizQuestions !== null && Object.keys(completedQuizQuestions).length === 0) {
@@ -2490,6 +3335,19 @@ function initializeMainLogic() {
             completedQuizQuestions = {};
         }
     } else {
+    }
+
+    updateQuizFooterButton();
+
+    if (
+        filteredLocations &&
+        filteredLocations.length > 0 &&
+        currentIndex >= filteredLocations.length - 1
+    ) {
+        localStorage.setItem('tourCompleted', 'true');
+    }
+    if (localStorage.getItem('tourCompleted') === 'true') {
+        enableTourExplorationMode();
     }
     
     const forceTarget = localStorage.getItem("mons_forceTarget");
@@ -2556,75 +3414,51 @@ function initializeMainLogic() {
         sessionStorage.setItem('comingFromLanguageSelection', 'true');
     }
     
-    // Vérifier si les permissions de géolocalisation ont déjà été accordées
     const geoPermissionGranted = localStorage.getItem('geoPermissionGranted') === 'true';
     const isFirstLaunch = !localStorage.getItem('appLaunchedBefore');
-    
-    // Marquer que l'app a été lancée au moins une fois
+
     if (!isFirstLaunch) {
         localStorage.setItem('appLaunchedBefore', 'true');
     }
-    
-    // Forcer la demande d'autorisation si on vient de language-selection.html
-    const shouldForcePermissionRequest = isComingFromLanguageSelection || isFirstLaunch;
-    
-    if (isAndroidDevice()) {
+
+    const shouldForcePermissionRequest =
+        isComingFromLanguageSelection || isFirstLaunch;
+
+    if (isComingFromLanguageSelection) {
+        sessionStorage.removeItem('clq_geo_session_ok');
+        geoFixConfirmed = false;
+        localStorage.removeItem('geoPermissionGranted');
+        localStorage.removeItem('orientationPermissionGranted');
+        localStorage.removeItem('compassGuidanceActive');
+        requestGeolocationWithUserGesture();
+    } else if (isHandheldPhone() && sessionStorage.getItem('clq_geo_session_ok') !== '1') {
+        geoFixConfirmed = false;
         geoPermissionRequested = false;
         orientationPermissionRequested = false;
-
-        const promptAndroidGeoWithMapFallback = () => {
-            beginMainGeolocationFlow();
-            if (typeof startPoint !== 'undefined' && startPoint && map) {
-                calculateRouteFromPosition(startPoint, 'Point de départ');
-            }
-        };
-
-        if (shouldForcePermissionRequest) {
-            localStorage.removeItem('geoPermissionGranted');
-            localStorage.removeItem('orientationPermissionGranted');
-            localStorage.removeItem('compassGuidanceActive');
-            promptAndroidGeoWithMapFallback();
-        } else {
-            androidVerifyGeoPermission((granted) => {
-                if (granted) {
-                    updateLocation();
-                } else {
-                    promptAndroidGeoWithMapFallback();
-                }
-            });
-        }
+        localStorage.removeItem('orientationPermissionGranted');
+        localStorage.removeItem('compassGuidanceActive');
+        requestGeolocationWithUserGesture();
     } else if (geoPermissionGranted && !shouldForcePermissionRequest) {
-        updateLocation();
+        tryResumeGrantedGeolocation();
     } else {
-        
-        // Forcer la réinitialisation des flags
         geoPermissionRequested = false;
         orientationPermissionRequested = false;
-        
-        // Nettoyer les permissions stockées pour forcer la demande
-        if (isComingFromLanguageSelection) {
-            localStorage.removeItem('geoPermissionGranted');
-            localStorage.removeItem('orientationPermissionGranted');
-            localStorage.removeItem('compassGuidanceActive');
-        } else {
-            // Même si on ne vient pas de language-selection, nettoyer les permissions d'orientation
-            // pour forcer la demande de boussole à chaque ouverture
-            localStorage.removeItem('orientationPermissionGranted');
-            localStorage.removeItem('compassGuidanceActive');
-        }
-        
-        beginMainGeolocationFlow();
+        localStorage.removeItem('orientationPermissionGranted');
+        localStorage.removeItem('compassGuidanceActive');
+        requestGeolocationWithUserGesture();
     }
-    
-    // Forcer la demande de boussole immédiatement
-    const compassGuidanceActive = localStorage.getItem('compassGuidanceActive') === 'true';
-    if (!compassGuidanceActive) {
-        setTimeout(() => {
-            showCompassHelpPopup();
-        }, 2000); // Délai de 2 secondes pour laisser le temps à la page de se charger
-    } else {
+
+    updateLocation();
+    syncNextButtonState();
+
+    if (geoPermissionGranted && typeof restoreCompassState === 'function') {
+        restoreCompassState();
     }
-    
+
+    if (isFirstLaunch) {
+        localStorage.setItem('appLaunchedBefore', 'true');
+    }
+
     // Vérifier l'orientation au démarrage
     checkOrientationAndShowPopup();
     
@@ -2646,6 +3480,7 @@ function initializeMainLogic() {
     setupTransitButton(filteredLocations, () => currentIndex);
     // Bouton Uber
     setupUberButton(filteredLocations, () => currentIndex);
+    setupGoogleMapsNavButton();
 }
 
 // Fonction pour désactiver les boutons du footer en mode musée
@@ -2790,8 +3625,24 @@ function isLandscapeNow() {
     return bySize || mqLandscape;
 }
 
+function isHandheldPhone() {
+    const ua = navigator.userAgent || '';
+    return (
+        /iPhone|iPod/i.test(ua) ||
+        (/Android/i.test(ua) && /Mobile/i.test(ua))
+    );
+}
+
 // Fonction pour vérifier l'orientation et afficher le popup si nécessaire
 function checkOrientationAndShowPopup() {
+    if (typeof isMainGeoPromptVisible === 'function' && isMainGeoPromptVisible()) {
+        const landscapePopup = document.getElementById('landscape-required-popup');
+        if (landscapePopup) landscapePopup.remove();
+        return;
+    }
+    if (isHandheldPhone()) {
+        return;
+    }
     const isLandscape = isLandscapeNow();
 
     // 🔍 Debug (à garder tant que tu testes sur tablette)
@@ -2911,8 +3762,8 @@ function handleCompassHeading(rawHeading) {
     if (typeof rawHeading !== 'number' || isNaN(rawHeading)) return;
 
     const now = performance.now();
-    // On limite la fréquence des mises à jour pour calmer le jitter
-    if (now - lastHeadingUpdateTime < HEADING_MIN_INTERVAL) {
+    const headingInterval = isIOSDevice() ? 140 : HEADING_MIN_INTERVAL;
+    if (now - lastHeadingUpdateTime < headingInterval) {
         return;
     }
     lastHeadingUpdateTime = now;
@@ -2957,42 +3808,52 @@ function handleCompassHeading(rawHeading) {
  * Adapte cette fonction à ton code existant (Leaflet, DOM, etc.).
  */
 function applyHeadingToMap(heading) {
-    if (!map) return;
-    if (isAndroidDevice()) {
-        resetAndroidMapAndMarkerForGoogleGuidance();
-        const pos = getCurrentUserLatLng();
-        if (pos) applyMapViewForGuidance(pos);
-        return;
-    }
-
-    const mapDiv = document.getElementById('map');
-    if (!mapDiv) {
-        console.error('❌ mapDiv introuvable');
-        return;
-    }
-
-    const gmStyle = mapDiv.querySelector('.gm-style');
-    if (!gmStyle) {
-        console.error('❌ .gm-style introuvable dans mapDiv');
-        return;
-    }
-
-    // Carte : on la tourne dans le sens inverse du heading
-    const rotationAngle = -heading;
-    gmStyle.style.transform = `rotate(${rotationAngle}deg)`;
-    gmStyle.style.transformOrigin = 'center center';
-    gmStyle.style.transition = 'transform 0.12s linear';
-
-    // Flèche utilisateur : on la garde "vers le haut"
-    if (userPositionMarker) {
-        const icon = userPositionMarker.getIcon && userPositionMarker.getIcon();
-        if (icon) {
-            currentArrowRotation = heading; // simple, même angle que la boussole
-            icon.rotation = currentArrowRotation;
-            userPositionMarker.setIcon(icon);
-        }
-    }
+    applyWalkNavigationHeading(heading);
 }
+
+function isUserMovingForHeading() {
+    if (androidMode === 'MOVING') {
+        return true;
+    }
+    if (lastDeviceSpeed != null && !isNaN(lastDeviceSpeed) && lastDeviceSpeed > 1.1) {
+        return true;
+    }
+    return false;
+}
+
+/** iOS 13+ : permission boussole dans le geste utilisateur (clic géoloc). */
+function ensureCompassPermission(done) {
+    const finish = typeof done === 'function' ? done : function () {};
+    if (!isHandheldPhone()) {
+        activateCompass();
+        finish();
+        return;
+    }
+    if (
+        isIOSDevice() &&
+        typeof DeviceOrientationEvent !== 'undefined' &&
+        typeof DeviceOrientationEvent.requestPermission === 'function'
+    ) {
+        DeviceOrientationEvent.requestPermission()
+            .then(function (state) {
+                orientationPermissionRequested = true;
+                if (state === 'granted') {
+                    localStorage.setItem('orientationPermissionGranted', 'true');
+                    activateCompass();
+                }
+                finish();
+            })
+            .catch(function () {
+                finish();
+            });
+        return;
+    }
+    orientationPermissionRequested = true;
+    activateCompass();
+    finish();
+}
+
+window.clqEnsureCompassPermission = ensureCompassPermission;
 
 
 
@@ -3073,33 +3934,84 @@ function normalizeAngle(angle) {
 // quelque part dans ton watchPosition (position.coords.heading)
 let lastAndroidHeading = null;
 
+/** iOS : offset boussole (rotation .gm-style ; +90° vs ancien −90° sur le conteneur). */
+const IOS_COMPASS_NAV_OFFSET = 90;
+
+/**
+ * Android (main) : +90° horaire sur la carte uniquement (000° en haut → 090° en haut).
+ * La flèche utilise toujours le cap brut ; seul .gm-style est décalé.
+ */
+const ANDROID_MAP_NAV_OFFSET = 90;
+
+/** Degrés passés à rotate() sur .gm-style (Android : -heading + 90). */
+function getMapGmStyleRotateCssDeg(headingDeg) {
+    const h = ((Number(headingDeg) % 360) + 360) % 360;
+    if (isAndroidDevice()) {
+        return -h + ANDROID_MAP_NAV_OFFSET;
+    }
+    return -h;
+}
+
+function applyIosCompassNavOffset(heading) {
+    if (heading == null || isNaN(heading) || !isIOSDevice()) {
+        return heading;
+    }
+    return normalizeAngle(heading + IOS_COMPASS_NAV_OFFSET);
+}
+
 function getCompassHeadingFromEvent(event) {
+    if (!event) return null;
     const isAndroid = /android/i.test(navigator.userAgent);
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isIOS = isIOSDevice();
+    const moving = isUserMovingForHeading();
 
-    // 🔹 ANDROID : on NE FAIT PLUS CONFIANCE AUX CAPTEURS MAGNÉTIQUES
-    // On utilise UNIQUEMENT le heading GPS pour avoir le même résultat
-    // sur téléphone et tablette.
-    if (isAndroid) {
-        if (typeof gpsHeading === 'number' && !isNaN(gpsHeading)) {
+    if (moving && typeof gpsHeading === 'number' && !isNaN(gpsHeading)) {
+        if (isAndroid) {
             lastAndroidHeading = normalizeAngle(gpsHeading);
-            return lastAndroidHeading;
         }
+        return normalizeAngle(gpsHeading);
+    }
 
-        // Pas encore de heading GPS → on garde le dernier connu, sinon null
+    if (
+        isIOS &&
+        typeof event.webkitCompassHeading === 'number' &&
+        !isNaN(event.webkitCompassHeading)
+    ) {
+        window._clqLastCompassHeading = event.webkitCompassHeading;
+        return applyIosCompassNavOffset(event.webkitCompassHeading);
+    }
+
+    if (
+        typeof event.alpha === 'number' &&
+        !isNaN(event.alpha) &&
+        typeof event.beta === 'number' &&
+        typeof event.gamma === 'number'
+    ) {
+        const computed = computeCompassHeading(
+            event.alpha,
+            event.beta,
+            event.gamma
+        );
+        if (computed != null && !isNaN(computed)) {
+            window._clqLastCompassHeading = computed;
+            return isIOS
+                ? applyIosCompassNavOffset(computed)
+                : normalizeAngle(computed);
+        }
+    }
+
+    if (typeof event.alpha === 'number' && !isNaN(event.alpha)) {
+        window._clqLastCompassHeading = 360 - event.alpha;
+        const fromAlpha = normalizeAngle(360 - event.alpha);
+        return isIOS ? applyIosCompassNavOffset(fromAlpha) : fromAlpha;
+    }
+
+    if (isAndroid && lastAndroidHeading != null) {
         return lastAndroidHeading;
     }
 
-    // 🔹 iOS : on garde la logique boussole (webkitCompassHeading)
-    if (isIOS && typeof event.webkitCompassHeading === 'number') {
-        return normalizeAngle(event.webkitCompassHeading);
-    }
-
-    // 🔹 Fallback générique (autres plateformes) :
-    if (typeof event.alpha === 'number') {
-        // Convention classique : 0° = Nord, rotation horaire
-        // heading ≈ 360 - alpha
-        return normalizeAngle(360 - event.alpha);
+    if (!moving && typeof gpsHeading === 'number' && !isNaN(gpsHeading)) {
+        return normalizeAngle(gpsHeading);
     }
 
     return null;
@@ -3185,14 +4097,6 @@ function handleOrientation(event) {
     const isAndroid = /android/i.test(navigator.userAgent);
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
-    if (isAndroid) {
-        resetAndroidMapAndMarkerForGoogleGuidance();
-        const pos = getCurrentUserLatLng();
-        if (pos) applyMapViewForGuidance(pos);
-        window.isHandlingOrientation = false;
-        return;
-    }
-
     // On sépare :
     // - mapBearing   = orientation de la CARTE (Android : POI vers le haut)
     // - arrowBearing = orientation de la FLÈCHE (direction de l'utilisateur)
@@ -3211,146 +4115,11 @@ function handleOrientation(event) {
         arrowBearing: null
     };
 
-    // --- iOS : on garde la logique boussole qui fonctionne bien ---
-    if (isIOS && typeof event.webkitCompassHeading === 'number') {
-        const deviceOrientation = window.orientation || 0;
-        let offset = 95; // empirique, comme avant
-
-        if (deviceOrientation === 90) {
-            offset = 95;
-        } else if (deviceOrientation === -90 || deviceOrientation === 270) {
-            offset = 95;
-        } else {
-            offset = 95;
-        }
-
-        const heading = norm360(event.webkitCompassHeading + offset);
-
-        // iOS : carte et flèche suivent la boussole
-        mapBearing = heading;
-        arrowBearing = heading;
-
-    // --- ANDROID : CARTE = POI vers le haut, FLÈCHE = heading GPS uniquement ---
-    } else if (isAndroid) {
-
-        // 1) Calcul du bearing vers le POI / musée pour orienter la CARTE
-        (function () {
-            // Vérifications de sécurité : ne pas exécuter si les éléments ne sont pas prêts
-            if (!map) return;
-            if (typeof filteredLocations === 'undefined') return;
-            if (typeof currentIndex === 'undefined') return;
-
-            let from = null;
-            let destination = null;
-
-            // FROM : position utilisateur si disponible, sinon point de départ
-            if (userPositionMarker && userPositionMarker.getPosition) {
-                const pos = userPositionMarker.getPosition();
-                if (pos) {
-                    from = { lat: pos.lat(), lng: pos.lng() };
-                }
-            }
-            if (!from && startPoint && typeof startPoint.lat === 'number' && typeof startPoint.lng === 'number') {
-                from = { lat: startPoint.lat, lng: startPoint.lng };
-            }
-
-            // DESTINATION : musée ou POI courant
-            if (localStorage.getItem('museumMode') === 'true') {
-                try {
-                    const museum = JSON.parse(localStorage.getItem('museumData'));
-                    if (museum && typeof museum.lat === 'number' && typeof museum.lng === 'number') {
-                        destination = { lat: museum.lat, lng: museum.lng };
-                    }
-                } catch (e) {
-                    console.error("Erreur museumData pour orientation Android :", e);
-                }
-            } else {
-                try {
-                    if (typeof filteredLocations !== 'undefined' &&
-                        Array.isArray(filteredLocations) &&
-                        typeof currentIndex === 'number' &&
-                        currentIndex >= 0 &&
-                        currentIndex < filteredLocations.length) {
-                        const loc = filteredLocations[currentIndex];
-                        if (loc && typeof loc.lat === 'number' && typeof loc.lng === 'number') {
-                            destination = { lat: loc.lat, lng: loc.lng };
-                        }
-                    }
-                } catch (e) {
-                    console.error("Erreur filteredLocations/currentIndex pour orientation Android :", e);
-                }
-            }
-
-            if (!from || !destination) return;
-
-            const poiBearing = calculateAzimuth(from, destination); // direction utilisateur → POI
-            debugData.poiBearing = poiBearing;
-
-            if (typeof window.poiBearingSmoothed !== 'number' || isNaN(window.poiBearingSmoothed)) {
-                window.poiBearingSmoothed = poiBearing;
-            } else {
-                window.poiBearingSmoothed = emaAngle(window.poiBearingSmoothed, poiBearing, 0.25);
-            }
-            debugData.poiBearingSmoothed = window.poiBearingSmoothed;
-
-            // ➜ CARTE tournée pour mettre la direction vers le POI vers le haut
-            mapBearing = window.poiBearingSmoothed;
-        })();
-
-        // 2) Direction de l'utilisateur = UNIQUEMENT heading GPS quand on est en mouvement
-        let userHeading = null;
-
-        if (gpsHeading != null && !isNaN(gpsHeading) && androidMode === 'MOVING') {
-            // heading GPS déjà en degrés par rapport au nord
-            userHeading = norm360(gpsHeading);
-        } else {
-            // Pas de heading GPS fiable → on fige la flèche sur la dernière valeur connue
-            if (typeof bearingSmoothed === 'number' && !isNaN(bearingSmoothed)) {
-                userHeading = bearingSmoothed;
-            } else {
-                userHeading = null;
-            }
-        }
-
-        debugData.userHeading = userHeading;
-
-        // Lissage de la flèche : assez réa// Lissage de la flèche : dynamique selon l'ampleur du virage
-if (userHeading != null) {
-    if (typeof bearingSmoothed !== 'number' || isNaN(bearingSmoothed)) {
-        // Première valeur : on se cale directement dessus
-        bearingSmoothed = userHeading;
-    } else {
-        // Différence angulaire entre la direction actuelle et la nouvelle
-        const diff = Math.abs(angDiff(bearingSmoothed, userHeading)); // angDiff doit déjà exister chez toi
-
-        // Plus le virage est important, plus on réagit vite
-        let alpha;
-        if (diff > 60) {
-            // GROS virage → on suit presque directement
-            alpha = 0.9;
-        } else if (diff > 25) {
-            // Virage net mais pas extrême
-            alpha = 0.75;
-        } else {
-            // Petites variations → lissage plus doux
-            alpha = 0.55;
-        }
-
-        bearingSmoothed = emaAngle(bearingSmoothed, userHeading, alpha);
-    }
-
-    arrowBearing = bearingSmoothed;
-    debugData.arrowBearing = arrowBearing;
-} else {
-    arrowBearing = null;
-}
-
-
-    } else {
-        // Fallback autres plateformes : carte + flèche suivent event.alpha
-        const h = (typeof event.alpha === 'number') ? norm360(event.alpha) : null;
-        mapBearing = h;
-        arrowBearing = h;
+    const userHeading = getCompassHeadingFromEvent(event);
+    if (userHeading != null && !isNaN(userHeading)) {
+        mapBearing = norm360(userHeading);
+        debugData.userHeading = mapBearing;
+        debugData.compassHeading = window._clqLastCompassHeading;
     }
 
     const hasMap = !!map;
@@ -3362,53 +4131,20 @@ if (userHeading != null) {
     }
 
     const userPos = hasMarker ? userPositionMarker.getPosition() : null;
+    const navActive = guidanceWatchActive || isCompassActive || geoFixConfirmed;
 
-    // --- Rotation de la carte ---
     try {
-        const mapDiv = document.getElementById('map');
-        if (mapDiv) {
-            const gmStyle =
-                mapDiv.querySelector('.gm-style') ||
-                mapDiv.querySelector('[style*="transform"]') ||
-                mapDiv;
-
-            if (gmStyle) {
-                gmStyle.style.transformOrigin = 'center center';
-
-                if (mapBearing !== null && !isNaN(mapBearing)) {
-                    // iOS : heading boussole
-                    // Android : direction vers le POI → POI vers le haut
-                    const rotationAngle = -mapBearing;
-                    gmStyle.style.transform = `rotate(${rotationAngle}deg)`;
-                } else if (isAndroid) {
-                    gmStyle.style.transform = 'rotate(0deg)';
-                }
-            }
+        if (navActive && mapBearing !== null && !isNaN(mapBearing)) {
+            applyWalkNavigationHeading(mapBearing);
+        }
+        if (hasMarker && userPos) {
+            applyMapViewForGuidance(userPos);
         }
     } catch (error) {
-        console.error("❌ Erreur rotation carte:", error);
+        console.error('❌ Erreur rotation carte:', error);
+    } finally {
+        window.isHandlingOrientation = false;
     }
-
-    // --- Rotation de la flèche (userPositionMarker) ---
-    if (hasMarker && arrowBearing !== null && !isNaN(arrowBearing)) {
-        const icon = userPositionMarker.getIcon();
-        if (icon) {
-            currentArrowRotation = arrowBearing;
-            icon.rotation = currentArrowRotation;
-            userPositionMarker.setIcon(icon);
-        }
-    }
-
-    // Centrer la carte sur l'utilisateur et adapter le zoom (zoom 17 si proche du point)
-    if (hasMarker && userPos) {
-        applyMapViewForGuidance(userPos);
-    }
-
-    // --- DEBUG PANEL ANDROID (activable) ---
-    // DÉSACTIVÉ TEMPORAIREMENT pour éviter les problèmes sur Android
-    // Le panneau de débogage est désactivé via DEBUG_ORIENTATION_OVERLAY = false
-
-    window.isHandlingOrientation = false;
 }
 
 
@@ -3496,10 +4232,79 @@ function calculateAzimuth(from, to) {
 function updateAndroidPoiUpGuidance() {
     const isAndroid = /android/i.test(navigator.userAgent);
     if (!isAndroid || !map || !userPositionMarker) return;
-    resetAndroidMapAndMarkerForGoogleGuidance(gpsHeading);
+
+    // Déterminer la destination actuelle (POI ou Musée)
+    let destination = null;
+
+    if (localStorage.getItem('museumMode') === 'true') {
+        try {
+            const museum = JSON.parse(localStorage.getItem("museumData"));
+            if (museum && museum.lat && museum.lng) {
+                destination = museum;
+            }
+        } catch (e) {
+            console.error("Erreur destination musée Android :", e);
+            return;
+        }
+    } else {
+        if (typeof filteredLocations !== 'undefined' &&
+            Array.isArray(filteredLocations) &&
+            currentIndex >= 0 &&
+            currentIndex < filteredLocations.length) {
+            destination = filteredLocations[currentIndex];
+        }
+    }
+
+    if (!destination || typeof destination.lat === 'undefined' || typeof destination.lng === 'undefined') {
+        return;
+    }
+
     const userPos = userPositionMarker.getPosition();
     if (!userPos) return;
-    applyMapViewForGuidance({ lat: userPos.lat(), lng: userPos.lng() });
+
+    const from = { lat: userPos.lat(), lng: userPos.lng() };
+    const to   = { lat: destination.lat, lng: destination.lng };
+
+    // Bearing vers le POI (direction POI)
+    let poiBearing = calculateAzimuth(from, to);
+
+    // Lissage du bearing vers le POI
+    if (androidPoiBearingSmoothed === null) {
+        androidPoiBearingSmoothed = poiBearing;
+    } else {
+        androidPoiBearingSmoothed = emaAngle(androidPoiBearingSmoothed, poiBearing, 0.2);
+    }
+
+    // ➜ Carte tournée de façon à mettre le POI vers le haut
+    const mapDiv = document.getElementById('map');
+    if (mapDiv) {
+        const gmStyle = mapDiv.querySelector('.gm-style') || mapDiv;
+        gmStyle.style.transformOrigin = 'center center';
+        gmStyle.style.transition = 'transform 0.12s linear';
+        gmStyle.style.transform =
+            'rotate(' +
+            getMapGmStyleRotateCssDeg(androidPoiBearingSmoothed) +
+            'deg)';
+    }
+
+    // ➜ Flèche = direction de marche (heading GPS lissé)
+    if (gpsHeading != null && !isNaN(gpsHeading)) {
+        if (androidHeadingSmoothed === null) {
+            androidHeadingSmoothed = gpsHeading;
+        } else {
+            androidHeadingSmoothed = emaAngle(androidHeadingSmoothed, gpsHeading, 0.35);
+        }
+
+        if (userPositionMarker) {
+            const icon = userPositionMarker.getIcon();
+            if (icon) {
+                // Rotation en coordonnées monde (par rapport au nord)
+                icon.rotation = androidHeadingSmoothed;
+                userPositionMarker.setIcon(icon);
+                currentArrowRotation = androidHeadingSmoothed;
+            }
+        }
+    }
 }
 
 
@@ -3523,9 +4328,8 @@ function getUserPosition(successCallback, errorCallback, options) {
                     localStorage.setItem('geoPermissionGranted', 'true');
                     navigator.geolocation.getCurrentPosition(successCallback, errorCallback, options);
                 } else if (permissionStatus.state === 'denied') {
-                    // Autorisation refusée
                     localStorage.setItem('geoPermissionGranted', 'false');
-                    errorCallback(new Error("Autorisation de géolocalisation refusée"));
+                    errorCallback(new Error('Autorisation de géolocalisation refusée'));
                 } else {
                     // État 'prompt' - demander l'autorisation
                     navigator.geolocation.getCurrentPosition(
@@ -3718,63 +4522,35 @@ function showInfoPopup(title, message, onClose) {
 // === Fonction pour afficher le popup de fin de parcours ===
 function showEndOfTourPopup() {
     const overlay = document.createElement('div');
-    overlay.style.position = 'fixed';
-    overlay.style.top = 0;
-    overlay.style.left = 0;
-    overlay.style.width = '100vw';
-    overlay.style.height = '100vh';
-    overlay.style.background = 'rgba(0,0,0,0.8)';
-    overlay.style.display = 'flex';
-    overlay.style.alignItems = 'center';
-    overlay.style.justifyContent = 'center';
-    overlay.style.zIndex = 9999;
+    overlay.id = 'end-of-tour-overlay';
 
     const box = document.createElement('div');
-    box.style.background = 'url("images/parchemin.jpg") center/cover';
-    box.style.border = '6px solid #b8860b';
-    box.style.borderRadius = '20px';
-    box.style.boxShadow = '0 0 32px #000a';
-    box.style.color = '#4b2e05';
-    box.style.fontFamily = 'MedievalSharp, Arial, serif';
-    box.style.padding = '40px 32px 32px 32px';
-    box.style.maxWidth = '500px';
-    box.style.textAlign = 'center';
-    box.style.position = 'relative';
+    box.className = 'end-of-tour-box';
 
     const icon = document.createElement('div');
+    icon.className = 'end-of-tour-icon';
     icon.textContent = '⚔️🐉🏆';
-    icon.style.fontSize = '3em';
-    icon.style.marginBottom = '16px';
     box.appendChild(icon);
 
     const title = document.createElement('div');
-    const victoryText = window.translationManager ? window.translationManager.translate('victory') : 'Victoire !';
-    title.textContent = victoryText;
-    title.style.fontWeight = 'bold';
-    title.style.fontSize = '1.5em';
-    title.style.color = '#b30000';
-    title.style.marginBottom = '20px';
+    title.className = 'end-of-tour-title';
+    title.textContent = window.translationManager
+        ? window.translationManager.translate('victory')
+        : 'Victoire !';
     box.appendChild(title);
 
     const msg = document.createElement('div');
-    const victoryMessage = window.translationManager ? window.translationManager.translate('victory_message') : "C'est la dernière étape de votre parcours !<br><br>Bravo, vous avez vaincu le Dragon !<br>La bête est terrassée !<br><br><strong>Ein V'la co pou ein an !</strong><br><br>À l'arrivée, si vous le souhaitez, vous pourrez prendre un selfie avec Saint Georges !";
-    msg.innerHTML = victoryMessage;
-    msg.style.marginBottom = '28px';
-    msg.style.color = '#222';
+    msg.className = 'end-of-tour-msg';
+    msg.innerHTML = window.translationManager
+        ? window.translationManager.translate('victory_message')
+        : "C'est la dernière étape de votre parcours !<br><br>Bravo, vous avez vaincu la Sardine !<br>La bête est terrassée !<br><br>À l'arrivée, si vous le souhaitez, vous pourrez prendre un selfie avec la Sardine !<br><br>Vous pouvez également voyager à votre guise dans les différents points du parcours si vous voulez vous rendre à un endroit particulier.";
     box.appendChild(msg);
 
     const btnCompris = document.createElement('button');
-    const understoodText = window.translationManager ? window.translationManager.translate('understood') : 'COMPRIS';
-    btnCompris.textContent = understoodText;
-    btnCompris.style.background = '#b30000';
-    btnCompris.style.color = '#fff';
-    btnCompris.style.fontWeight = 'bold';
-    btnCompris.style.border = 'none';
-    btnCompris.style.borderRadius = '10px';
-    btnCompris.style.padding = '12px 24px';
-    btnCompris.style.fontSize = '1.1em';
-    btnCompris.style.cursor = 'pointer';
-    btnCompris.style.fontFamily = 'MedievalSharp, Arial, serif';
+    btnCompris.className = 'end-of-tour-btn';
+    btnCompris.textContent = window.translationManager
+        ? window.translationManager.translate('understood')
+        : 'COMPRIS';
     btnCompris.addEventListener('click', () => {
         document.body.removeChild(overlay);
         // Afficher le bouton selfie
@@ -3796,7 +4572,6 @@ document.addEventListener("DOMContentLoaded", () => {
     cultureButton = document.getElementById('culture-btn');
     audioBtn = document.getElementById('audio-btn');
     poiInterestBtn = document.getElementById('poi-interest-btn');
-    doudouBtn = document.getElementById('doudou-btn');
     pauseBtn = document.getElementById('pause-btn');
     stopBtn = document.getElementById('stop-btn');
     restartBtn = document.getElementById('restart-btn');
@@ -3807,17 +4582,16 @@ document.addEventListener("DOMContentLoaded", () => {
     updateQuizFooterButton();
     const selfieBtn = document.getElementById('selfie-btn');
     const pwaInstallBtn = document.getElementById('pwa-install-btn');
+    /** Déclaré avant les addEventListener (audio / pause) qui lisent cette variable. */
+    let lastAudioLang = null;
 
-    // Par défaut : le bouton "suivant" est verrouillé jusqu'à écoute de l'audio du point courant
-    if (nextButton) nextButton.disabled = true;
     syncNextButtonState();
 
-    // Lancer le processus (le splash screen sera caché une fois la carte prête)
-    startMap();
+    // startMap() est déjà appelé par initApp() via DOMContentLoaded
 
-    // Vérifier si le tour est terminé (après refus du selfie ou retour depuis selfie)
+    // Parcours bouclé : navigation libre entre les points (sans réécouter l'audio)
     if (localStorage.getItem('tourCompleted') === 'true') {
-        disableAllControls();
+        enableTourExplorationMode();
     }
 
     // --- Ajout des écouteurs d'événements ---
@@ -3834,7 +4608,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             } else {
             }
-            // Redirection vers la page selfie
+            markGuidancePauseForLeave();
             window.location.href = 'selfie.html';
         });
     }
@@ -3849,10 +4623,11 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
     
+    if (nextButton) {
     nextButton.addEventListener('click', () => {
-        // Force : écouter l'audio du point courant avant de passer au suivant
-        const audioIdx = localStorage.getItem('mons_audio_clicked_index');
-        if (String(audioIdx) !== String(currentIndex)) {
+
+        // Audio requis seulement à la première visite du point (pas en retour arrière ni après fin de parcours)
+        if (!isPointUnlockedForNext(currentIndex)) {
             if (nextButton) nextButton.disabled = true;
             const titleKey = 'audio_required_title';
             const msgKey = 'audio_required_message';
@@ -3872,6 +4647,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         
         stopAllAudio();
+
         if (localStorage.getItem("mons_quizEnabled") === null) {
             showQuizPrompt((wantsQuiz) => {
                 quizEnabled = wantsQuiz;
@@ -3890,7 +4666,9 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
     });
+    }
 
+    if (prevButton) {
     prevButton.addEventListener('click', () => {
         stopAllAudio();
         if (currentIndex > 0) {
@@ -3921,7 +4699,9 @@ document.addEventListener("DOMContentLoaded", () => {
             );
         }
     });
+    }
 
+    if (homeButton) {
     homeButton.addEventListener("click", () => {
         const isMuseumMode = localStorage.getItem("museumMode") === "true";
         
@@ -3942,21 +4722,9 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
     });
-
-    if (poiInterestBtn) {
-        poiInterestBtn.addEventListener('click', () => {
-            stopAllAudio();
-            try {
-                sessionStorage.setItem('clq_guidance_was_active', localStorage.getItem('geoPermissionGranted') === 'true' ? '1' : '0');
-                localStorage.setItem('mons_currentIndex', String(currentIndex));
-                localStorage.setItem('mons_score', String(score));
-            } catch (e) {
-                /* ignore */
-            }
-            window.location.href = "poi-experiment.html";
-        });
     }
 
+    if (audioBtn) {
     audioBtn.addEventListener('click', () => {
         // Masquer la flèche de guidage 1 si elle est visible
         if (typeof hideGuideArrow1 === 'function') {
@@ -3964,14 +4732,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         
         stopAllAudio();
-        const current = filteredLocations[currentIndex];
+        const current = getLocationAtIndex(currentIndex);
         const imageElement = document.getElementById("point-image");
         if(current && current.audio) {
             const textFile = `data/${normalizeFileName(current.name)}.txt`;
             playExclusiveAudio(current.audio, textFile, imageElement);
-            // Verrouillage levé pour le point courant une fois l'audio (point) lancé
-            localStorage.setItem('mons_audio_clicked_index', String(currentIndex));
-            syncNextButtonState();
+            unlockPointNavigationAfterAudioStart(currentIndex);
             // Initialiser lastAudioLang lors du premier lancement
             if (lastAudioLang === null) {
                 const currentLang = window.translationManager ? window.translationManager.getCurrentLanguage() : 'fr';
@@ -3979,39 +4745,27 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         } else {
             // Si le point n'a pas d'audio (rare), on évite de bloquer le "suivant"
-            localStorage.setItem('mons_audio_clicked_index', String(currentIndex));
-            syncNextButtonState();
+            unlockPointNavigationAfterAudioStart(currentIndex);
+            markAudioCompletedForIndex(currentIndex);
+            poiDescriptionAudioIndex = null;
+            if (quizResumeAwaitingAudio && quizEnabled) {
+                quizResumeAwaitingAudio = false;
+                setTimeout(() => showQuizForCurrentPoint(() => {}), 300);
+            }
         }
     });
+    }
 
-    doudouBtn.addEventListener('click', () => {
-        stopAllAudio();
-        const imageElement = document.getElementById("point-image");
-        const textContainer = document.getElementById("media-display");
-        
-        fetch('data/Texte_chanson_doudou.txt')
-            .then(response => response.text())
-            .then(text => {
-                if (textContainer) {
-                    currentDescriptionText = text; // Mémoriser les paroles
-                    isDoudouSongPlaying = true;    // Activer le flag
-                    textContainer.innerText = text;
-                    textContainer.style.display = "block";
-                }
-                if (imageElement) imageElement.style.display = "none";
-            });
-        
-        playExclusiveAudio("Chansons/air_doudou.mp3");
-        // Initialiser lastAudioLang lors du premier lancement (pour l'air du doudou, on garde la langue actuelle)
-        if (typeof lastAudioLang === 'undefined' || lastAudioLang === null) {
-            const currentLang = window.translationManager ? window.translationManager.getCurrentLanguage() : 'fr';
-            lastAudioLang = currentLang;
-        }
-    });
+    if (poiInterestBtn) {
+        poiInterestBtn.addEventListener('click', () => {
+            stopAllAudio();
+            markGuidancePauseForLeave();
+            snapshotTourStateForExternalPage();
+            window.location.href = "poi-experiment.html";
+        });
+    }
 
-    // --- Ajout : mémorisation de la langue de la dernière lecture audio ---
-    let lastAudioLang = null;
-
+    if (pauseBtn) {
     pauseBtn.addEventListener('click', () => {
         const currentLang = window.translationManager ? window.translationManager.getCurrentLanguage() : 'fr';
         if (currentAudio) {
@@ -4027,6 +4781,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     if(current && current.audio) {
                         const textFile = `data/${normalizeFileName(current.name)}.txt`;
                         playExclusiveAudio(current.audio, textFile, imageElement);
+                        unlockPointNavigationAfterAudioStart(currentIndex);
                         lastAudioLang = currentLang;
                     }
                     pauseBtn.textContent = "⏸️";
@@ -4056,12 +4811,15 @@ document.addEventListener("DOMContentLoaded", () => {
             if(current && current.audio) {
                 const textFile = `data/${normalizeFileName(current.name)}.txt`;
                 playExclusiveAudio(current.audio, textFile, imageElement);
+                unlockPointNavigationAfterAudioStart(currentIndex);
                 lastAudioLang = currentLang;
             }
             pauseBtn.textContent = "⏸️";
         }
     });
+    }
 
+    if (stopBtn) {
     stopBtn.addEventListener('click', () => {
         if (currentAudio) {
             currentAudio.pause();
@@ -4078,7 +4836,9 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
     });
+    }
 
+    if (restartBtn) {
     restartBtn.addEventListener('click', () => {
         if (currentAudio) {
             currentAudio.currentTime = 0;
@@ -4097,25 +4857,17 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
     });
-
-    cultureButton.addEventListener("click", () => {
-        stopAllAudio();
-        localStorage.setItem("mons_currentIndex", currentIndex);
-        localStorage.setItem("mons_score", score);
-        window.location.href = "culture.html?v=" + Date.now();
-    });
-
-    // Popup d'aide pour la boussole au premier démarrage
-    const compassHelpShown = localStorage.getItem('compassHelpShown');
-    const orientationPermissionGranted = localStorage.getItem('orientationPermissionGranted') === 'true';
-
-   
-    // Afficher le popup si l'aide n'a pas déjà été montrée et si l'autorisation n'est pas accordée
-    if (!compassHelpShown && !orientationPermissionGranted) {
-        showTranslatedPopup('compass_title', 'compass_message');
     }
 
-    // Affichage temporaire du bouton selfie pour les tests
+    if (cultureButton) {
+    cultureButton.addEventListener("click", () => {
+        stopAllAudio();
+        markGuidancePauseForLeave();
+        snapshotTourStateForExternalPage();
+        window.location.href = "culture.html?v=" + Date.now();
+    });
+    }
+
     if (selfieBtn) {
         selfieBtn.style.display = 'block';
     }
@@ -4151,6 +4903,7 @@ function showUniversalPopup({
   title = '',
   message = '',
   buttons = [{ label: 'FERMER', color: '#b30000', onClick: null }],
+  extraButtons = [],
   icon1 = '⚔️',
   icon2 = '🐉',
   id = ''
@@ -4234,19 +4987,54 @@ function showUniversalPopup({
   });
   box.appendChild(btns);
 
+  if (extraButtons.length) {
+    const extraRow = document.createElement('div');
+    extraRow.style.marginTop = '18px';
+    extraRow.style.paddingTop = '14px';
+    extraRow.style.borderTop = '1px solid #b8860b55';
+    extraButtons.forEach(btn => {
+      const button = document.createElement('button');
+      button.textContent = btn.label;
+      button.style.background = btn.color || '#555';
+      button.style.color = '#fff';
+      button.style.fontWeight = 'bold';
+      button.style.border = 'none';
+      button.style.borderRadius = '8px';
+      button.style.padding = '10px 18px';
+      button.style.fontSize = '0.95rem';
+      button.style.cursor = 'pointer';
+      button.style.fontFamily = 'MedievalSharp, Arial, serif';
+      button.style.display = 'block';
+      button.style.margin = '10px auto 0';
+      button.style.maxWidth = '100%';
+      button.addEventListener('click', () => {
+        if (btn.closeOnClick !== false) {
+          document.body.removeChild(overlay);
+        }
+        if (btn.onClick) btn.onClick();
+      });
+      extraRow.appendChild(button);
+    });
+    box.appendChild(extraRow);
+  }
+
   overlay.appendChild(box);
   document.body.appendChild(overlay);
 }
 
 // Remplacer tous les anciens popups par showUniversalPopup avec les bons paramètres (titre, message, boutons, callbacks)
 
+/** Guidage carte : itinéraire Google à pied intégré ; pas de popup boussole automatique. */
+function scheduleCompassHelpPopup() {
+    /* L'itinéraire est affiché via DirectionsRenderer ; le bouton 🗺️ ouvre Google Maps pour le guidage vocal. */
+}
+
 // --- Correction du popup boussole - style unifié ---
 function showCompassHelpPopup() {
-    if (isAndroidDevice() && localStorage.getItem('geoPermissionGranted') !== 'true') {
-        return;
-    }
+    if (document.getElementById('clq-compass-help-overlay')) return;
     // Créer l'overlay
     const overlay = document.createElement('div');
+    overlay.id = 'clq-compass-help-overlay';
     overlay.className = 'popup-overlay';
     overlay.style.position = 'fixed';
     overlay.style.top = 0;
@@ -4257,13 +5045,11 @@ function showCompassHelpPopup() {
     overlay.style.display = 'flex';
     overlay.style.alignItems = 'center';
     overlay.style.justifyContent = 'center';
-    overlay.style.zIndex = 10002;
+    overlay.style.zIndex = 10008;
 
     // Créer la boîte du popup - style unifié (centré via CSS popup-confirm)
     const box = document.createElement('div');
-    box.className = 'popup-confirm';
-    // Le centrage est géré par la classe popup-confirm via position: fixed, top: 50%, left: 50%, transform: translate(-50%, -50%)
-    // On garde seulement les styles essentiels qui peuvent être overridés si nécessaire
+    box.className = 'popup-confirm popup-confirm--in-overlay';
     box.style.textAlign = 'center';
 
     // Icône
@@ -4290,7 +5076,7 @@ function showCompassHelpPopup() {
     const msg = document.createElement('div');
     const compassMsg = window.translationManager && window.translationManager.isLoaded ? 
         window.translationManager.translate('compass_message') : "APPUYER SUR L'ICONE BOUSSOLE AUTANT DE FOIS QUE NECESSAIRE POUR BENEFICIER DU GUIDAGE FLECHE";
-    msg.innerHTML = compassMsg;
+    msg.textContent = compassMsg;
     msg.style.marginBottom = '24px';
     msg.style.color = '#2b6cb0';
     msg.style.fontSize = '14px';
@@ -4435,6 +5221,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const imageElement = document.getElementById("point-image");
                     const textFile = `data/${normalizeFileName(currentLocation.name)}.txt`;
                     playExclusiveAudio(currentLocation.audio, textFile, imageElement);
+                    unlockPointNavigationAfterAudioStart(currentIndex);
                 }
             }, 100);
         }
@@ -4561,45 +5348,6 @@ async function loadQuizTranslations() {
     }
 }
 
-// Fonction pour réinitialiser la rotation de la carte
-function resetMapRotation() {
-    if (map) {
-        try {
-            // Méthode 1: Rotation via CSS (priorité sur mobile)
-            const mapDiv = document.getElementById('map');
-            if (mapDiv) {
-                // Chercher l'élément Google Maps à l'intérieur
-                const googleMapElement = mapDiv.querySelector('.gm-style') || mapDiv.querySelector('[style*="transform"]') || mapDiv;
-                
-                if (googleMapElement) {
-                    googleMapElement.style.transform = 'rotate(0deg)';
-                } else {
-                    mapDiv.style.transform = 'rotate(0deg)';
-                }
-            } else {
-                // Méthode 2: setHeading (si supporté)
-                if (typeof map.setHeading === 'function') {
-                    map.setHeading(0);
-                } else {
-                    // Méthode 3: setOptions
-                    map.setOptions({ heading: 0 });
-                }
-            }
-            
-            // Remettre aussi la flèche à 0
-            if (userPositionMarker) {
-                const icon = userPositionMarker.getIcon();
-                if (icon) {
-                    icon.rotation = 0;
-                    userPositionMarker.setIcon(icon);
-                    currentArrowRotation = 0;
-                }
-            }
-        } catch (error) {
-            console.error("❌ Erreur lors de la réinitialisation de la rotation:", error);
-        }
-    }
-}
 
 // Fonction pour forcer le centrage de la carte sur l'utilisateur (avec zoom adapté à la distance)
 function centerMapOnUser() {
@@ -4658,18 +5406,16 @@ function testCSSRotation() {
 
 // Fonction pour gérer les changements d'orientation de l'appareil
 function handleOrientationChange() {
-    if (isCompassActive && userPositionMarker) {
-        // Forcer une mise à jour de l'orientation pour corriger la rotation
-        setTimeout(() => {
-            // Déclencher un événement d'orientation factice pour forcer la mise à jour
-            const fakeEvent = {
-                webkitCompassHeading: null,
-                alpha: 0
-            };
-            handleOrientation(fakeEvent);
-        }, 100);
-        
-    }
+    if (!isCompassActive) return;
+    setTimeout(function () {
+        if (window._clqLastCompassHeading != null) {
+            const raw = window._clqLastCompassHeading;
+            const heading = isIOSDevice()
+                ? applyIosCompassNavOffset(raw)
+                : raw;
+            applyWalkNavigationHeading(heading);
+        }
+    }, 120);
 }
 
 // Fonction de test pour Android - rotation de la carte
@@ -4719,22 +5465,17 @@ function restoreCompassState() {
         
         // Android : utiliser deviceorientationabsolute pour avoir des valeurs absolues
         const isAndroid = /android/i.test(navigator.userAgent);
-        if (isAndroid && 'ondeviceorientationabsolute' in window) {
-            window.addEventListener('deviceorientationabsolute', handleOrientation, true);
-        } else {
-            window.addEventListener('deviceorientation', handleOrientation, true);
-        }
-        window.addEventListener('orientationchange', handleOrientationChange);
-        
+        attachCompassListenersOnce();
+
         // Attendre que la carte et le marqueur utilisateur soient prêts
         const checkAndRestore = () => {
-            if (userPositionMarker && map) {
-                const fakeEvent = {
-                    webkitCompassHeading: 0,
-                    alpha: 0
-                };
-                handleOrientation(fakeEvent);
-            } else {
+            if (userPositionMarker && map && window._clqLastCompassHeading != null) {
+                const raw = window._clqLastCompassHeading;
+                const heading = isIOSDevice()
+                    ? applyIosCompassNavOffset(raw)
+                    : raw;
+                applyWalkNavigationHeading(heading);
+            } else if (!userPositionMarker || !map) {
                 setTimeout(checkAndRestore, 500);
             }
         };
@@ -4764,18 +5505,15 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     window.forcePermissionRequest = function() {
-        // Nettoyer les permissions
         localStorage.removeItem('geoPermissionGranted');
         localStorage.removeItem('orientationPermissionGranted');
         localStorage.removeItem('compassGuidanceActive');
-        // Réinitialiser les flags
         geoPermissionRequested = false;
         orientationPermissionRequested = false;
         mapLoadInitiated = false;
-        // Marquer comme venant de language-selection
+        pendingMapCallbacks.length = 0;
         sessionStorage.setItem('comingFromLanguageSelection', 'true');
-        // Relancer updateLocation
-        updateLocation();
+        requestGeolocationLikeBrussels();
     };
     
     window.forceCompassRequest = function() {
@@ -4787,10 +5525,42 @@ document.addEventListener('DOMContentLoaded', () => {
         showCompassHelpPopup();
     };
     
-    // Nettoyer le sessionStorage quand l'utilisateur quitte la page
     window.addEventListener('pagehide', () => {
         sessionStorage.removeItem('comingFromLanguageSelection');
-        releaseTransientMapResourcesForLeave();
+    });
+
+    window.addEventListener('pageshow', (event) => {
+        if (!document.getElementById('map')) {
+            return;
+        }
+        const geoGranted = localStorage.getItem('geoPermissionGranted') === 'true';
+        const wasActive = sessionStorage.getItem('clq_guidance_was_active') === '1';
+        if (!event.persisted && !wasActive && !geoGranted) {
+            return;
+        }
+        sessionStorage.removeItem('clq_guidance_was_active');
+        if (watchId !== null && navigator.geolocation) {
+            try {
+                navigator.geolocation.clearWatch(watchId);
+            } catch (e) {
+                /* ignore */
+            }
+            watchId = null;
+        }
+        guidanceWatchActive = false;
+        routeGpsThrottleEnabled = false;
+        geoPermissionRequested = geoGranted;
+        if (map && typeof map.getCenter === 'function') {
+            resumeGeolocationLikeBrussels();
+        } else {
+            window.mainLogicInitialized = false;
+            mapInitialized = false;
+            localStorage.removeItem('mapInitialized');
+            mapLoadInitiated = !!(window.google && window.google.maps);
+            if (typeof startMap === 'function') {
+                startMap();
+            }
+        }
     });
 });
 
@@ -4821,17 +5591,27 @@ function toggleCompass() {
 
 function activateCompass() {
     isCompassActive = true;
-    localStorage.setItem('compassGuidanceActive', 'true');
-    
-    // Android : utiliser deviceorientationabsolute pour avoir des valeurs absolues
-    const isAndroid = /android/i.test(navigator.userAgent);
-    if (isAndroid && 'ondeviceorientationabsolute' in window) {
-        window.addEventListener('deviceorientationabsolute', handleOrientation, true);
-    } else {
-        window.addEventListener('deviceorientation', handleOrientation, true);
-    }
-    window.addEventListener('orientationchange', handleOrientationChange);
+    localStorage.setItem("compassGuidanceActive", "true");
+    attachCompassListenersOnce();
 }
+
+window.clqDumpNavRotation = function () {
+    const c = document.getElementById('map-container');
+    return {
+        version: typeof APP_VERSION !== 'undefined' ? APP_VERSION : null,
+        navHeadingSmoothed: navHeadingSmoothed,
+        mapHeadingNativeActive: mapHeadingNativeActive,
+        containerTransform: c ? c.style.transform : null,
+        mapGetHeading: map && typeof map.getHeading === 'function' ? map.getHeading() : null,
+        isCompassActive: isCompassActive,
+        compassListenersAttached: compassListenersAttached,
+        guidanceWatchActive: guidanceWatchActive,
+        geoFixConfirmed: geoFixConfirmed,
+        lastCompass: window._clqLastCompassHeading,
+        gpsHeading: gpsHeading,
+        moving: typeof isUserMovingForHeading === 'function' ? isUserMovingForHeading() : null,
+    };
+};
 
 // La fonction deactivateCompass n'est plus nécessaire car la boussole reste toujours active
 
@@ -4867,4 +5647,5 @@ window.addEventListener('load', () => {
   });
 */
   
+
 
