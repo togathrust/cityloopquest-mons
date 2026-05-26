@@ -64,7 +64,7 @@
       "lng": 3.952281,
       "coordinateSystem": "WGS84 decimal degrees",
       "coordinateStatus": "validated",
-      "distanceKmFromGrandPlaceMons": 0.0,
+      "distanceKmFromGrandPlaceMons": 0,
       "radiusPriorityKm": 50,
       "visitDurationMin": 25,
       "hasOpeningHours": false,
@@ -81,10 +81,12 @@
         "cn": "Grand-Place de Mons是位于蒙斯大广场周边50公里范围内的历史广场。这里是蒙斯历史与社会生活的核心，周围环绕着古老立面、露台、纪念建筑，并通向老城小巷。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约25分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Grand-Place de Monsは、モンスのグランプラスから半径50km圏内にある歴史的広場です。ここはモンスの歴史的・社会的中心で、古いファサード、テラス、記念建造物、旧市街へ続く小路に囲まれています。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約25分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": ["images/points%20interets/grandplace.jpg"],
-      "sourceUrls": [
-              ],
-      "lastVerified": "2026-05-26"
+      "photos": [
+        "images/points%20interets/grandplace.jpg"
+      ],
+      "sourceUrls": [],
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/grandplace.jpg"
     },
     {
       "id": "mons-hotel-de-ville",
@@ -134,11 +136,14 @@
         "cn": "Hôtel de Ville de Mons是位于蒙斯大广场周边50公里范围内的纪念性建筑 / 地标。这座15世纪哥特式瑰宝象征着蒙斯的市民生活，也是大广场最重要的建筑标志。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约45分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Hôtel de Ville de Monsは、モンスのグランプラスから半径50km圏内にあるモニュメント／ランドマークです。15世紀ゴシック様式の宝石ともいえる建物で、モンスの市民生活を象徴し、グランプラスの主要な建築的目印となっています。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約45分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/hoteldeville.jpg"
+      ],
       "sourceUrls": [
         "https://www.visitmons.be/fr/sites-et-musees/hotel-de-ville-de-mons-035798"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/hoteldeville.jpg"
     },
     {
       "id": "mons-singe-grand-garde",
@@ -188,11 +193,14 @@
         "cn": "Singe du Grand Garde是位于蒙斯大广场周边50公里范围内的纪念性建筑 / 地标。这是一尊位于市政厅附近的小型民间雕塑，以“摸猴头带来好运”的传统而闻名。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约10分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Singe du Grand Gardeは、モンスのグランプラスから半径50km圏内にあるモニュメント／ランドマークです。市庁舎のそばにある小さな民俗的彫刻で、猿の頭をなでると幸運が訪れるという習慣で知られています。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約10分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/singe.jpg"
+      ],
       "sourceUrls": [
         "https://visitwallonia.be/fr-be/content/singe-du-grand-garde-incontournable-mons"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/singe.jpg"
     },
     {
       "id": "mons-musee-doudou",
@@ -242,11 +250,14 @@
         "cn": "Musée du Doudou et Jardin du Mayeur是位于蒙斯大广场周边50公里范围内的博物馆 / 解说中心。博物馆讲述蒙斯仪式性杜卡斯节、卢梅松战斗、人物角色、器物和“Doudou”象征。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约60分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Musée du Doudou et Jardin du Mayeurは、モンスのグランプラスから半径50km圏内にある博物館／解説センターです。この博物館では、モンスの儀礼的なドゥカス、リュメソンの戦い、その登場人物、道具、Doudouの象徴を紹介しています。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約60分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/jardinmayeur.jpg"
+      ],
       "sourceUrls": [
         "https://visitwallonia.be/fr-be/3/ou-aller/villes-wallonnes/mons/aux-alentours"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/jardinmayeur.jpg"
     },
     {
       "id": "mons-theatre-royal",
@@ -296,12 +307,15 @@
         "cn": "Théâtre Royal de Mons是位于蒙斯大广场周边50公里范围内的纪念性建筑 / 地标。这座位于大广场上的19世纪新古典主义建筑，见证了蒙斯的文化生活与表演艺术传统。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约20分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Théâtre Royal de Monsは、モンスのグランプラスから半径50km圏内にあるモニュメント／ランドマークです。グランプラスに面した19世紀の新古典主義建築で、モンスの文化と舞台芸術の役割を物語ります。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約20分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/theatreroyal.jpg"
+      ],
       "sourceUrls": [
         "https://surmars.be/nos-lieux/theatre-royal",
         "https://www.monscentreville.be/commerces/theatre-royal/"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/theatreroyal.jpg"
     },
     {
       "id": "mons-artotheque",
@@ -351,11 +365,14 @@
         "cn": "Artothèque de Mons是位于蒙斯大广场周边50公里范围内的博物馆 / 解说中心。这里保存并解读蒙斯博物馆藏品，适合理解城市遗产在展厅背后的保护与管理工作。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约40分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Artothèque de Monsは、モンスのグランプラスから半径50km圏内にある博物館／解説センターです。モンスの博物館コレクションを保管・解説する施設で、文化遺産の舞台裏を理解するのに役立ちます。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約40分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/artotheque.jpg"
+      ],
       "sourceUrls": [
         "https://www.museums.mons.be/"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/artotheque.jpg"
     },
     {
       "id": "mons-beffroi",
@@ -405,13 +422,16 @@
         "cn": "Beffroi de Mons是位于蒙斯大广场周边50公里范围内的联合国教科文组织遗产 / 重要遗产地。这是比利时唯一的巴洛克钟楼，高约87米，作为比利时和法国钟楼群的一部分列入世界遗产。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约60分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Beffroi de Monsは、モンスのグランプラスから半径50km圏内にあるユネスコ／重要遺産です。ベルギー唯一のバロック様式の鐘楼で、高さは約87m。ベルギーとフランスの鐘楼群として世界遺産に登録されています。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約60分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/beffroy.jpg"
+      ],
       "sourceUrls": [
         "https://www.visitmons.be/fr/sites-et-musees/site-du-beffroi-de-mons-791662",
         "https://fr.wikipedia.org/wiki/Beffroi_de_Mons",
         "https://visitwallonia.com/en-gb/content/mons-belfry-fascinating-monument"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/beffroy.jpg"
     },
     {
       "id": "mons-maison-patrimoines-unesco",
@@ -461,11 +481,14 @@
         "cn": "Maison des patrimoines UNESCO / Maison Espagnole是位于蒙斯大广场周边50公里范围内的博物馆 / 解说中心。它位于钟楼脚下，将游客与蒙斯的联合国教科文组织遗产联系起来：Doudou、钟楼、斯皮耶讷和大霍尔努。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约45分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Maison des patrimoines UNESCO / Maison Espagnoleは、モンスのグランプラスから半径50km圏内にある博物館／解説センターです。鐘楼のふもとに位置し、Doudou、鐘楼、スピエンヌ、グラン＝オルニュというモンスのユネスコ遺産を結びます。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約45分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/maisonespagnole.jpg"
+      ],
       "sourceUrls": [
         "https://www.visitmons.be/en/unesco/article/house-of-unesco-heritage-159548"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/maisonespagnole.jpg"
     },
     {
       "id": "mons-chapelle-saint-calixte",
@@ -515,11 +538,14 @@
         "cn": "Chapelle Saint-Calixte是位于蒙斯大广场周边50公里范围内的宗教遗产。这座小型历史礼拜堂融入钟楼遗址与旧伯爵城堡区域，是蒙斯古城层次的一部分。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约25分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Chapelle Saint-Calixteは、モンスのグランプラスから半径50km圏内にある宗教遺産です。鐘楼の敷地と旧伯爵城の区域に組み込まれた小さな歴史的礼拝堂です。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約25分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/calixte.jpg"
+      ],
       "sourceUrls": [
         "https://www.visitmons.be/fr/sites-et-musees/site-du-beffroi-de-mons-791662"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/calixte.jpg"
     },
     {
       "id": "mons-eglise-sainte-elisabeth",
@@ -569,11 +595,14 @@
         "cn": "Église Sainte-Élisabeth是位于蒙斯大广场周边50公里范围内的宗教遗产。这座老城区教堂丰富了从大广场、尼米街到Mundaneum之间的遗产步行线路。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约25分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Église Sainte-Élisabethは、モンスのグランプラスから半径50km圏内にある宗教遺産です。旧市街の教会で、グランプラス、ニミ通り、Mundaneumを結ぶ遺産散策に奥行きを与えます。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約25分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/sainteelisabeth.jpg"
+      ],
       "sourceUrls": [
         "https://ie.maptons.com/p/753766988"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/sainteelisabeth.jpg"
     },
     {
       "id": "mons-maison-losseau",
@@ -623,11 +652,14 @@
         "cn": "Maison Losseau是位于蒙斯大广场周边50公里范围内的博物馆 / 解说中心。这是一座新艺术风格的作家兼收藏家故居，展现精致室内装饰与浓厚文学氛围。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约50分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Maison Losseauは、モンスのグランプラスから半径50km圏内にある博物館／解説センターです。アール・ヌーヴォー様式の作家兼収集家の邸宅で、洗練された室内装飾と文学的な雰囲気を感じられます。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約50分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/maisonlosseau.jpg"
+      ],
       "sourceUrls": [
         "https://www.maisonlosseau.be/infos-pratiques/"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/maisonlosseau.jpg"
     },
     {
       "id": "mons-eglise-saint-nicolas",
@@ -677,11 +709,14 @@
         "cn": "Église Saint-Nicolas-en-Havré是位于蒙斯大广场周边50公里范围内的宗教遗产。这是蒙斯市中心重要的城市教堂，与老城街区结构和遗产步行路线紧密相连。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约25分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Église Saint-Nicolas-en-Havréは、モンスのグランプラスから半径50km圏内にある宗教遺産です。モンス中心部の重要な都市教会で、旧市街の構造や遺産散策ルートと深く結びついています。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約25分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/eglisenicolas.jpg"
+      ],
       "sourceUrls": [
         "https://visitmons.be/"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/eglisenicolas.jpg"
     },
     {
       "id": "mons-car-dor",
@@ -731,12 +766,15 @@
         "cn": "Car d’Or是位于蒙斯大广场周边50公里范围内的纪念性建筑 / 地标。这是Doudou节的标志性礼仪花车，与圣瓦尔德吕德圣物匣游行和著名坡道攀升仪式相关。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约20分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Car d’Orは、モンスのグランプラスから半径50km圏内にあるモニュメント／ランドマークです。Doudouの象徴的な儀礼用山車で、聖ヴォードリュの聖遺物箱の行列と有名な坂道登坂に関係しています。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約20分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/cardor.jpg"
+      ],
       "sourceUrls": [
         "https://www.visitmons.be/agenda/le-doudou/la-montee-du-car-d-or",
         "https://wordpress-v2.waudru.be/cardor-2/"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/cardor.jpg"
     },
     {
       "id": "mons-collegiale-sainte-waudru",
@@ -786,12 +824,15 @@
         "cn": "Collégiale Sainte-Waudru是位于蒙斯大广场周边50公里范围内的宗教遗产。这座始建于1450年的哥特式杰作收藏圣物匣、金车以及雅克·杜布勒克的重要雕塑。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约60分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Collégiale Sainte-Waudruは、モンスのグランプラスから半径50km圏内にある宗教遺産です。1450年に建設が始まったゴシックの傑作で、聖遺物箱、金の山車、ジャック・デュ・ブロイックの主要彫刻を収蔵しています。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約60分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/collegialesaintewaudru.jpg"
+      ],
       "sourceUrls": [
         "https://www.visitmons.be/fr/sites-et-musees/collegiale-sainte-waudru-807662",
         "https://en.wikipedia.org/wiki/Saint_Waltrude_Collegiate_Church"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/collegialesaintewaudru.jpg"
     },
     {
       "id": "mons-tresor-sainte-waudru",
@@ -841,12 +882,15 @@
         "cn": "Trésor de Sainte-Waudru是位于蒙斯大广场周边50公里范围内的博物馆 / 解说中心。宝库展示宗教金银器、手稿、绘画，以及与圣瓦尔德吕德崇敬传统相关的器物。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约45分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Trésor de Sainte-Waudruは、モンスのグランプラスから半径50km圏内にある博物館／解説センターです。宝物館では、宗教的金銀細工、写本、絵画、聖ヴォードリュ信仰に関わる品々を展示しています。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約45分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/tresors.jpg"
+      ],
       "sourceUrls": [
         "https://visitwallonia.be/fr-be/content/collegiale-sainte-waudru-et-tresor-de-mons",
         "https://artsetpublics.be/musees/tresor-de-sainte-waudru/"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/tresors.jpg"
     },
     {
       "id": "mons-mundaneum",
@@ -896,13 +940,16 @@
         "cn": "Mundaneum是位于蒙斯大广场周边50公里范围内的博物馆 / 解说中心。这是围绕保罗·奥特莱和亨利·拉封丹建立的档案中心与博物馆，常被称为“纸上的Google”。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约60分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Mundaneumは、モンスのグランプラスから半径50km圏内にある博物館／解説センターです。ポール・オトレとアンリ・ラ・フォンテーヌを中心とするアーカイブセンター兼博物館で、「紙のGoogle」とも呼ばれます。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約60分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/mundaneum.jpg"
+      ],
       "sourceUrls": [
         "https://mundaneum.org/en/",
         "https://visitwallonia.com/en-gb/content/mundaneum-mons-paper-google",
         "https://fk.maptons.com/p/753484917"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/mundaneum.jpg"
     },
     {
       "id": "mons-memorial-museum",
@@ -952,12 +999,15 @@
         "cn": "Mons Memorial Museum是位于蒙斯大广场周边50公里范围内的纪念场所。这座博物馆关注战争现象、占领历史，以及蒙斯的平民与军人记忆。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约75分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Mons Memorial Museumは、モンスのグランプラスから半径50km圏内にある記憶の場です。戦争、占領、そしてモンスにおける市民と軍人の記憶を扱う博物館です。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約75分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/memorial.jpg"
+      ],
       "sourceUrls": [
         "https://visitmons.co.uk/en/sites-and-museums/mons-memorial-museum-669999",
         "https://gh.2markers.com/628936"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/memorial.jpg"
     },
     {
       "id": "mons-parc-waux-hall",
@@ -1007,11 +1057,14 @@
         "cn": "Parc du Waux-Hall是位于蒙斯大广场周边50公里范围内的自然景点。这是蒙斯大型历史景观公园，靠近市中心，适合作为绿色休息点。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约45分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Parc du Waux-Hallは、モンスのグランプラスから半径50km圏内にある自然スポットです。モンスの大きな歴史的景観公園で、中心部近くの緑の休憩地点として利用できます。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約45分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/parcduwauxhall.jpg"
+      ],
       "sourceUrls": [
         "https://visitmons.be/"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/parcduwauxhall.jpg"
     },
     {
       "id": "mons-bam",
@@ -1061,11 +1114,14 @@
         "cn": "BAM - Beaux-Arts Mons是位于蒙斯大广场周边50公里范围内的博物馆 / 解说中心。这座美术馆和临时展览空间，为历史中心增添了当代与视觉艺术层次。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约60分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "BAM - Beaux-Arts Monsは、モンスのグランプラスから半径50km圏内にある博物館／解説センターです。美術館兼企画展示施設で、歴史的中心部に現代的で視覚芸術的な層を加えます。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約60分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/bam.jpg"
+      ],
       "sourceUrls": [
         "https://gh.2markers.com/628894"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/bam.jpg"
     },
     {
       "id": "mons-grand-large",
@@ -1098,7 +1154,7 @@
       "lng": 3.9305,
       "coordinateSystem": "WGS84 decimal degrees",
       "coordinateStatus": "to_verify",
-      "distanceKmFromGrandPlaceMons": 2.0,
+      "distanceKmFromGrandPlaceMons": 2,
       "radiusPriorityKm": 50,
       "visitDurationMin": 45,
       "hasOpeningHours": false,
@@ -1115,11 +1171,14 @@
         "cn": "Grand Large de Mons是位于蒙斯大广场周边50公里范围内的自然景点。这是与运河相连的游艇港和水域，是RAVeL步道、水边散步和休憩的宜人起点。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约45分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Grand Large de Monsは、モンスのグランプラスから半径50km圏内にある自然スポットです。運河と結びついたマリーナと水辺で、RAVeL散策や水辺の休憩の気持ちよい出発点です。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約45分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/grandlarge.jpg"
+      ],
       "sourceUrls": [
         "https://visitwallonia.be/fr-be/3/ou-aller/villes-wallonnes/mons/aux-alentours"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/grandlarge.jpg"
     },
     {
       "id": "cuesmes-maison-van-gogh",
@@ -1169,12 +1228,15 @@
         "cn": "Maison Van Gogh de Cuesmes是位于蒙斯大广场周边50公里范围内的博物馆 / 解说中心。这座博里纳日地区的房屋是文森特·梵高1879至1880年居住过的地方，早于其艺术突破时期。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约50分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Maison Van Gogh de Cuesmesは、モンスのグランプラスから半径50km圏内にある博物館／解説センターです。ボリナージュ地方にある家で、フィンセント・ファン・ゴッホが1879年から1880年にかけて滞在し、後の芸術的転機へつながりました。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約50分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/maisonvanGogh.jpg"
+      ],
       "sourceUrls": [
         "https://www.visitmons.be/en/sites-and-museums/van-gogh-house-cuesmes-mons-110528",
         "https://en.wikipedia.org/wiki/Maison_Van_Gogh"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/maisonvanGogh.jpg"
     },
     {
       "id": "spiennes-silexs",
@@ -1224,12 +1286,15 @@
         "cn": "SILEX'S - Minières néolithiques de Spiennes是位于蒙斯大广场周边50公里范围内的联合国教科文组织遗产 / 重要遗产地。这是欧洲最古老、规模最大的燧石采矿中心之一，已列入联合国教科文组织世界遗产。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约90分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "SILEX'S - Minières néolithiques de Spiennesは、モンスのグランプラスから半径50km圏内にあるユネスコ／重要遺産です。ヨーロッパ最古級かつ最大級の火打石採掘センターの一つで、ユネスコ世界遺産に登録されています。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約90分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/silexs.jpg"
+      ],
       "sourceUrls": [
         "https://www.visitmons.be/fr/sites-et-musees/silexs-les-minieres-neolithiques-de-spiennes-437185",
         "https://fr.wikipedia.org/wiki/Mini%C3%A8res_n%C3%A9olithiques_de_silex_de_Spiennes"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/silexs.jpg"
     },
     {
       "id": "saint-symphorien-cemetery",
@@ -1279,12 +1344,15 @@
         "cn": "Cimetière militaire de Saint-Symphorien是位于蒙斯大广场周边50公里范围内的纪念场所。这是一战军人墓地，英国与德国士兵共同长眠于此，如今也获得联合国教科文组织认可。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约45分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Cimetière militaire de Saint-Symphorienは、モンスのグランプラスから半径50km圏内にある記憶の場です。第一次世界大戦の墓地で、英国兵とドイツ兵が眠り、現在はユネスコにも認定されています。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約45分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/saint-symphorien-cemetery.jpg"
+      ],
       "sourceUrls": [
         "https://www.cwgc.org/visit-us/find-cemeteries-memorials/cemetery-details/90801/st-symphorien-military-cemetery/",
         "https://www.visitmons.be/en/sites-and-museums/st-symphorien-military-cemetery-795275"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/saint-symphorien-cemetery.jpg"
     },
     {
       "id": "frameries-sparkoh",
@@ -1334,13 +1402,16 @@
         "cn": "SPARKOH!是位于蒙斯大广场周边50公里范围内的家庭游览景点。这座科学发现中心位于旧工业场址内，提供展览、工作坊、挑战活动和家庭体验。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约180分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "SPARKOH!は、モンスのグランプラスから半径50km圏内にある家族向けスポットです。旧工業施設にある科学発見センターで、展示、ワークショップ、チャレンジ、家族向け体験を提供します。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約180分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/sparkoh.jpg"
+      ],
       "sourceUrls": [
         "https://sparkoh.be/en/access/",
         "https://www.365.be/en/attractions/visit-sciences-parks-frameries-sparkoh/",
         "https://aroundus.com/p/167804045-sparkoh"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/sparkoh.jpg"
     },
     {
       "id": "havre-chateau",
@@ -1390,11 +1461,14 @@
         "cn": "Château d’Havré是位于蒙斯大广场周边50公里范围内的城堡 / 庄园。这是一座由中世纪堡垒演变成休闲府邸的城堡，与昂吉安和克罗伊家族有关。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约60分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Château d’Havréは、モンスのグランプラスから半径50km圏内にある城／庭園領地です。中世の要塞から優雅な邸宅へと変化した城で、アンギャン家やクロイ家と関係があります。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約60分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/havre-chateau.jpg"
+      ],
       "sourceUrls": [
         "https://visitwallonia.be/fr-be/3/ou-aller/villes-wallonnes/mons/aux-alentours"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/havre-chateau.jpg"
     },
     {
       "id": "hornu-cid",
@@ -1444,11 +1518,14 @@
         "cn": "CID - Centre d’Innovation et de Design是位于蒙斯大广场周边50公里范围内的博物馆 / 解说中心。这是位于大霍尔努的创新与设计中心，专注于展览和当代设计文化。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约75分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "CID - Centre d’Innovation et de Designは、モンスのグランプラスから半径50km圏内にある博物館／解説センターです。グラン＝オルニュにあるイノベーションとデザインのセンターで、展覧会と現代デザイン文化に特化しています。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約75分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/cid.jpg"
+      ],
       "sourceUrls": [
         "https://www.cid-grand-hornu.be/en/visit"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/cid.jpg"
     },
     {
       "id": "hornu-macs",
@@ -1498,11 +1575,14 @@
         "cn": "MACS - Musée des Arts Contemporains是位于蒙斯大广场周边50公里范围内的博物馆 / 解说中心。这座当代艺术博物馆位于大霍尔努，与联合国教科文组织工业建筑遗产形成直接对话。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约75分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "MACS - Musée des Arts Contemporainsは、モンスのグランプラスから半径50km圏内にある博物館／解説センターです。グラン＝オルニュに位置する現代美術館で、ユネスコ登録の産業建築と直接響き合っています。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約75分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/macs.jpg"
+      ],
       "sourceUrls": [
         "https://visitwallonia.com/en-gb/content/macs-museum-contemporary-arts-wallonia-brussels-federation"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/macs.jpg"
     },
     {
       "id": "hornu-grand-hornu",
@@ -1552,12 +1632,15 @@
         "cn": "Site du Grand-Hornu是位于蒙斯大广场周边50公里范围内的联合国教科文组织遗产 / 重要遗产地。这是19世纪煤矿综合体的典范，也是工业城镇规划杰作，并被列入世界遗产。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约90分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Site du Grand-Hornuは、モンスのグランプラスから半径50km圏内にあるユネスコ／重要遺産です。19世紀の炭鉱複合施設の模範であり、産業都市計画の傑作として世界遺産に登録されています。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約90分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/grand-hornu.jpg"
+      ],
       "sourceUrls": [
         "https://www.grand-hornu.eu/fr",
         "https://www.grand-hornu.eu/en/visit"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/grand-hornu.jpg"
     },
     {
       "id": "saint-ghislain-musee-foire",
@@ -1607,11 +1690,14 @@
         "cn": "Musée de la Foire et de la Mémoire是位于蒙斯大广场周边50公里范围内的博物馆 / 解说中心。这是一座别具特色的博物馆，讲述从中世纪至今的集市、地方节庆和民间记忆。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约45分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Musée de la Foire et de la Mémoireは、モンスのグランプラスから半径50km圏内にある博物館／解説センターです。中世から現代までの市、地域祭礼、民衆の記憶を扱う珍しい博物館です。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約45分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/saint-ghislain-musee-foire.jpg"
+      ],
       "sourceUrls": [
         "https://visitwallonia.be/fr-be/3/ou-aller/villes-wallonnes/mons/aux-alentours"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/saint-ghislain-musee-foire.jpg"
     },
     {
       "id": "boussu-chateau",
@@ -1661,12 +1747,15 @@
         "cn": "Château de Boussu是位于蒙斯大广场周边50公里范围内的城堡 / 庄园。这座文艺复兴城堡与公园拥有受保护的门楼和墓葬礼拜堂，见证埃诺贵族历史。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约60分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Château de Boussuは、モンスのグランプラスから半径50km圏内にある城／庭園領地です。ルネサンス期の城と公園で、登録された門楼と葬祭礼拝堂があり、エノー地方の貴族史を物語ります。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約60分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/chateau-de-boussu.jpg"
+      ],
       "sourceUrls": [
         "https://chateaudeboussu.be/",
         "https://visitwallonia.be/fr-be/3/ou-aller/villes-wallonnes/mons/aux-alentours"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/chateau-de-boussu.jpg"
     },
     {
       "id": "strepy-thieu-ascenseur",
@@ -1716,12 +1805,15 @@
         "cn": "Ascenseur funiculaire de Strépy-Thieu是位于蒙斯大广场周边50公里范围内的工业遗产。这座巨型船舶升降机在中央运河上克服超过70米的高差，是工程遗产的壮观地标。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约90分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Ascenseur funiculaire de Strépy-Thieuは、モンスのグランプラスから半径50km圏内にある産業遺産です。中央運河で70mを超える高低差を克服する巨大な船舶リフトで、圧倒的な工学遺産です。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約90分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/ascenseur-funiculaire-de-strepy-thieu.jpg"
+      ],
       "sourceUrls": [
         "https://visitwallonia.be/fr-be/content/ascenseur-funiculaire-de-strepy-thieu-tresor-fluvial-en-wallonie",
         "https://canalducentre.be/en/historical/ascenseur-funiculaire-de-strepy-thieu/"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/ascenseur-funiculaire-de-strepy-thieu.jpg"
     },
     {
       "id": "haulchin-vignoble-agaises",
@@ -1771,11 +1863,14 @@
         "cn": "Vignoble des Agaises / Ruffus是位于蒙斯大广场周边50公里范围内的地方风味 / 品鉴。这是比利时重要葡萄园，以Ruffus起泡酒闻名，适合地方美食与葡萄酒旅游。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约75分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Vignoble des Agaises / Ruffusは、モンスのグランプラスから半径50km圏内にある地域の味覚／試飲・試食です。Ruffusのスパークリングワインで知られるベルギー有数のブドウ園で、食とワインの地域観光に適しています。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約75分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/vignoble-des-agaises.jpg"
+      ],
       "sourceUrls": [
         "https://visitwallonia.be/fr-be/3/ou-aller/villes-wallonnes/mons/aux-alentours"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/vignoble-des-agaises.jpg"
     },
     {
       "id": "canal-centre-lifts",
@@ -1825,11 +1920,14 @@
         "cn": "Ascenseurs hydrauliques historiques du Canal du Centre是位于蒙斯大广场周边50公里范围内的联合国教科文组织遗产 / 重要遗产地。这组列入世界遗产的历史液压船舶升降机，是比利时水运工程的重要见证。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约120分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Ascenseurs hydrauliques historiques du Canal du Centreは、モンスのグランプラスから半径50km圏内にあるユネスコ／重要遺産です。世界遺産に登録された歴史的な水力式船舶リフト群で、ベルギー水路工学の重要な証人です。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約120分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/ascenseurs-hydrauliques-historiques-du-canal-du-centre.jpg"
+      ],
       "sourceUrls": [
         "https://visitwallonia.be/fr-be/3/ou-aller/villes-wallonnes/mons/aux-alentours"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/ascenseurs-hydrauliques-historiques-du-canal-du-centre.jpg"
     },
     {
       "id": "blaugies-brasserie",
@@ -1879,11 +1977,14 @@
         "cn": "Brasserie de Blaugies是位于蒙斯大广场周边50公里范围内的地方风味 / 品鉴。这家精酿啤酒厂以未过滤、瓶中二次发酵啤酒闻名。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约60分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Brasserie de Blaugiesは、モンスのグランプラスから半径50km圏内にある地域の味覚／試飲・試食です。無濾過で瓶内発酵させるビールで知られるクラフト醸造所です。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約60分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/brasserie-de-blaugies.jpg"
+      ],
       "sourceUrls": [
         "https://visitwallonia.be/fr-be/3/ou-aller/villes-wallonnes/mons/aux-alentours"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/brasserie-de-blaugies.jpg"
     },
     {
       "id": "bois-du-luc",
@@ -1933,12 +2034,15 @@
         "cn": "Bois-du-Luc - Musée de la Mine et du Développement Durable是位于蒙斯大广场周边50公里范围内的联合国教科文组织遗产 / 重要遗产地。这座保存完好的矿业村包括工人住房、工业建筑和社会记忆，是瓦隆主要矿业遗址的一部分。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约90分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Bois-du-Luc - Musée de la Mine et du Développement Durableは、モンスのグランプラスから半径50km圏内にあるユネスコ／重要遺産です。労働者住宅、産業建築、社会的記憶を残す保存状態の良い鉱山村で、ワロン地方の主要鉱山遺産の一部です。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約90分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/bois-du-luc.jpg"
+      ],
       "sourceUrls": [
         "https://visitwallonia.be/fr-be/content/bois-du-luc-musee-de-la-mine-et-du-developpement-durable",
         "https://fr.wikipedia.org/wiki/Bois-du-Luc"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/bois-du-luc.jpg"
     },
     {
       "id": "dour-belvedere",
@@ -1988,11 +2092,14 @@
         "cn": "Le Belvédère de Dour是位于蒙斯大广场周边50公里范围内的家庭游览景点。这是围绕天然游泳区形成的休闲地点，与博里纳日地区的绿色娱乐活动相关。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约90分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Le Belvédère de Dourは、モンスのグランプラスから半径50km圏内にある家族向けスポットです。自然水泳エリアを中心としたレクリエーションスポットで、ボリナージュ地方の緑の余暇と結びついています。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約90分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/belvedere-de-dour.jpg"
+      ],
       "sourceUrls": [
         "https://visitwallonia.be/fr-be/3/ou-aller/villes-wallonnes/mons/aux-alentours"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/belvedere-de-dour.jpg"
     },
     {
       "id": "brugelette-pairi-daiza",
@@ -2042,13 +2149,16 @@
         "cn": "Pairi Daiza是位于蒙斯大广场周边50公里范围内的家庭游览景点。这座动物与植物园位于旧康布龙修道院庄园内，按多个主题世界组织游览。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约300分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Pairi Daizaは、モンスのグランプラスから半径50km圏内にある家族向けスポットです。旧カンブロン修道院領にある動植物園で、複数のテーマ世界に分かれて構成されています。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約300分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/pairi-daiza.jpg"
+      ],
       "sourceUrls": [
         "https://www.pairidaiza.eu/en/",
         "https://visitwallonia.com/en-gb/content/pairi-daiza-unique-zoological-park-brugelette",
         "https://www.coordinatenbepalen.nl/coordinates/58672-pairi-daiza"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/pairi-daiza.jpg"
     },
     {
       "id": "binche-beffroi-hotel-ville",
@@ -2098,11 +2208,14 @@
         "cn": "Beffroi et Hôtel de Ville de Binche是位于蒙斯大广场周边50公里范围内的联合国教科文组织遗产 / 重要遗产地。这座融入市政厅的钟楼与班什的市民历史及著名狂欢节传统相关。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约45分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Beffroi et Hôtel de Ville de Bincheは、モンスのグランプラスから半径50km圏内にあるユネスコ／重要遺産です。市庁舎に組み込まれた鐘楼で、バンシュの市民史と有名なカーニバルに結びついています。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約45分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/binche.jpg"
+      ],
       "sourceUrls": [
         "https://visitwallonia.com/en-gb/catalogue_table?f%5B0%5D=field_lien_elto%253Afield_quatier%3A4521&f%5B1%5D=field_lien_elto%253Afield_attractions_activites%3A732&f%5B2%5D=field_lien_elto%253Afield_attractions_activites%3A717&f%5B3%5D=field_lien_elto%253Afield_theme%3A607"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/binche.jpg"
     },
     {
       "id": "binche-mumask",
@@ -2152,13 +2265,16 @@
         "cn": "MUMASK - Musée international du Carnaval et du Masque是位于蒙斯大广场周边50公里范围内的博物馆 / 解说中心。这是一座重要的面具传统博物馆，将班什狂欢节与世界各地的节庆传统联系起来。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约75分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "MUMASK - Musée international du Carnaval et du Masqueは、モンスのグランプラスから半径50km圏内にある博物館／解説センターです。仮面の伝統を扱う主要な博物館で、バンシュのカーニバルと世界各地の祝祭文化を結びます。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約75分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/mumask.jpg"
+      ],
       "sourceUrls": [
         "https://visitwallonia.be/fr-be/content/mumask-musee-international-du-carnaval-et-du-masque-binche",
         "https://mumask.be/",
         "https://fr.wikipedia.org/wiki/MUMASK%2C_Mus%C3%A9e_du_Masque_et_du_Carnaval"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/mumask.jpg"
     },
     {
       "id": "binche-remparts",
@@ -2208,11 +2324,14 @@
         "cn": "Remparts de Binche是位于蒙斯大广场周边50公里范围内的纪念性建筑 / 地标。这些中世纪城墙为理解班什城市空间提供线索，并补充其狂欢节身份。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约40分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Remparts de Bincheは、モンスのグランプラスから半径50km圏内にあるモニュメント／ランドマークです。中世の城壁で、バンシュのカーニバル都市としての個性を補完する都市的読み解きを提供します。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約40分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/remparts.jpg"
+      ],
       "sourceUrls": [
         "https://www.binche.be/"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/remparts.jpg"
     },
     {
       "id": "louvignies-chateau",
@@ -2262,11 +2381,14 @@
         "cn": "Château de Louvignies是位于蒙斯大广场周边50公里范围内的城堡 / 庄园。这是一座保存完好的有人居住城堡，拥有室内空间、附属建筑和英式园林。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约75分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Château de Louvigniesは、モンスのグランプラスから半径50km圏内にある城／庭園領地です。内部、付属建築、英国式庭園が残る、保存状態の良い居住城です。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約75分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/louvignies.jpg"
+      ],
       "sourceUrls": [
         "https://visitwallonia.be/fr-be/3/ou-aller/villes-wallonnes/mons/aux-alentours"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/louvignies.jpg"
     },
     {
       "id": "harchies-marais",
@@ -2316,11 +2438,14 @@
         "cn": "Marais d’Harchies是位于蒙斯大广场周边50公里范围内的自然景点。这片大型湿地具有重要鸟类价值，以观鸟屋、芦苇带和候鸟而受欢迎。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约120分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Marais d’Harchiesは、モンスのグランプラスから半径50km圏内にある自然スポットです。鳥類学的に重要な大湿地で、観察小屋、葦原、渡り鳥で親しまれています。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約120分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/harchies.jpg"
+      ],
       "sourceUrls": [
         "https://visitwallonia.be/"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/harchies.jpg"
     },
     {
       "id": "beloeil-chateau",
@@ -2370,12 +2495,15 @@
         "cn": "Domaine du Château de Beloeil是位于蒙斯大广场周边50公里范围内的城堡 / 庄园。这是德利涅亲王家族府邸，拥有城堡、历史房间和25公顷法式花园。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约120分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Domaine du Château de Beloeilは、モンスのグランプラスから半径50km圏内にある城／庭園領地です。リーニュ公家の邸宅で、城、歴史的な部屋、25ヘクタールのフランス式庭園を備えています。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約120分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/beloeil.jpg"
+      ],
       "sourceUrls": [
         "https://www.chateaudebeloeil.com/infos-pratiques",
         "https://visitwallonia.be/fr-be/content/domaine-du-chateau-de-beloeil"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/beloeil.jpg"
     },
     {
       "id": "attre-chateau",
@@ -2425,11 +2553,14 @@
         "cn": "Château d’Attre是位于蒙斯大广场周边50公里范围内的城堡 / 庄园。这座古典城堡及景观庄园，是位于Ath、Brugelette与Mons之间的优雅遗产停靠点。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约75分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Château d’Attreは、モンスのグランプラスから半径50km圏内にある城／庭園領地です。古典主義の城と景観庭園からなる優雅な遺産スポットで、Ath、Brugelette、Monsの間に位置します。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約75分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/attre.jpg"
+      ],
       "sourceUrls": [
         "https://visitwallonia.be/"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/attre.jpg"
     },
     {
       "id": "mariemont-musee",
@@ -2479,13 +2610,16 @@
         "cn": "Musée royal de Mariemont是位于蒙斯大广场周边50公里范围内的博物馆 / 解说中心。这是一座位于林地庄园中的重要文明博物馆，收藏古物、珍本书籍和图尔奈瓷器。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约120分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Musée royal de Mariemontは、モンスのグランプラスから半径50km圏内にある博物館／解説センターです。樹林に囲まれた大きな文明博物館で、古代資料、稀覯書、トゥルネー磁器を所蔵しています。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約120分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/mariemont.jpg"
+      ],
       "sourceUrls": [
         "https://musee-mariemont.be/",
         "https://visitwallonia.com/en-gb/content/musee-royal-de-mariemont-morlanwelz",
         "https://sz.maptons.com/p/759060115"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/mariemont.jpg"
     },
     {
       "id": "honnelles-caillou-qui-bique",
@@ -2535,11 +2669,14 @@
         "cn": "Caillou-qui-Bique et vallée de la Grande Honnelle是位于蒙斯大广场周边50公里范围内的自然景点。这是上佩地区的自然景点，拥有岩石、林谷、河流和法比边境地带氛围。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约75分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Caillou-qui-Bique et vallée de la Grande Honnelleは、モンスのグランプラスから半径50km圏内にある自然スポットです。岩、森の谷、川、フランス＝ベルギー国境地帯の雰囲気を持つオー＝ペイ地方の自然スポットです。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約75分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/honnelles.jpg"
+      ],
       "sourceUrls": [
         "https://visitwallonia.be/"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/honnelles.jpg"
     },
     {
       "id": "bernissart-iguanodon",
@@ -2589,11 +2726,14 @@
         "cn": "Musée de l’Iguanodon是位于蒙斯大广场周边50公里范围内的博物馆 / 解说中心。这座博物馆与贝尔尼萨尔禽龙发现有关，是比利时古生物学的重要篇章。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约60分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Musée de l’Iguanodonは、モンスのグランプラスから半径50km圏内にある博物館／解説センターです。ベルニサールのイグアノドン発見に関わる博物館で、ベルギー古生物学の重要な一章です。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約60分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/iguanodon.jpg"
+      ],
       "sourceUrls": [
         "https://visitwallonia.be/"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/iguanodon.jpg"
     },
     {
       "id": "ath-espace-gallo-romain",
@@ -2643,11 +2783,14 @@
         "cn": "Espace gallo-romain d’Ath是位于蒙斯大广场周边50公里范围内的博物馆 / 解说中心。这座考古博物馆聚焦本地区古代发现，尤其是高卢—罗马船只。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约60分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Espace gallo-romain d’Athは、モンスのグランプラスから半径50km圏内にある博物館／解説センターです。地域の古代発見、特にガロ＝ローマ時代の船に焦点を当てた考古学博物館です。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約60分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/ath.jpg"
+      ],
       "sourceUrls": [
         "https://visitwallonia.be/"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/ath.jpg"
     },
     {
       "id": "ath-maison-geants",
@@ -2697,11 +2840,14 @@
         "cn": "Maison des Géants是位于蒙斯大广场周边50公里范围内的博物馆 / 解说中心。这座博物馆专门介绍Ath的游行巨人与非物质节庆文化。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约60分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Maison des Géantsは、モンスのグランプラスから半径50km圏内にある博物館／解説センターです。Athの行列巨人と無形の祝祭文化を紹介する博物館です。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約60分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/geants.jpg"
+      ],
       "sourceUrls": [
         "https://visitwallonia.com/en-gb/catalogue_table?f%5B0%5D=field_lien_elto%253Afield_quatier%3A4521&f%5B1%5D=field_lien_elto%253Afield_attractions_activites%3A732&f%5B2%5D=field_lien_elto%253Afield_attractions_activites%3A717&f%5B3%5D=field_lien_elto%253Afield_theme%3A607"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/geants.jpg"
     },
     {
       "id": "seneffe-chateau",
@@ -2751,11 +2897,14 @@
         "cn": "Domaine du Château de Seneffe是位于蒙斯大广场周边50公里范围内的城堡 / 庄园。这座18世纪庄园拥有银器博物馆、公园、水景和古典建筑。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约120分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Domaine du Château de Seneffeは、モンスのグランプラスから半径50km圏内にある城／庭園領地です。銀器博物館、公園、水景、古典建築を備えた18世紀の邸宅です。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約120分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/seneffe.jpg"
+      ],
       "sourceUrls": [
         "https://visitwallonia.be/"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/seneffe.jpg"
     },
     {
       "id": "aubechies-archeosite",
@@ -2805,12 +2954,15 @@
         "cn": "Archéosite et Musée d’Aubechies-Beloeil是位于蒙斯大广场周边50公里范围内的博物馆 / 解说中心。这是比利时最大的考古重建遗址，带领游客从史前时代走向高卢—罗马世界。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约120分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Archéosite et Musée d’Aubechies-Beloeilは、モンスのグランプラスから半径50km圏内にある博物館／解説センターです。ベルギー最大の考古復元施設で、先史時代からガロ＝ローマ世界までをたどれます。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約120分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/aubechies.jpg"
+      ],
       "sourceUrls": [
         "https://visitwallonia.be/fr-be/produit/attractions/activites/musee/decouverte/archeosite-et-musee-daubechies-beloeil-espace-leonce-demarez/8779",
         "https://www.archeosite.be/who-are-we/"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/aubechies.jpg"
     },
     {
       "id": "thuin-beffroi",
@@ -2860,11 +3012,14 @@
         "cn": "Beffroi de Thuin是位于蒙斯大广场周边50公里范围内的联合国教科文组织遗产 / 重要遗产地。这座列入世界遗产的钟楼俯瞰Thuin上城和桑布尔河谷景观。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约45分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Beffroi de Thuinは、モンスのグランプラスから半径50km圏内にあるユネスコ／重要遺産です。世界遺産の鐘楼で、Thuinの上町とサンブル渓谷の風景を見渡します。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約45分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/thuin.jpg"
+      ],
       "sourceUrls": [
         "https://visitwallonia.com/en-gb/catalogue_table?f%5B0%5D=field_lien_elto%253Afield_quatier%3A4521&f%5B1%5D=field_lien_elto%253Afield_attractions_activites%3A732&f%5B2%5D=field_lien_elto%253Afield_theme%3A607"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/thuin.jpg"
     },
     {
       "id": "lessines-notre-dame-rose",
@@ -2914,13 +3069,16 @@
         "cn": "Hôpital Notre-Dame à la Rose是位于蒙斯大广场周边50公里范围内的博物馆 / 解说中心。这座中世纪医院创建于1242年，拥有回廊、礼拜堂、药房、花园和医学收藏。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约120分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Hôpital Notre-Dame à la Roseは、モンスのグランプラスから半径50km圏内にある博物館／解説センターです。1242年創設の中世病院で、回廊、礼拝堂、薬局、庭園、医学コレクションを備えています。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約120分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/notredame.jpg"
+      ],
       "sourceUrls": [
         "https://www.notredamealarose.be/",
         "https://visitwallonia.be/fr-be/content/hopital-notre-dame-la-rose-et-le-jardin-du-cloitre-lessines",
         "https://fr.wikipedia.org/wiki/H%C3%B4pital_Notre-Dame_%C3%A0_la_Rose"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/notredame.jpg"
     },
     {
       "id": "charleroi-beffroi",
@@ -2970,11 +3128,14 @@
         "cn": "Beffroi de Charleroi是位于蒙斯大广场周边50公里范围内的联合国教科文组织遗产 / 重要遗产地。这座装饰艺术风格钟楼融入沙勒罗瓦市政厅，是钟楼传统的现代变体。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约45分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Beffroi de Charleroiは、モンスのグランプラスから半径50km圏内にあるユネスコ／重要遺産です。シャルルロワ市庁舎に組み込まれたアール・デコ様式の鐘楼で、鐘楼伝統の近代的な形です。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約45分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/charleroi.jpg"
+      ],
       "sourceUrls": [
         "https://visitwallonia.com/en-gb/catalogue_table?f%5B0%5D=field_lien_elto%253Afield_quatier%3A4521&f%5B1%5D=field_lien_elto%253Afield_attractions_activites%3A732&f%5B2%5D=field_lien_elto%253Afield_attractions_activites%3A717&f%5B3%5D=field_lien_elto%253Afield_theme%3A607"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/charleroi.jpg"
     },
     {
       "id": "charleroi-bois-cazier",
@@ -3024,11 +3185,14 @@
         "cn": "Bois du Cazier是位于蒙斯大广场周边50公里范围内的联合国教科文组织遗产 / 重要遗产地。这座旧煤矿已转为纪念地、博物馆和世界遗产，并因1956年矿难而具有深刻记忆。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约120分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Bois du Cazierは、モンスのグランプラスから半径50km圏内にあるユネスコ／重要遺産です。旧炭鉱を記念施設、博物館、世界遺産へ転用した場所で、1956年の鉱山事故の記憶が刻まれています。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約120分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/bois-du-cazier.jpg"
+      ],
       "sourceUrls": [
         "https://visitwallonia.com/en-gb/catalogue_table?f%5B0%5D=field_lien_elto%253Afield_quatier%3A4521&f%5B1%5D=field_lien_elto%253Afield_attractions_activites%3A732&f%5B2%5D=field_lien_elto%253Afield_attractions_activites%3A717&f%5B3%5D=field_lien_elto%253Afield_theme%3A607"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/bois-du-cazier.jpg"
     },
     {
       "id": "tournai-beffroi",
@@ -3078,13 +3242,16 @@
         "cn": "Beffroi de Tournai是位于蒙斯大广场周边50公里范围内的联合国教科文组织遗产 / 重要遗产地。这是比利时最古老的钟楼，高72米，是市民自由的象征，并列入世界遗产。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约60分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Beffroi de Tournaiは、モンスのグランプラスから半径50km圏内にあるユネスコ／重要遺産です。ベルギー最古の鐘楼で、高さ72m。市民の自由の象徴として世界遺産に登録されています。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約60分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/tournai.jpg"
+      ],
       "sourceUrls": [
         "https://en.visittournai.be/impressive/belfry-oldest-in-belgium/",
         "https://visitwallonia.com/en-gb/content/tournai-belfry-unesco-gem",
         "https://en.wikipedia.org/wiki/Belfry_of_Tournai"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/tournai.jpg"
     },
     {
       "id": "tournai-cathedrale",
@@ -3134,13 +3301,16 @@
         "cn": "Cathédrale Notre-Dame de Tournai是位于蒙斯大广场周边50公里范围内的联合国教科文组织遗产 / 重要遗产地。这座五塔中世纪杰作结合罗曼式中殿、宏伟耳堂和哥特式唱诗席，并列入世界遗产。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约90分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Cathédrale Notre-Dame de Tournaiは、モンスのグランプラスから半径50km圏内にあるユネスコ／重要遺産です。五つの塔を持つ中世の傑作で、ロマネスク様式の身廊、壮大な翼廊、ゴシック様式の内陣を組み合わせ、世界遺産に登録されています。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約90分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/ndtournai.jpg"
+      ],
       "sourceUrls": [
         "https://whc.unesco.org/en/list/1009/",
         "https://visitwallonia.com/en-gb/content/notre-dame-de-tournai-cathedral-listed-unesco",
         "https://latitude.to/articles-by-country/be/belgium/40257/tournai-cathedral"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/ndtournai.jpg"
     },
     {
       "id": "tournai-pont-trous",
@@ -3190,11 +3360,14 @@
         "cn": "Pont des Trous是位于蒙斯大广场周边50公里范围内的纪念性建筑 / 地标。这是斯海尔德河上的标志性中世纪水门，也是图尔奈最著名的视觉地标之一。 这个POI非常适合CityLoopQuest：它是一个真实、可精确定位、便于在地图上显示的停靠点，具有历史、视觉或文化内容。建议游览时间约30分钟，可根据开放时间、展览安排和路线节奏调整。",
         "ja": "Pont des Trousは、モンスのグランプラスから半径50km圏内にあるモニュメント／ランドマークです。スヘルデ川に架かる象徴的な中世の水門で、トゥルネーを代表する視覚的ランドマークの一つです。 CityLoopQuestに適したPOIで、地図上で正確に表示できる実在の停車地点であり、歴史的・視覚的・文化的な内容を備えています。目安の見学時間は約30分で、開館状況、展示内容、ルートのペースに応じて調整できます。"
       },
-      "photos": [],
+      "photos": [
+        "images/points%20interets/pont-trous.jpg"
+      ],
       "sourceUrls": [
         "https://visittournai.be/"
       ],
-      "lastVerified": "2026-05-26"
+      "lastVerified": "2026-05-26",
+      "image": "images/points interets/pont-trous.jpg"
     }
   ]
 }
