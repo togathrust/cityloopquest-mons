@@ -537,9 +537,18 @@ function attachCompassListenersOnce() {
     compassListenersAttached = true;
 }
 
+function getMapGmStyleElement(mapDiv) {
+    if (!mapDiv) return null;
+    return (
+        mapDiv.querySelector('.gm-style') ||
+        mapDiv.querySelector('[style*="transform"]') ||
+        mapDiv
+    );
+}
+
 function clearGoogleMapCssRotation(mapDiv) {
     if (!mapDiv) return;
-    const gmStyle = mapDiv.querySelector('.gm-style');
+    const gmStyle = getMapGmStyleElement(mapDiv);
     if (!gmStyle) return;
     gmStyle.style.transform = '';
     gmStyle.style.transformOrigin = '';
@@ -618,7 +627,7 @@ function applyMapNavigationRotation(heading) {
 
     const mapRotateDeg = getMapGmStyleRotateCssDeg(h);
     const controlRotateDeg = -mapRotateDeg;
-    const gmStyle = mapDiv && mapDiv.querySelector('.gm-style');
+    const gmStyle = mapDiv && getMapGmStyleElement(mapDiv);
     if (gmStyle) {
         gmStyle.style.transformOrigin = '50% 50%';
         gmStyle.style.transform = 'rotate(' + mapRotateDeg + 'deg)';
@@ -994,7 +1003,12 @@ function startGeolocationWatch() {
                     gpsHeading = norm360(heading);
                     if (androidMode === 'MOVING') bearingTarget = gpsHeading;
                 }
-            } else if (heading !== null && heading !== undefined && !isNaN(heading)) {
+            } else if (
+                heading !== null &&
+                heading !== undefined &&
+                !isNaN(heading) &&
+                heading >= 0
+            ) {
                 gpsHeading = norm360(heading);
             }
 
@@ -1456,6 +1470,28 @@ function normalizeFileName(name) {
         .toLowerCase();
 }
 
+/** Variante fichier image Mons : espaces → underscores, casse conservée. */
+function poiImageBaseFromName(name) {
+    if (!name) return "";
+    return name
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^\w\s-]/g, "")
+        .replace(/\s+/g, "_")
+        .trim();
+}
+
+const POI_IMAGE_EXTENSIONS = [
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".webp",
+    ".avif",
+    ".JPG",
+    ".JPEG",
+    ".PNG",
+];
+
 function encodeAssetPath(assetPath) {
     return String(assetPath)
         .split("/")
@@ -1465,25 +1501,80 @@ function encodeAssetPath(assetPath) {
         .join("/");
 }
 
-/** Chemin image explicite (circuit-data.js : champ image). */
-function getPointImagePath(location) {
-    if (!location) return null;
-    if (location.image) return location.image;
+/** Liste ordonnée de chemins images à essayer (Mons, Bruxelles, Mons explicite). */
+function getPointImagePathCandidates(location) {
+    if (!location) return [];
+    const candidates = [];
+    const seen = new Set();
+    function add(path) {
+        if (!path || seen.has(path)) return;
+        seen.add(path);
+        candidates.push(path);
+    }
+
+    if (location.image) {
+        add(location.image);
+    }
+
+    const rawName = (location.name || "").trim();
+
     if (location.audio) {
-        return location.audio
+        const fromAudioJpg = location.audio
             .replace(/^audio\//i, "images/")
             .replace(/\.mp3$/i, ".jpg");
+        add(fromAudioJpg);
+        add(fromAudioJpg.replace(/\.jpg$/i, ".png"));
+        add(fromAudioJpg.replace(/\.jpg$/i, ".jpeg"));
     }
-    return null;
+
+    const bases = [];
+    if (rawName) {
+        bases.push(rawName);
+        const withoutIndex = rawName.replace(/^\d+\s+/, "").trim();
+        if (withoutIndex && withoutIndex !== rawName) {
+            bases.push(withoutIndex);
+        }
+        const titleBase = poiImageBaseFromName(rawName);
+        if (titleBase) bases.push(titleBase);
+        const normBase = normalizeFileName(rawName);
+        if (normBase) bases.push(normBase);
+    }
+
+    const ordered = [];
+    for (const path of candidates) {
+        ordered.push(path);
+    }
+    for (const base of bases) {
+        for (const ext of POI_IMAGE_EXTENSIONS) {
+            const path = `images/${base}${ext}`;
+            if (!seen.has(path)) {
+                seen.add(path);
+                ordered.push(path);
+            }
+        }
+    }
+    return ordered;
 }
 
 function applyPointImage(imageElement, location) {
     if (!imageElement || !location) return;
-    const assetPath = getPointImagePath(location);
-    if (!assetPath) return;
+    const candidates = getPointImagePathCandidates(location);
+    if (!candidates.length) return;
     imageElement.alt = location.name || "";
-    imageElement.onerror = null;
-    imageElement.src = encodeAssetPath(assetPath);
+    let index = 0;
+    function tryNext() {
+        if (index >= candidates.length) {
+            imageElement.onerror = null;
+            return;
+        }
+        const path = candidates[index++];
+        imageElement.onerror = function () {
+            imageElement.onerror = null;
+            tryNext();
+        };
+        imageElement.src = encodeAssetPath(path);
+    }
+    tryNext();
 }
 
 function stopAllAudio() {
@@ -3839,8 +3930,10 @@ function ensureCompassPermission(done) {
                 orientationPermissionRequested = true;
                 if (state === 'granted') {
                     localStorage.setItem('orientationPermissionGranted', 'true');
-                    activateCompass();
+                } else {
+                    localStorage.removeItem('orientationPermissionGranted');
                 }
+                activateCompass();
                 finish();
             })
             .catch(function () {
@@ -3938,12 +4031,12 @@ let lastAndroidHeading = null;
 const IOS_COMPASS_NAV_OFFSET = 90;
 
 /**
- * Android (main) : +90° horaire sur la carte uniquement (000° en haut → 090° en haut).
- * La flèche utilise toujours le cap brut ; seul .gm-style est décalé.
+ * Android (main) : pas d'offset supplémentaire.
+ * La rotation .gm-style place maintenant ce qui était à 90° sur 0°.
  */
-const ANDROID_MAP_NAV_OFFSET = 90;
+const ANDROID_MAP_NAV_OFFSET = 0;
 
-/** Degrés passés à rotate() sur .gm-style (Android : -heading + 90). */
+/** Degrés passés à rotate() sur .gm-style (Android : -heading). */
 function getMapGmStyleRotateCssDeg(headingDeg) {
     const h = ((Number(headingDeg) % 360) + 360) % 360;
     if (isAndroidDevice()) {
@@ -3965,13 +4058,6 @@ function getCompassHeadingFromEvent(event) {
     const isIOS = isIOSDevice();
     const moving = isUserMovingForHeading();
 
-    if (moving && typeof gpsHeading === 'number' && !isNaN(gpsHeading)) {
-        if (isAndroid) {
-            lastAndroidHeading = normalizeAngle(gpsHeading);
-        }
-        return normalizeAngle(gpsHeading);
-    }
-
     if (
         isIOS &&
         typeof event.webkitCompassHeading === 'number' &&
@@ -3979,6 +4065,18 @@ function getCompassHeadingFromEvent(event) {
     ) {
         window._clqLastCompassHeading = event.webkitCompassHeading;
         return applyIosCompassNavOffset(event.webkitCompassHeading);
+    }
+
+    if (
+        moving &&
+        typeof gpsHeading === 'number' &&
+        !isNaN(gpsHeading) &&
+        gpsHeading >= 0
+    ) {
+        if (isAndroid) {
+            lastAndroidHeading = normalizeAngle(gpsHeading);
+        }
+        return normalizeAngle(gpsHeading);
     }
 
     if (
