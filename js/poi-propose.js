@@ -6,7 +6,9 @@
 
   const FALLBACK = "fr";
   const SUPPORTED = ["fr", "en", "nl", "de", "it", "es", "pl", "ar", "zh", "ja"];
-  const DEFAULT_CENTER = { lat: 50.4543, lng: 3.9526 };
+  const CITY_CONFIG = window.CLQ_POI_CITY_CONFIG || {};
+  const DEFAULT_CENTER = CITY_CONFIG.center || { lat: 50.4543, lng: 3.9526 };
+  const CITY_KEY = CITY_CONFIG.cityKey || "mons";
 
   const texts = {
     proposeBtn: {
@@ -487,6 +489,7 @@
           name,
           lat,
           lng,
+          cityKey: CITY_KEY,
           description,
           submitterEmail,
           sourceLang: lang(),

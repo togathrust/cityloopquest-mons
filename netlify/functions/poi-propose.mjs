@@ -8,11 +8,25 @@ import {
   slugFromName,
 } from "./_lib/store.mjs";
 
-const REGION_BOUNDS = { minLat: 50.35, maxLat: 50.55, minLon: 3.80, maxLon: 4.05 };
+const REGIONS = {
+  mons: {
+    city: "Mons",
+    bounds: { minLat: 50.35, maxLat: 50.55, minLon: 3.80, maxLon: 4.05 },
+  },
+  bruxelles: {
+    city: "Bruxelles",
+    bounds: { minLat: 50.39, maxLat: 51.30, minLon: 3.65, maxLon: 4.95 },
+  },
+};
 const MAX_B64 = 3_500_000;
 
-function inRegion(lat, lng) {
-  return lat >= REGION_BOUNDS.minLat && lat <= REGION_BOUNDS.maxLat && lng >= REGION_BOUNDS.minLon && lng <= REGION_BOUNDS.maxLon;
+function regionFor(key) {
+  return REGIONS[String(key || "mons").toLowerCase()] || REGIONS.mons;
+}
+
+function inRegion(lat, lng, region) {
+  const bounds = region.bounds;
+  return lat >= bounds.minLat && lat <= bounds.maxLat && lng >= bounds.minLon && lng <= bounds.maxLon;
 }
 
 function parseBody(event) {
@@ -56,10 +70,11 @@ export async function handler(event) {
     const description = String(body.description || "").trim().slice(0, 500);
     const submitterEmail = String(body.submitterEmail || "").trim().slice(0, 120);
     const sourceLang = normSource(body.sourceLang);
+    const region = regionFor(body.cityKey);
 
     if (!name || name.length < 2) return json(400, { error: "invalid_name" });
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) return json(400, { error: "invalid_coords" });
-    if (!inRegion(lat, lng)) return json(400, { error: "coords_outside_mons" });
+    if (!inRegion(lat, lng, region)) return json(400, { error: "coords_outside_mons" });
     if (!description || description.length < 10) return json(400, { error: "invalid_description" });
     if (submitterEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(submitterEmail)) {
       return json(400, { error: "invalid_email" });
@@ -82,7 +97,7 @@ export async function handler(event) {
       name,
       lat,
       lng,
-      city: "Mons",
+      city: region.city,
       category: ["patrimoine", "culture"],
       descriptions,
       sourceDescription: description,

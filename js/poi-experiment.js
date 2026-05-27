@@ -1,11 +1,34 @@
-/* Experimental POI explorer for CLQ Mons. */
+/* Experimental POI explorer for CLQ city datasets. */
 (function () {
   "use strict";
 
-  const DEFAULT_CENTER = { lat: 50.4543, lng: 3.9526 }; // Mons
+  const CITY_CONFIGS = {
+    mons: {
+      label: "CLQ Mons",
+      datasetUrl: "data/pois_mons_experiment.json",
+      defaultCenter: { lat: 50.4543, lng: 3.9526 },
+      lastPosKey: "mons_lastKnownPosition"
+    },
+    bruxelles: {
+      label: "CLQ Bruxelles",
+      datasetUrl: "data/pois_bruxelles_experiment.json",
+      defaultCenter: { lat: 50.8467, lng: 4.3525 },
+      lastPosKey: "bruxelles_lastKnownPosition"
+    }
+  };
+  const params = new URLSearchParams(window.location.search || "");
+  const requestedCity = (params.get("city") || params.get("dataset") || "mons").toLowerCase();
+  const CITY_CONFIG = CITY_CONFIGS[requestedCity] || CITY_CONFIGS.mons;
+  const DEFAULT_CENTER = CITY_CONFIG.defaultCenter;
   const FALLBACK_LANG = "fr";
-  const LS_LAST_POS = "mons_lastKnownPosition";
+  const LS_LAST_POS = CITY_CONFIG.lastPosKey;
   const SUPPORTED_LANGS = ["fr", "en", "nl", "de", "it", "es", "pl", "ar", "zh", "ja"];
+  window.CLQ_POI_CITY_CONFIG = {
+    center: { ...CITY_CONFIG.defaultCenter },
+    label: CITY_CONFIG.label,
+    datasetUrl: CITY_CONFIG.datasetUrl,
+    cityKey: CITY_CONFIG === CITY_CONFIGS.bruxelles ? "bruxelles" : "mons"
+  };
   /** Zoom lorsqu'un POI est choisi (liste ou marqueur). */
   const ZOOM_POI_FOCUS = 17;
 
@@ -148,9 +171,20 @@
     poiActionsBound: false
   };
 
-  const sectionCenters = {
-    MONS_CENTRE: DEFAULT_CENTER
-  };
+  const sectionCenters = {};
+
+  function applyCityLabel() {
+    const title = `${CITY_CONFIG.label} - POI Explorer`;
+    document.title = title;
+    const h1 = document.querySelector("header h1");
+    if (h1) h1.textContent = title;
+    window.CLQ_POI_CITY_CONFIG = {
+      center: { ...CITY_CONFIG.defaultCenter },
+      label: CITY_CONFIG.label,
+      datasetUrl: CITY_CONFIG.datasetUrl,
+      cityKey: CITY_CONFIG === CITY_CONFIGS.bruxelles ? "bruxelles" : "mons"
+    };
+  }
 
   function rawStoredLanguage() {
     return (localStorage.getItem("selectedLanguage") || FALLBACK_LANG).toLowerCase();
@@ -784,15 +818,20 @@
       const res = await fetch("/.netlify/functions/poi-community");
       if (!res.ok) return [];
       const data = await res.json();
-      return (data.pois || []).filter((p) => p.verified === true);
+      const cityKey = window.CLQ_POI_CITY_CONFIG?.cityKey || "mons";
+      const expectedCity = cityKey === "bruxelles" ? "bruxelles" : "mons";
+      return (data.pois || []).filter((p) => {
+        const city = String(p.city || "").toLowerCase();
+        return p.verified === true && city.includes(expectedCity);
+      });
     } catch {
       return [];
     }
   }
 
   async function loadPois() {
-    const res = await fetch("data/pois_mons_experiment.json");
-    if (!res.ok) throw new Error("Impossible de charger pois_mons_experiment.json");
+    const res = await fetch(CITY_CONFIG.datasetUrl);
+    if (!res.ok) throw new Error(`Impossible de charger ${CITY_CONFIG.datasetUrl}`);
     const data = await res.json();
     const center = data.center || data.meta?.center;
     if (center && Number.isFinite(center.lat) && Number.isFinite(center.lng)) {
@@ -825,7 +864,7 @@
   }
 
   async function loadMasterListPois() {
-    // Les POI Mons confirmes sont fournis par data/pois_mons_experiment.json.
+    // Les POI confirmes sont fournis par le dataset ville charge plus haut.
     return [];
   }
 
@@ -1013,5 +1052,8 @@
     }
   });
 
-  document.addEventListener("DOMContentLoaded", loadGoogleMapsAPI);
+  document.addEventListener("DOMContentLoaded", () => {
+    applyCityLabel();
+    loadGoogleMapsAPI();
+  });
 })();
