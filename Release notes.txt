@@ -1,4 +1,8 @@
+CityLoop Quest Mons - Release notes
+Version 26.06.26
+----------------------------------------
 
+précision clic et centrage page parcours
 
 CityLoop Quest Mons - Release notes
 Version 26.06.01
