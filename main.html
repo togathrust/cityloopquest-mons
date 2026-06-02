@@ -338,7 +338,7 @@
         cursor: not-allowed;
         opacity: 0.7;
     }
-#main-geo-activation-overlay {
+    #main-geo-activation-overlay {
         position: fixed;
         inset: 0;
         background: rgba(0, 0, 0, 0.72);
@@ -776,7 +776,7 @@
       (port === '5173' || port === '5174') &&
       (host === 'localhost' || host === '127.0.0.1' || /^192\.168\./.test(host) || /^10\./.test(host));
     if (isDev || !('serviceWorker' in navigator)) return;
-    navigator.serviceWorker.register('service-worker.js?v=20')
+    navigator.serviceWorker.register('service-worker.js?v=36')
       .then(() => console.log('Service Worker enregistré.'))
       .catch(error => console.log('Service Worker échec :', error));
   })();

@@ -434,13 +434,52 @@
           popup.style.display = 'none';
         }
       }
+
+      function clearExpiredPurchaseState() {
+        const keys = [
+          'clq_token',
+          'jwt',
+          'clq_has_access',
+          'clq_short_code',
+          'clq_entitlements',
+          'clq_city',
+          'clq_last_checkout',
+          'user_version',
+          'upgrade_type',
+          'user_state_before_upgrade'
+        ];
+
+        keys.forEach(key => {
+          try { localStorage.removeItem(key); } catch (_) {}
+        });
+
+        try {
+          sessionStorage.setItem('expired_popup_acknowledged', '1');
+          sessionStorage.removeItem('payment_successful');
+        } catch (_) {}
+
+        try {
+          document.cookie = 'clq_short_code=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Lax';
+        } catch (_) {}
+
+        try {
+          const request = indexedDB.open('cityloopquest_db', 1);
+          request.onsuccess = () => {
+            const db = request.result;
+            if (!db.objectStoreNames.contains('app_data')) return;
+            const tx = db.transaction(['app_data'], 'readwrite');
+            const store = tx.objectStore('app_data');
+            keys.forEach(key => store.delete(key));
+          };
+        } catch (_) {}
+      }
       
       // Gérer le clic sur OUI (rediriger vers la page d'achat)
       $('#license-expired-yes')?.addEventListener('click', () => {
         hideLicenseExpiredPopup();
+        clearExpiredPurchaseState();
         const currentLang = getCurrentLang();
-        // Rediriger vers choose-access.html ou index.html avec paramètre pour acheter
-        window.location.href = `choose-access.html?lang=${encodeURIComponent(currentLang)}&reason=expired`;
+        window.location.href = `choose-access.html?lang=${encodeURIComponent(currentLang)}&from_expired=1`;
       });
       
       // Gérer le clic sur NON (fermer le popup)

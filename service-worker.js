@@ -1,15 +1,18 @@
-const PRECACHE = 'precache-v20';
-const RUNTIME  = 'runtime-v20';
+const PRECACHE = 'precache-v46';
+const RUNTIME  = 'runtime-v31';
 
 const PRECACHE_URLS = [
   './',                       // ok si tu sers à la racine du dossier
   './index.html',
   './language-selection.html',
+  './parcours.html',
   './style.css',
+  './circuit.css',
   './app.js',
   './secure-content.js',
   './content-loader.js',
   './manifest.json',
+  './manifest-android.json',
   // './images/logo.png',      // ❌ supprimé car 404 chez toi
 ];
 
@@ -61,12 +64,20 @@ self.addEventListener('fetch', (event) => {
       path.endsWith('app.js') ||
       path.endsWith('/version.js') ||
       path.endsWith('version.js') ||
+      path.endsWith('/manifest.json') ||
+      path.endsWith('manifest.json') ||
+      path.endsWith('/manifest-android.json') ||
+      path.endsWith('manifest-android.json') ||
       path.endsWith('/main.html') ||
       path.endsWith('main.html') ||
+      path.endsWith('/parcours.html') ||
+      path.endsWith('parcours.html') ||
       path.endsWith('/api-key.js') ||
       path.endsWith('api-key.js') ||
       path.endsWith('/style.css') ||
-      path.endsWith('style.css');
+      path.endsWith('style.css') ||
+      path.endsWith('/circuit.css') ||
+      path.endsWith('circuit.css');
 
     if (mustNetworkFirst) {
       event.respondWith((async () => {

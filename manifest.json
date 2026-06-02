@@ -1,7 +1,7 @@
 {
   "name": "CityLoop Quest Mons",
   "short_name": "CLQ Mons",
-  "start_url": "/index.html",
+  "start_url": "/index.html?pwa=1",
   "display": "standalone",
   "background_color": "#b30000",
   "theme_color": "#b30000",

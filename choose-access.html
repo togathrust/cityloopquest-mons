@@ -86,12 +86,58 @@
     // Vérifier si l'utilisateur a déjà un code - si oui, rediriger vers index.html pour afficher l'écran d'avertissement
     // Sauf si marqueur (sessionStorage ou URL from_expired=1) : l'utilisateur vient de cliquer OK sur "accès expiré" → rester sur choose-access
     (function() {
+      const urlParams = new URLSearchParams(window.location.search || '');
+      const fromExpiredPopup =
+        sessionStorage.getItem('expired_popup_acknowledged') === '1' ||
+        urlParams.get('from_expired') === '1' ||
+        urlParams.get('reason') === 'expired';
+
+      if (fromExpiredPopup) {
+        [
+          'clq_token',
+          'jwt',
+          'clq_has_access',
+          'clq_short_code',
+          'clq_entitlements',
+          'clq_city',
+          'clq_last_checkout',
+          'user_version',
+          'upgrade_type',
+          'user_state_before_upgrade'
+        ].forEach(key => {
+          try { localStorage.removeItem(key); } catch (_) {}
+        });
+        try { sessionStorage.setItem('expired_popup_acknowledged', '1'); } catch (_) {}
+        try {
+          document.cookie = 'clq_short_code=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Lax';
+        } catch (_) {}
+        try {
+          const request = indexedDB.open('cityloopquest_db', 1);
+          request.onsuccess = () => {
+            const db = request.result;
+            if (!db.objectStoreNames.contains('app_data')) return;
+            const tx = db.transaction(['app_data'], 'readwrite');
+            const store = tx.objectStore('app_data');
+            [
+              'clq_token',
+              'jwt',
+              'clq_has_access',
+              'clq_short_code',
+              'clq_entitlements',
+              'clq_city',
+              'clq_last_checkout',
+              'user_version',
+              'upgrade_type',
+              'user_state_before_upgrade'
+            ].forEach(key => store.delete(key));
+          };
+        } catch (_) {}
+      }
+
       const hasCode = localStorage.getItem('clq_short_code') || 
                      localStorage.getItem('clq_token') || 
                      localStorage.getItem('jwt') ||
                      localStorage.getItem('clq_has_access') === '1';
-      const urlParams = new URLSearchParams(window.location.search || '');
-      const fromExpiredPopup = sessionStorage.getItem('expired_popup_acknowledged') === '1' || urlParams.get('from_expired') === '1';
       const fromClquestPortal = urlParams.get('from') === 'clquest' ||
         (document.referrer && /clquest\.netlify\.app/i.test(document.referrer));
       

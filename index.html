@@ -125,7 +125,12 @@
         const data = await r.json().catch(()=>null);
         if (r.ok && data?.token) {
           localStorage.setItem('clq_token', data.token);
-          localStorage.setItem('jwt', data.token); // Compatibilité avec app.js
+          localStorage.setItem('jwt', data.token);
+          try {
+            if (window.storageHelper && typeof window.storageHelper.savePurchaseData === 'function') {
+              await window.storageHelper.savePurchaseData({});
+            }
+          } catch (_) {}
         }
       } catch (err) {
         // on ne bloque pas le démarrage si le refresh échoue
@@ -179,12 +184,85 @@
       return false;
     }
 
+    /** PWA installed: display-mode, start_url ?pwa=1, or persisted install flag. */
+    function isLikelyInstalledPwa() {
+      try {
+        const params = new URLSearchParams(window.location.search || '');
+        if (params.get('pwa') === '1' || params.get('installed') === 'true') {
+          return true;
+        }
+      } catch (e) {}
+      if (isRunningAsInstalledPwa()) return true;
+      try {
+        if (localStorage.getItem('pwa-installed') === 'true') {
+          return true;
+        }
+      } catch (e) {}
+      return false;
+    }
+
+    async function persistAuthToIndexedDB() {
+      try {
+        if (window.storageHelper && typeof window.storageHelper.savePurchaseData === 'function') {
+          await window.storageHelper.savePurchaseData({});
+        }
+      } catch (e) {}
+    }
+
+    async function routePwaToParcours() {
+      let lang = localStorage.getItem('selectedLanguage');
+      if (!lang) {
+        const langCookie = getCookie('clq_selected_language');
+        lang = langCookie || 'fr';
+        localStorage.setItem('selectedLanguage', lang);
+      }
+      sessionStorage.setItem('webLanguageSelected', 'true');
+      await persistAuthToIndexedDB();
+      window.location.replace(`parcours.html?lang=${encodeURIComponent(lang)}`);
+    }
+
+    async function routePwaToChooseAccess() {
+      let lang = localStorage.getItem('selectedLanguage');
+      if (!lang) {
+        const langCookie = getCookie('clq_selected_language');
+        lang = langCookie || 'fr';
+      }
+      try {
+        sessionStorage.setItem('show_expired_access_popup', '1');
+        sessionStorage.setItem('expired_access_lang', lang);
+      } catch (e) {}
+      if (document.readyState === 'loading') return;
+      showExpiredAccessPopup();
+    }
+
+    function showExpiredAccessPopup() {
+      const overlay = document.getElementById('expired-access-overlay');
+      const ok = document.getElementById('expired-access-ok');
+      if (!overlay || !ok) return;
+      let lang = sessionStorage.getItem('expired_access_lang') || localStorage.getItem('selectedLanguage') || 'fr';
+      overlay.classList.add('show');
+      overlay.setAttribute('aria-hidden', 'false');
+      ok.onclick = function () {
+        try {
+          sessionStorage.removeItem('show_expired_access_popup');
+          sessionStorage.removeItem('expired_access_lang');
+          sessionStorage.setItem('expired_popup_acknowledged', '1');
+        } catch (e) {}
+        window.location.replace('choose-access.html?lang=' + encodeURIComponent(lang) + '&from_expired=1');
+      };
+    }
+
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+      return null;
+    }
+
     function syncPwaInstalledFlag() {
       try {
-        if (isRunningAsInstalledPwa()) {
+        if (isRunningAsInstalledPwa() || isLikelyInstalledPwa()) {
           localStorage.setItem('pwa-installed', 'true');
-        } else {
-          localStorage.removeItem('pwa-installed');
         }
       } catch (e) {}
     }
@@ -379,11 +457,11 @@
         alert(`🔍 ÉTAT AU DÉMARRAGE:\n\nCode: ${debugState.clq_short_code}\nToken: ${debugState.clq_token}\nJWT: ${debugState.jwt}\nAccès: ${debugState.clq_has_access}\nLangue: ${debugState.selectedLanguage}\nLangue sélectionnée: ${debugState.webLanguageSelected}`);
       }
       
-      const isPWAInstalled = isRunningAsInstalledPwa();
+      const isPWAInstalled = isLikelyInstalledPwa();
       const isAndroid = /android/i.test(navigator.userAgent || '');
       
       if (localStorage.getItem('debug_mode') === 'true') {
-        alert(`🚀 DÉTECTION PWA:\n\nPWA active (display-mode): ${isPWAInstalled}\nFlag localStorage: ${localStorage.getItem('pwa-installed') || 'absent'}`);
+        alert(`🚀 DÉTECTION PWA:\n\nPWA active: ${isPWAInstalled}\nFlag localStorage: ${localStorage.getItem('pwa-installed') || 'absent'}`);
       }
       
       // On vérifie le code si l'app est installée OU si l'on dispose déjà d'un code/token stocké (localStorage/cookie)
@@ -436,27 +514,25 @@
         // Dans ce cas, rediriger vers la page d'activation manuelle
         if (!token && !shortCode && !hasAccess) {
           if (showDebugAlert) {
-            alert('⚠️ App installée détectée mais aucune donnée trouvée.\n\nC\'est normal sur iOS : les données ne sont pas partagées entre le navigateur et l\'app installée.\n\n→ Redirection vers la page d\'activation pour entrer le code depuis l\'email.');
+            alert('⚠️ App installée détectée mais aucune donnée trouvée.\n\n→ Redirection vers la page d\'activation pour entrer le code depuis l\'email.');
           }
           
-          // Récupérer la langue sauvegardée (depuis cookie, localStorage ou défaut)
-          let lang = localStorage.getItem('selectedLanguage');
-          if (!lang) {
-            // Essayer de récupérer depuis le cookie
-            const langCookie = getCookie('clq_selected_language');
-            if (langCookie) {
-              lang = langCookie;
-              localStorage.setItem('selectedLanguage', lang);
-            } else {
-              lang = 'fr';
-              localStorage.setItem('selectedLanguage', lang);
+          if (isPWAInstalled) {
+            let lang = localStorage.getItem('selectedLanguage');
+            if (!lang) {
+              const langCookie = getCookie('clq_selected_language');
+              if (langCookie) {
+                lang = langCookie;
+                localStorage.setItem('selectedLanguage', lang);
+              } else {
+                lang = 'fr';
+                localStorage.setItem('selectedLanguage', lang);
+              }
             }
+            sessionStorage.setItem('webLanguageSelected', 'true');
+            window.location.replace(`activation-manual.html?lang=${encodeURIComponent(lang)}&from=pwa`);
+            return;
           }
-          sessionStorage.setItem('webLanguageSelected', 'true');
-          
-          // Rediriger vers la page d'activation manuelle avec la langue
-          window.location.replace(`activation-manual.html?lang=${encodeURIComponent(lang)}&from=pwa`);
-          return; // IMPORTANT : arrêter ici
         }
         
         // Si on a un token ou un code, vérifier la validité
@@ -516,10 +592,10 @@
                 }
                 
                 if (isPWAInstalled) {
-                  window.location.replace(`parcours.html?lang=${encodeURIComponent(lang)}`);
-                  return; // IMPORTANT : arrêter ici pour éviter le flux normal
+                  await routePwaToParcours();
+                  return;
                 } else {
-                  // non-PWA : on continue le flux d’avertissement
+                  // non-PWA : on continue le flux d'avertissement
                 }
               } else {
                 if (localStorage.getItem('debug_mode') === 'true') {
@@ -606,8 +682,8 @@
                   }
                   
                   if (isPWAInstalled) {
-                    window.location.replace(`parcours.html?lang=${encodeURIComponent(lang)}`);
-                    return; // IMPORTANT : arrêter ici pour éviter le flux normal
+                    await routePwaToParcours();
+                    return;
                   } else {
                     // non-PWA : on continue l’écran d’avertissement
                   }
@@ -630,46 +706,12 @@
             // PWA installée mais accès expiré/invalide → redirection directe vers choose-access (évite la boucle popup)
             if (isPWAInstalled) {
               try {
-                let lang = localStorage.getItem('selectedLanguage');
-                if (!lang) { const c = getCookie('clq_selected_language'); lang = c || 'fr'; }
-                window.location.replace('choose-access.html?lang=' + encodeURIComponent(lang) + '&from_expired=1');
+                await routePwaToChooseAccess();
                 return;
               } catch (_) {}
             }
           } catch (error) {
             console.error('❌ Erreur lors de la vérification de l\'accès PWA:', error);
-            
-            // Si on a un code sauvegardé mais que la vérification échoue (réseau, etc.),
-            // on considère que le code est valide et on redirige quand même
-            // MAIS UNIQUEMENT si l'app est installée (PWA détectée)
-            // Si l'app n'est pas installée, on passe par le flux normal (écran d'avertissement)
-            const errorMessage = (error && error.message) ? error.message : '';
-            if (shortCode && isPWAInstalled && (error.name === 'AbortError' || errorMessage.includes('fetch') || errorMessage.includes('network'))) {
-              if (localStorage.getItem('debug_mode') === 'true') {
-                alert(`Erreur réseau mais code présent ET app installée.\nOn considère le code comme valide.\nRedirection vers parcours...`);
-              }
-
-              // Récupérer la langue sauvegardée (depuis cookie, localStorage ou défaut)
-              let lang = localStorage.getItem('selectedLanguage');
-              if (!lang) {
-                const langCookie = getCookie('clq_selected_language');
-                if (langCookie) {
-                  lang = langCookie;
-                  localStorage.setItem('selectedLanguage', lang);
-                } else {
-                  lang = 'fr';
-                  localStorage.setItem('selectedLanguage', lang);
-                }
-              }
-              sessionStorage.setItem('webLanguageSelected', 'true');
-
-              if (!localStorage.getItem('user_version')) {
-                localStorage.setItem('user_version', 'LITE');
-              }
-
-              window.location.replace(`parcours.html?lang=${encodeURIComponent(lang)}`);
-              return;
-            }
             
             if (localStorage.getItem('debug_mode') === 'true') {
               alert(`Erreur lors de la vérification:\n${error.message}\n→ Redirection vers page paiements`);
@@ -677,9 +719,7 @@
             // PWA installée mais vérification en erreur (accès expiré) → redirection directe vers choose-access
             if (isPWAInstalled) {
               try {
-                let lang = localStorage.getItem('selectedLanguage');
-                if (!lang) { const c = getCookie('clq_selected_language'); lang = c || 'fr'; }
-                window.location.replace('choose-access.html?lang=' + encodeURIComponent(lang) + '&from_expired=1');
+                await routePwaToChooseAccess();
                 return;
               } catch (_) {}
             }
@@ -702,12 +742,10 @@
                                        codeFromCookie;
       
       if (hasAccessBeforeLangCheck) {
-        // Si on a un accès, s'assurer qu'une langue est définie (utiliser le français par défaut si nécessaire)
         const selectedLang = localStorage.getItem('selectedLanguage');
         const webLanguageSelected = sessionStorage.getItem('webLanguageSelected');
         
         if (!selectedLang) {
-          // Utiliser le français par défaut ou la langue du cookie
           const langCookie = getCookie('clq_selected_language');
           const defaultLang = langCookie || 'fr';
           localStorage.setItem('selectedLanguage', defaultLang);
@@ -716,8 +754,10 @@
           sessionStorage.setItem('webLanguageSelected', 'true');
         }
         
-        // Ne pas rediriger, laisser le code continuer pour afficher l'écran d'avertissement
-        // Le DOMContentLoaded gérera l'affichage de l'écran d'avertissement
+        if (isLikelyInstalledPwa()) {
+          await routePwaToParcours();
+          return;
+        }
         return;
       }
       
@@ -1045,8 +1085,8 @@
   <!-- Popup accès expiré (PWA : date/token plus valable) -->
   <div id="expired-access-overlay" aria-hidden="true">
     <div id="expired-access-box">
-      <p id="expired-access-message">Votre accès n'est plus valable. Merci de souscrire une nouvelle inscription si vous désirez continuer dans l'application.</p>
-      <button type="button" id="expired-access-ok">OK</button>
+      <p id="expired-access-message">Le code n'est plus valable. Voulez-vous acqu?rir une nouvelle licence valable 7 jours ?</p>
+      <button type="button" id="expired-access-ok">OUI</button>
     </div>
   </div>
 
@@ -1083,14 +1123,7 @@
       // Accès expiré (flag posé par bootRouteGuard ou ancien cache) → redirection directe, jamais de popup (Safari cache)
       const showExpiredPopup = sessionStorage.getItem('show_expired_access_popup') === '1';
       if (showExpiredPopup) {
-        try {
-          sessionStorage.removeItem('show_expired_access_popup');
-          const lang = sessionStorage.getItem('expired_access_lang') || localStorage.getItem('selectedLanguage') || 'fr';
-          sessionStorage.removeItem('expired_access_lang');
-          window.location.replace('choose-access.html?lang=' + encodeURIComponent(lang) + '&from_expired=1');
-        } catch (_) {
-          window.location.replace('choose-access.html?lang=fr&from_expired=1');
-        }
+        showExpiredAccessPopup();
         return;
       }
 
@@ -1104,10 +1137,10 @@
         try { sessionStorage.removeItem('android_pwa_show_welcome'); } catch (_) {}
       }
       
-      let isPWA = isRunningAsInstalledPwa();
+      let isPWA = isLikelyInstalledPwa();
       if (androidForceShowWelcome) isPWA = false;
       
-      let isAppInstalled = isRunningAsInstalledPwa() ||
+      let isAppInstalled = isLikelyInstalledPwa() ||
                            window.location.search.includes('installed=true');
       if (androidForceShowWelcome) isAppInstalled = false;
       
@@ -1148,12 +1181,14 @@
           
           // Forcer l'affichage de l'avertissement
           if (!isPWA) {
-            // Attendre que le DOM soit prêt si nécessaire
             if (document.readyState === 'loading') {
               document.addEventListener('DOMContentLoaded', showWarningScreen);
             } else {
               showWarningScreen();
             }
+            return;
+          } else if (hasAccess) {
+            routePwaToParcours();
             return;
           } else {
             return;
@@ -1246,9 +1281,15 @@
         return;
       }
       
-      // CAS 2: PWA installée avec langue sélectionnée → Redirection directe vers parcours
-      // NE PAS rediriger ici si PWA - laisser bootRouteGuard vérifier la validité du code
+      // CAS 2: PWA installée avec langue sélectionnée → parcours si accès valide
       if (isPWA && selectedLang) {
+        const pwaHasAccess = localStorage.getItem('clq_has_access') === '1' ||
+          localStorage.getItem('clq_token') ||
+          localStorage.getItem('jwt') ||
+          localStorage.getItem('clq_short_code');
+        if (pwaHasAccess) {
+          routePwaToParcours();
+        }
         return;
       }
       
