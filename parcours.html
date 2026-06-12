@@ -13,7 +13,14 @@
 
   <link rel="stylesheet" href="carte.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <link rel="stylesheet" href="circuit.css?v=51">
+  <link rel="stylesheet" href="circuit.css?v=52">
+
+  <script src="js/ios-viewport-fix.js"></script>
+  <script>
+    if (window.CLQViewportFix && window.CLQViewportFix.isIOS()) {
+      window.CLQViewportFix.bind();
+    }
+  </script>
 
   <script src="api-base.js"></script>
   <script src="js/auth-session.js"></script>
@@ -180,26 +187,7 @@
       if (sel && anchor) anchor.appendChild(sel);
     }
 
-    var parcoursLayoutRecalibrationBound = false;
-
-    function recalibrateParcoursLayout() {
-      try {
-        window.scrollTo(0, 0);
-        document.documentElement.scrollTop = 0;
-        document.body.scrollTop = 0;
-      } catch (e) {}
-
-      var vv = window.visualViewport;
-      var mapEl = document.getElementById('map');
-      if (vv && mapEl) {
-        var height = Math.round(vv.height || window.innerHeight);
-        if (height > 0) {
-          document.documentElement.style.height = height + 'px';
-          document.body.style.height = height + 'px';
-          mapEl.style.height = height + 'px';
-        }
-      }
-
+    function recalibrateParcoursLeaflet() {
       if (!map) return;
 
       var center = map.getCenter();
@@ -207,7 +195,6 @@
 
       map.invalidateSize({ animate: false, pan: false });
 
-      /* Micro-mouvement : reproduit l'effet d'un toucher carte en PWA paysage. */
       try {
         map.panBy([1, 1], { animate: false, noMoveStart: true });
         map.panBy([-1, -1], { animate: false, noMoveStart: true });
@@ -217,28 +204,24 @@
       map.invalidateSize({ animate: false, pan: false });
     }
 
+    function recalibrateParcoursLayout() {
+      if (window.CLQViewportFix) {
+        window.CLQViewportFix.recalibrate();
+      }
+      recalibrateParcoursLeaflet();
+    }
+
     function scheduleParcoursLayoutRecalibration() {
-      [0, 80, 180, 350, 700, 1200].forEach(function(delay) {
-        setTimeout(recalibrateParcoursLayout, delay);
-      });
+      if (window.CLQViewportFix) {
+        window.CLQViewportFix.schedule();
+      } else {
+        recalibrateParcoursLayout();
+      }
     }
 
     function bindParcoursLayoutRecalibration() {
-      if (parcoursLayoutRecalibrationBound) return;
-      parcoursLayoutRecalibrationBound = true;
-
-      var rerun = function() {
-        scheduleParcoursLayoutRecalibration();
-      };
-
-      window.addEventListener('resize', rerun);
-      window.addEventListener('orientationchange', rerun);
-      window.addEventListener('pageshow', rerun);
-
-      if (window.visualViewport) {
-        window.visualViewport.addEventListener('resize', rerun);
-        window.visualViewport.addEventListener('scroll', rerun);
-      }
+      if (!window.CLQViewportFix) return;
+      window.CLQViewportFix.bind({ onRecalibrate: recalibrateParcoursLeaflet });
     }
 
     function initCircuitMap() {
@@ -604,7 +587,7 @@
       var warning = document.getElementById('orientation-warning');
       if (!warning) return;
       var isLandscape = window.innerWidth > window.innerHeight;
-      if (isLandscape || isInstalledPwaContext()) {
+      if (isLandscape) {
         warning.style.display = 'none';
         if (typeof scheduleParcoursLayoutRecalibration === 'function') {
           scheduleParcoursLayoutRecalibration();
@@ -618,7 +601,9 @@
     }
     window.addEventListener('resize', checkOrientation);
     window.addEventListener('orientationchange', checkOrientation);
+    window.addEventListener('DOMContentLoaded', checkOrientation);
     window.addEventListener('load', checkOrientation);
+    window.addEventListener('pageshow', checkOrientation);
     if (screen.orientation) {
       screen.orientation.addEventListener('change', checkOrientation);
     }

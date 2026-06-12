@@ -1,4 +1,4 @@
-const PRECACHE = 'precache-v51';
+const PRECACHE = 'precache-v57';
 const RUNTIME  = 'runtime-v36';
 
 const PRECACHE_URLS = [
@@ -9,6 +9,7 @@ const PRECACHE_URLS = [
   './style.css',
   './circuit.css',
   './js/access-control.js',
+  './js/ios-viewport-fix.js',
   './checkout.js',
   './app.js',
   './secure-content.js',

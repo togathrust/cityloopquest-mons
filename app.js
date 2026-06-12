@@ -768,6 +768,7 @@ function updatePointPhotoForCurrentIndex() {
         return;
     }
     imageElement.style.display = 'block';
+    schedulePointImageFit();
     if (textContainer) {
         textContainer.style.display = 'none';
     }
@@ -786,6 +787,21 @@ function refreshRouteToCurrentDestination() {
     } else if (typeof startPoint !== "undefined" && startPoint) {
         calculateRouteFromPosition(startPoint, "Point de départ");
     }
+}
+
+function resizeMainMapToLayout() {
+    if (!map || !window.google || !google.maps || !google.maps.event) return;
+    const center = map.getCenter();
+    const zoom = map.getZoom();
+    google.maps.event.trigger(map, 'resize');
+    if (center) map.setCenter(center);
+    if (zoom != null) map.setZoom(zoom);
+}
+
+function scheduleMainMapResize() {
+    [0, 80, 180, 350, 700].forEach(function(delay) {
+        setTimeout(resizeMainMapToLayout, delay);
+    });
 }
 
 function markGuidancePauseForLeave() {
@@ -1568,13 +1584,80 @@ function applyPointImage(imageElement, location) {
             return;
         }
         const path = candidates[index++];
+        const encodedPath = encodeAssetPath(path);
         imageElement.onerror = function () {
             imageElement.onerror = null;
             tryNext();
         };
-        imageElement.src = encodeAssetPath(path);
+        imageElement.onload = function () {
+            fitPointImageToFrame(imageElement);
+        };
+        imageElement.src = encodedPath;
+        if (imageElement.complete) {
+            setTimeout(function () {
+                fitPointImageToFrame(imageElement);
+            }, 0);
+        }
     }
     tryNext();
+}
+
+function fitPointImageToFrame(imageElement) {
+    imageElement = imageElement || document.getElementById('point-image');
+    const frame = document.getElementById('point-image-frame');
+    if (!imageElement || !frame) return;
+    if (!imageElement.naturalWidth || !imageElement.naturalHeight) return;
+
+    if (/android/i.test(navigator.userAgent || '')) {
+        frame.style.setProperty('width', '100%', 'important');
+        frame.style.setProperty('height', '100%', 'important');
+        frame.style.setProperty('max-width', '100%', 'important');
+        frame.style.setProperty('max-height', '100%', 'important');
+        frame.style.setProperty('display', 'block', 'important');
+        frame.style.setProperty('overflow', 'hidden', 'important');
+        frame.style.setProperty('background-image', `url("${imageElement.currentSrc || imageElement.src}")`, 'important');
+        frame.style.setProperty('background-repeat', 'no-repeat', 'important');
+        frame.style.setProperty('background-position', 'center top', 'important');
+        frame.style.setProperty('background-size', 'contain', 'important');
+        imageElement.style.setProperty('display', 'none', 'important');
+        imageElement.style.setProperty('width', '0', 'important');
+        imageElement.style.setProperty('height', '0', 'important');
+        imageElement.style.setProperty('opacity', '0', 'important');
+        imageElement.style.setProperty('pointer-events', 'none', 'important');
+        return;
+    }
+
+    const frameRect = frame.getBoundingClientRect();
+    const frameWidth = frameRect.width;
+    const frameHeight = frameRect.height;
+    if (!frameWidth || !frameHeight) return;
+
+    const imageRatio = imageElement.naturalWidth / imageElement.naturalHeight;
+    const frameRatio = frameWidth / frameHeight;
+
+    let renderedWidth;
+    let renderedHeight;
+    if (imageRatio > frameRatio) {
+        renderedWidth = frameWidth;
+        renderedHeight = frameWidth / imageRatio;
+    } else {
+        renderedHeight = frameHeight;
+        renderedWidth = frameHeight * imageRatio;
+    }
+
+    imageElement.style.width = Math.floor(renderedWidth) + 'px';
+    imageElement.style.height = Math.floor(renderedHeight) + 'px';
+    imageElement.style.maxWidth = '100%';
+    imageElement.style.maxHeight = '100%';
+    imageElement.style.objectFit = 'contain';
+}
+
+function schedulePointImageFit() {
+    [0, 80, 180, 350].forEach(function(delay) {
+        setTimeout(function() {
+            fitPointImageToFrame();
+        }, delay);
+    });
 }
 
 function stopAllAudio() {
@@ -1595,6 +1678,7 @@ function stopAllAudio() {
 
     if (imageElement && textContainer) {
         imageElement.style.display = "block";
+        schedulePointImageFit();
         textContainer.style.display = "none";
         textContainer.innerText = "";
     }
@@ -1676,6 +1760,7 @@ function playExclusiveAudio(src, textFile = null, imageElement = null, originalI
             if (imageElement && originalImageSrc) {
                 imageElement.src = originalImageSrc;
                 imageElement.style.display = "block";
+                schedulePointImageFit();
             }
             if (textContainer) {
                 textContainer.style.display = "none";
@@ -1724,6 +1809,7 @@ function playExclusiveAudio(src, textFile = null, imageElement = null, originalI
             const imageElement = document.getElementById('point-image');
             if (imageElement && textContainer) {
                 imageElement.style.display = 'block';
+                schedulePointImageFit();
                 textContainer.style.display = 'none';
             }
             if (
@@ -2189,6 +2275,21 @@ function startMap() {
         mapInitialized = true;
         localStorage.setItem('mapInitialized', 'true');
         initializationInProgress = false;
+
+        if (window.CLQViewportFix && typeof window.CLQViewportFix.bind === 'function') {
+            window.CLQViewportFix.bind({
+                onRecalibrate: function () {
+                    resizeMainMapToLayout();
+                }
+            });
+            window.CLQViewportFix.schedule();
+        }
+        scheduleMainMapResize();
+        window.addEventListener('resize', scheduleMainMapResize);
+        window.addEventListener('orientationchange', scheduleMainMapResize);
+        schedulePointImageFit();
+        window.addEventListener('resize', schedulePointImageFit);
+        window.addEventListener('orientationchange', schedulePointImageFit);
         
         // Cacher le splash screen maintenant que la carte est prête
         hideSplashScreen();
@@ -3448,6 +3549,18 @@ function initializeMainLogic() {
     if (localStorage.getItem('tourCompleted') === 'true') {
         enableTourExplorationMode();
     }
+    if (
+        localStorage.getItem('museumMode') !== 'true' &&
+        localStorage.getItem('tourCompleted') === 'true' &&
+        localStorage.getItem('mons_endOfTourPopupShown') !== 'true' &&
+        filteredLocations &&
+        filteredLocations.length > 0 &&
+        currentIndex >= filteredLocations.length - 1
+    ) {
+        setTimeout(function () {
+            showEndOfTourPopup();
+        }, 400);
+    }
     
     const forceTarget = localStorage.getItem("mons_forceTarget");
 
@@ -3737,9 +3850,7 @@ function checkOrientationAndShowPopup() {
     if (typeof isMainGeoPromptVisible === 'function' && isMainGeoPromptVisible()) {
         const landscapePopup = document.getElementById('landscape-required-popup');
         if (landscapePopup) landscapePopup.remove();
-        return;
-    }
-    if (isHandheldPhone()) {
+        setTimeout(checkOrientationAndShowPopup, 500);
         return;
     }
     const isLandscape = isLandscapeNow();
@@ -4627,6 +4738,14 @@ function showInfoPopup(title, message, onClose) {
 
 // === Fonction pour afficher le popup de fin de parcours ===
 function showEndOfTourPopup() {
+    if (document.getElementById('end-of-tour-overlay')) {
+        return;
+    }
+
+    try {
+        localStorage.setItem('mons_endOfTourPopupShown', 'true');
+    } catch (e) {}
+
     const overlay = document.createElement('div');
     overlay.id = 'end-of-tour-overlay';
 
@@ -4640,22 +4759,31 @@ function showEndOfTourPopup() {
 
     const title = document.createElement('div');
     title.className = 'end-of-tour-title';
-    title.textContent = window.translationManager
+    const victoryTitle = window.translationManager
         ? window.translationManager.translate('victory')
+        : null;
+    title.textContent = victoryTitle && victoryTitle !== 'victory'
+        ? victoryTitle
         : 'Victoire !';
     box.appendChild(title);
 
     const msg = document.createElement('div');
     msg.className = 'end-of-tour-msg';
-    msg.innerHTML = window.translationManager
+    const victoryMessage = window.translationManager
         ? window.translationManager.translate('victory_message')
-        : "C'est la dernière étape de votre parcours !<br><br>Bravo, vous avez vaincu la Sardine !<br>La bête est terrassée !<br><br>À l'arrivée, si vous le souhaitez, vous pourrez prendre un selfie avec la Sardine !<br><br>Vous pouvez également voyager à votre guise dans les différents points du parcours si vous voulez vous rendre à un endroit particulier.";
+        : null;
+    msg.innerHTML = victoryMessage && victoryMessage !== 'victory_message'
+        ? victoryMessage
+        : "C'est la dernière étape de votre parcours !<br><br>Bravo, vous avez vaincu le Dragon !<br>La bête est terrassée !<br><br>À l'arrivée, si vous le souhaitez, vous pourrez prendre un selfie avec Saint Georges !";
     box.appendChild(msg);
 
     const btnCompris = document.createElement('button');
     btnCompris.className = 'end-of-tour-btn';
-    btnCompris.textContent = window.translationManager
+    const understoodText = window.translationManager
         ? window.translationManager.translate('understood')
+        : null;
+    btnCompris.textContent = understoodText && understoodText !== 'understood'
+        ? understoodText
         : 'COMPRIS';
     btnCompris.addEventListener('click', () => {
         document.body.removeChild(overlay);
@@ -4950,6 +5078,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const textContainer = document.getElementById("media-display");
             if (imageElement && textContainer) {
                 imageElement.style.display = "block";
+                schedulePointImageFit();
                 textContainer.style.display = "none";
                 textContainer.innerText = "";
             }

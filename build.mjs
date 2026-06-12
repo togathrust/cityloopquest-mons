@@ -285,6 +285,30 @@ async function copyAll() {
 
 const HTML_MINIFY_SKIP = new Set(["main.html"]);
 
+const GLOBAL_VIEWPORT_FIX_SNIPPET = `
+  <script src="js/ios-viewport-fix.js"></script>
+  <script>
+    if (window.CLQViewportFix && window.CLQViewportFix.isIOS()) {
+      window.CLQViewportFix.bind();
+    }
+  </script>
+`;
+
+async function injectGlobalViewportFix() {
+  const files = await fg(["**/*.html"], { cwd: DIST, dot: false });
+  let injected = 0;
+  for (const rel of files) {
+    const abs = path.join(DIST, rel);
+    const src = await readFile(abs, "utf8");
+    if (src.includes("js/ios-viewport-fix.js")) continue;
+    if (!/<\/head>/i.test(src)) continue;
+    const out = src.replace(/<\/head>/i, `${GLOBAL_VIEWPORT_FIX_SNIPPET}</head>`);
+    await writeFile(abs, out, "utf8");
+    injected++;
+  }
+  log("viewport", `injected iOS viewport fix into ${injected} html file(s)`);
+}
+
 async function minifyHtmlFiles() {
   const files = await fg(["**/*.html"], { cwd: DIST, dot: false });
   let minified = 0;
@@ -425,6 +449,7 @@ async function createApiKeyFile() {
   await clean();
   await copyAll();
   await createApiKeyFile();
+  await injectGlobalViewportFix();
   await minifyHtmlFiles();
   await minifyCssFiles();
   await minifyJsFiles();

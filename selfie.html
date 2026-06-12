@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-translate="selfie_title">Selfie Saint Georges</title>
     <link rel="stylesheet" href="style.css">
+    <script src="js/ios-viewport-fix.js"></script>
+    <script>
+        if (window.CLQViewportFix && window.CLQViewportFix.isIOS()) {
+            window.CLQViewportFix.bind();
+        }
+    </script>
     <script src="translations/translationManager.js"></script>
     <script src="translations/languageSelector.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -32,72 +38,132 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            --drawing-width: min(100vw, calc((100dvh - 64px) * 16 / 9));
+            --drawing-height: min(calc(100dvh - 64px), calc(100vw * 9 / 16));
         }
         .stgeorges-bg {
             position: absolute;
-            width: 100%;
-            height: 100%;
+            left: 50%;
+            top: 50%;
+            width: var(--drawing-width);
+            height: var(--drawing-height);
+            transform: translate(-50%, -50%);
             object-fit: contain;
             z-index: 15; /* Au-dessus de la vidéo */
             pointer-events: none;
         }
         #video-wrapper {
             position: absolute;
-            width: 400px;
-            height: 400px;
-            transform: translate(-15%, -2%);
-            border-radius: 50%;
+            left: 50%;
+            top: 50%;
+            width: var(--drawing-width);
+            height: var(--drawing-height);
+            transform: translate(-50%, -50%);
+            border-radius: 0;
             overflow: hidden;
             z-index: 5; /* Derrière le dessin de fond */
-            border: 3px solid rgba(255,255,255,0.3);
+            border: none;
             display: flex;
             align-items: center;
             justify-content: center;
+            background: #000;
+            touch-action: none;
+        }
+
+        #video {
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+            border-radius: 0 !important;
+        }
+
+        #selfie-orientation-warning {
+            position: fixed;
+            inset: 0;
+            z-index: 100000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+            background: rgba(255, 245, 245, 0.98);
+            color: #222;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            font-size: 1.2rem;
+        }
+
+        #selfie-orientation-warning > div {
+            max-width: min(420px, calc(100vw - 40px));
+            padding: 20px;
+            border: 2px solid #14365c;
+            border-radius: 14px;
+            background: #fff;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
         }
 
         .selfie-btns {
-            position: absolute;
-            right: 5%;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 30; /* Toujours au-dessus de tout */
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+            display: contents;
         }
-        /* Suppression de .selfie-circle car non utilisé et peut causer des conflits */
-        .selfie-btns button {
-            font-size: 1.1rem;
-            padding: 12px 22px;
-            border-radius: 8px;
-            border: none;
-            background: #c8102e;
-            color: #fff;
-            cursor: pointer;
-            font-family: 'MedievalSharp', Arial, serif;
-            box-shadow: 0 2px 8px #0004;
+
+        .selfie-side-btn {
+            position: fixed !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            z-index: 60 !important;
+            width: 34px !important;
+            height: 96px !important;
+            min-width: 34px !important;
+            max-width: 34px !important;
+            min-height: 96px !important;
+            max-height: 96px !important;
+            margin: 0 !important;
+            padding: 6px 2px !important;
+            border: none !important;
+            border-radius: 12px !important;
+            color: #fff !important;
+            cursor: pointer !important;
+            font-family: 'MedievalSharp', Arial, serif !important;
+            font-size: 0.72rem !important;
+            font-weight: bold !important;
+            line-height: 1 !important;
+            letter-spacing: 0.02em !important;
+            writing-mode: vertical-rl !important;
+            text-orientation: mixed !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            box-shadow: 0 2px 6px #0003 !important;
+            opacity: 0.9 !important;
         }
-        .selfie-btns button:disabled {
-            background: #aaa;
-            color: #eee;
-            cursor: not-allowed;
+
+        #captureBtn {
+            right: 12px !important;
+            left: auto !important;
+            background: #2f61b8 !important;
+        }
+
+        #backBtn {
+            left: 12px !important;
+            right: auto !important;
+            background: #c8102e !important;
         }
         
         /* Styles pour les textes sur l'image */
         .selfie-text-overlay {
             position: absolute;
-            width: 100%;
-            height: 100%;
+            left: 50%;
+            top: 50%;
+            width: var(--drawing-width);
+            height: var(--drawing-height);
+            transform: translate(-50%, -50%);
             pointer-events: none;
             z-index: 20; /* Au-dessus de la vidéo */
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 20px;
+            display: block;
             box-sizing: border-box;
         }
         
         .selfie-text-top {
+            display: none;
             text-align: center;
             color: #b30000;
             font-family: 'MedievalSharp', Arial, serif;
@@ -113,17 +179,23 @@
         }
         
         .selfie-text-bottom {
+            position: absolute;
+            left: 50%;
+            bottom: 3.2%;
+            transform: translateX(-50%);
             text-align: center;
             color: #4b2e05;
             font-family: 'MedievalSharp', Arial, serif;
-            font-size: 1.2rem;
+            font-size: clamp(0.9rem, 2.1vw, 1.15rem);
             font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
-            background: rgba(255,255,255,0.9);
-            padding: 8px 12px;
-            border-radius: 8px;
-            border: 2px solid #b8860b;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            text-shadow: 1px 1px 1px rgba(255,255,255,0.85), 0 0 3px rgba(255,255,255,0.65);
+            background: transparent;
+            padding: 0;
+            border: none;
+            box-shadow: none;
+            min-width: 0;
+            max-width: 34%;
+            white-space: nowrap;
         }
         
         .countdown-overlay {
@@ -181,9 +253,14 @@
         <img src="images/icone titre1.png" alt="Icone 1" class="header-img right">
     </div>
 </header>
+    <div id="selfie-orientation-warning">
+        <div>
+            <p data-translate="orientation_message">🔄 Pour une meilleure expérience, veuillez pivoter votre appareil en mode paysage.</p>
+        </div>
+    </div>
     <div class="selfie-container">
         <div id="video-wrapper">
-            <video id="video" autoplay playsinline muted style="display:block; border-radius: 50%;"></video>
+            <video id="video" autoplay playsinline muted style="display:block;"></video>
         </div>
         <img src="images/fond_saintgeorges_dragon.png" class="stgeorges-bg" alt="Fond Saint Georges et Dragon">
         
@@ -196,7 +273,8 @@
 
         
         <div class="selfie-btns" id="selfie-btns">
-            <button id="backBtn" data-translate="back_button" style="position:fixed; right:-8px; top:50%; transform:translateY(-50%); z-index:40; font-size:1rem; padding:8px 4px; border-radius:12px; background:#c8102e; color:#fff; border:none; box-shadow:0 2px 6px #0003; opacity:0.8; writing-mode:vertical-rl; text-orientation:mixed; letter-spacing:0.15em; line-height:1.1; min-width:24px; min-height:80px;">R E T O U R</button>
+            <button id="captureBtn" class="selfie-side-btn" type="button">PHOTO</button>
+            <button id="backBtn" class="selfie-side-btn" data-translate="back_button" type="button">R E T O U R</button>
         </div>
     </div>
 
@@ -204,6 +282,11 @@
 // Script simplifié pour la caméra selfie
 let video = document.getElementById('video');
 let stream = null;
+let cameraZoom = 1;
+let minCameraZoom = 1;
+const MAX_CAMERA_ZOOM = 3;
+let pinchStartDistance = null;
+let pinchStartZoom = 1;
 
 function startCamera() {
     const constraints = {
@@ -293,104 +376,220 @@ function showCapturePopup() {
     }, 5000);
 }
 
-function applyMaxZoomOut() {
-    // Cette fonction optimise le dézoom pour avoir le maximum d'image visible
-    // tout en restant dans le cercle, sans que l'image sorte ou remplisse complètement le cercle
-    
+function checkSelfieOrientation() {
+    const warning = document.getElementById('selfie-orientation-warning');
+    if (!warning) return;
+    const isLandscape = window.innerWidth > window.innerHeight;
+    warning.style.display = isLandscape ? 'none' : 'flex';
+    if (isLandscape && window.CLQViewportFix) {
+        window.CLQViewportFix.schedule();
+    }
+}
+
+function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+}
+
+function getCameraDrawRect(targetWidth, targetHeight) {
+    const videoWidth = video.videoWidth || targetWidth;
+    const videoHeight = video.videoHeight || targetHeight;
+    const coverScale = Math.max(targetWidth / videoWidth, targetHeight / videoHeight);
+    const containScale = Math.min(targetWidth / videoWidth, targetHeight / videoHeight);
+    minCameraZoom = containScale / coverScale;
+    cameraZoom = clamp(cameraZoom, minCameraZoom, MAX_CAMERA_ZOOM);
+
+    const drawWidth = videoWidth * coverScale * cameraZoom;
+    const drawHeight = videoHeight * coverScale * cameraZoom;
+
+    return {
+        x: (targetWidth - drawWidth) / 2,
+        y: (targetHeight - drawHeight) / 2,
+        width: drawWidth,
+        height: drawHeight
+    };
+}
+
+function applyCameraZoom() {
     const videoWrapper = document.getElementById('video-wrapper');
     const video = document.getElementById('video');
     if (!videoWrapper || !video) return;
-    
-    // Attendre que les dimensions de la vidéo soient disponibles
-    if (video.videoWidth === 0 || video.videoHeight === 0) {
-        // Réessayer après un court délai
-        setTimeout(applyMaxZoomOut, 100);
-        return;
-    }
-    
-    // Dimensions du conteneur circulaire (400x400px)
-    const containerSize = 400;
-    const safetyMargin = 0.98; // 98% pour éviter que l'image sorte du cercle
-    const maxSize = containerSize * safetyMargin;
-    
-    // Dimensions réelles de la vidéo
-    const videoWidth = video.videoWidth;
-    const videoHeight = video.videoHeight;
-    const videoAspect = videoWidth / videoHeight;
-    
-    // Calculer le facteur d'échelle pour maximiser l'image visible
-    // tout en restant dans le cercle
-    let scale;
-    if (videoAspect >= 1) {
-        // La vidéo est plus large que haute (landscape ou carré)
-        // Le facteur limitant est la hauteur du conteneur
-        scale = maxSize / videoHeight;
-    } else {
-        // La vidéo est plus haute que large (portrait)
-        // Le facteur limitant est la largeur du conteneur
-        scale = maxSize / videoWidth;
-    }
-    
-    // Calculer les dimensions finales
-    const finalWidth = videoWidth * scale;
-    const finalHeight = videoHeight * scale;
-    
-    // Appliquer les styles pour centrer et redimensionner la vidéo
-    video.style.width = finalWidth + 'px';
-    video.style.height = finalHeight + 'px';
-    video.style.objectFit = 'fill'; // Utiliser fill car on contrôle déjà les dimensions
+
+    const rect = videoWrapper.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const drawRect = getCameraDrawRect(rect.width, rect.height);
+
+    video.style.width = drawRect.width + 'px';
+    video.style.height = drawRect.height + 'px';
+    video.style.objectFit = 'fill';
     video.style.position = 'absolute';
-    video.style.left = '50%';
-    video.style.top = '50%';
-    video.style.transform = 'translate(-50%, -50%)'; // Centrage parfait
-    video.style.borderRadius = '50%';
+    video.style.inset = 'auto';
+    video.style.left = drawRect.x + 'px';
+    video.style.top = drawRect.y + 'px';
+    video.style.transform = 'none';
+    video.style.borderRadius = '0';
+}
+
+function applyMaxZoomOut() {
+    applyCameraZoom();
+}
+
+function getTouchDistance(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+function setupCameraPinchZoom() {
+    const videoWrapper = document.getElementById('video-wrapper');
+    if (!videoWrapper) return;
+
+    videoWrapper.addEventListener('touchstart', function(event) {
+        if (event.touches.length !== 2) return;
+        pinchStartDistance = getTouchDistance(event.touches);
+        pinchStartZoom = cameraZoom;
+        event.preventDefault();
+    }, { passive: false });
+
+    videoWrapper.addEventListener('touchmove', function(event) {
+        if (event.touches.length !== 2 || !pinchStartDistance) return;
+        const currentDistance = getTouchDistance(event.touches);
+        cameraZoom = clamp(pinchStartZoom * (currentDistance / pinchStartDistance), minCameraZoom, MAX_CAMERA_ZOOM);
+        applyCameraZoom();
+        event.preventDefault();
+    }, { passive: false });
+
+    videoWrapper.addEventListener('touchend', function(event) {
+        if (event.touches.length < 2) {
+            pinchStartDistance = null;
+            pinchStartZoom = cameraZoom;
+        }
+    }, { passive: true });
+
+    videoWrapper.addEventListener('dblclick', function() {
+        cameraZoom = 1;
+        applyCameraZoom();
+    });
 }
 
 function updateCircuitText() {
     const selectedCircuit = localStorage.getItem('selectedCircuit');
     const selfieTextBottom = document.getElementById('selfie-text-bottom');
-    
-    if (selectedCircuit) {
-        let translationKey = '';
-        switch(selectedCircuit) {
-            case 'petit':
-                translationKey = 'circuit_short';
-                break;
-            case 'moyen':
-                translationKey = 'circuit_medium';
-                break;
-            case 'grand':
-                translationKey = 'circuit_long';
-                break;
-            default:
-                translationKey = 'circuit_default';
-        }
-        
-        // Appliquer la traduction
-        const selectedLanguage = localStorage.getItem('selectedLanguage') || 'en';
-        if (window.translationManager && window.translationManager.translations) {
-            const translations = window.translationManager.translations[selectedLanguage];
-            if (translations && translations[translationKey]) {
-                selfieTextBottom.textContent = translations[translationKey];
-            } else {
-                // Fallback avec la traduction en anglais
-                const enTranslations = window.translationManager.translations['en'];
-                if (enTranslations && enTranslations[translationKey]) {
-                    selfieTextBottom.textContent = enTranslations[translationKey];
-                } else {
-                    // Fallback final
-                    selfieTextBottom.textContent = 'Tour of CityLoop Quest Mons';
-                }
-            }
-        } else {
-            // Si le gestionnaire de traduction n'est pas encore chargé
-            selfieTextBottom.textContent = 'Tour of CityLoop Quest Mons';
-        }
-    }
+    if (!selfieTextBottom) return;
+
+    const selectedLanguage = localStorage.getItem('selectedLanguage') || 'fr';
+    const labels = {
+        fr: { petit: 'Parcours court', moyen: 'Parcours moyen', grand: 'Grand parcours' },
+        en: { petit: 'Short tour', moyen: 'Medium tour', grand: 'Long tour' },
+        nl: { petit: 'Korte route', moyen: 'Middelgrote route', grand: 'Lange route' },
+        de: { petit: 'Kurze Tour', moyen: 'Mittlere Tour', grand: 'Lange Tour' },
+        it: { petit: 'Percorso breve', moyen: 'Percorso medio', grand: 'Percorso lungo' },
+        es: { petit: 'Recorrido corto', moyen: 'Recorrido medio', grand: 'Recorrido largo' },
+        pl: { petit: 'Krótka trasa', moyen: 'Średnia trasa', grand: 'Długa trasa' },
+        ar: { petit: 'مسار قصير', moyen: 'مسار متوسط', grand: 'مسار طويل' },
+        cn: { petit: '短路线', moyen: '中路线', grand: '长路线' },
+        jp: { petit: '短いコース', moyen: '中コース', grand: '長いコース' }
+    };
+    const langLabels = labels[selectedLanguage] || labels.fr;
+    selfieTextBottom.textContent = langLabels[selectedCircuit] || langLabels.petit;
 }
 
 function goBack() {
     window.history.back();
+}
+
+function drawRoundedRect(ctx, x, y, width, height, radius) {
+    const r = Math.min(radius, width / 2, height / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + width, y, x + width, y + height, r);
+    ctx.arcTo(x + width, y + height, x, y + height, r);
+    ctx.arcTo(x, y + height, x, y, r);
+    ctx.arcTo(x, y, x + width, y, r);
+    ctx.closePath();
+}
+
+function drawVideoWithCameraZoom(ctx, videoEl, width, height) {
+    const drawRect = getCameraDrawRect(width, height);
+    ctx.drawImage(videoEl, drawRect.x, drawRect.y, drawRect.width, drawRect.height);
+}
+
+function wrapCanvasText(ctx, text, maxWidth) {
+    const words = String(text || '').split(/\s+/);
+    const lines = [];
+    let line = '';
+
+    words.forEach(function(word) {
+        const testLine = line ? line + ' ' + word : word;
+        if (ctx.measureText(testLine).width > maxWidth && line) {
+            lines.push(line);
+            line = word;
+        } else {
+            line = testLine;
+        }
+    });
+
+    if (line) lines.push(line);
+    return lines;
+}
+
+function saveCanvasBlob(blob) {
+    const fileName = 'cityloopquest-mons-selfie.png';
+    const file = blob ? new File([blob], fileName, { type: 'image/png' }) : null;
+
+    if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({
+            files: [file],
+            title: 'CityLoop Quest Mons',
+            text: 'Selfie CityLoop Quest Mons'
+        }).catch(function() {});
+        return;
+    }
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(function() {
+        URL.revokeObjectURL(url);
+    }, 1000);
+}
+
+function captureSelfieDrawing() {
+    const bg = document.querySelector('.stgeorges-bg');
+    const videoEl = document.getElementById('video');
+    const bottomText = document.getElementById('selfie-text-bottom');
+    if (!bg || !videoEl) return;
+
+    const canvas = document.createElement('canvas');
+    const width = bg.naturalWidth || 1024;
+    const height = bg.naturalHeight || 576;
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, width, height);
+
+    if (videoEl.readyState >= 2) {
+        drawVideoWithCameraZoom(ctx, videoEl, width, height);
+    }
+
+    ctx.drawImage(bg, 0, 0, width, height);
+
+    const text = bottomText ? bottomText.textContent : '';
+    ctx.fillStyle = '#4b2e05';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '24px MedievalSharp, Arial, serif';
+    ctx.shadowColor = 'rgba(255,255,255,0.9)';
+    ctx.shadowBlur = 3;
+    ctx.fillText(text, width / 2, height * 0.935);
+    ctx.shadowBlur = 0;
+
+    canvas.toBlob(saveCanvasBlob, 'image/png');
 }
 
 // Initialiser au chargement
@@ -398,6 +597,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Démarrer la caméra
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         startCamera();
+    }
+    checkSelfieOrientation();
+    window.addEventListener('resize', checkSelfieOrientation);
+    window.addEventListener('orientationchange', checkSelfieOrientation);
+    window.addEventListener('pageshow', checkSelfieOrientation);
+    if (screen.orientation) {
+        screen.orientation.addEventListener('change', checkSelfieOrientation);
     }
     
     // Créer le sélecteur de langue
@@ -418,6 +624,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Événement du bouton retour
     document.getElementById('backBtn').addEventListener('click', goBack);
+    document.getElementById('captureBtn').addEventListener('click', captureSelfieDrawing);
+    setupCameraPinchZoom();
+    window.addEventListener('resize', applyCameraZoom);
     
     // Écouter les changements de langue
     document.addEventListener('languageChanged', function(event) {
