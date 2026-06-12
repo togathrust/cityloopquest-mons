@@ -1,5 +1,5 @@
-const PRECACHE = 'precache-v57';
-const RUNTIME  = 'runtime-v36';
+const PRECACHE = 'precache-mons260638-cache3-viewport';
+const RUNTIME  = 'runtime-mons260638-cache3-viewport';
 
 const PRECACHE_URLS = [
   './',                       // ok si tu sers à la racine du dossier
@@ -8,6 +8,7 @@ const PRECACHE_URLS = [
   './parcours.html',
   './style.css',
   './circuit.css',
+  './carte.css',
   './js/access-control.js',
   './js/ios-viewport-fix.js',
   './checkout.js',
@@ -81,10 +82,20 @@ self.addEventListener('fetch', (event) => {
       path.endsWith('style.css') ||
       path.endsWith('/circuit.css') ||
       path.endsWith('circuit.css') ||
+      path.endsWith('/carte.css') ||
+      path.endsWith('carte.css') ||
       path.endsWith('/js/access-control.js') ||
       path.endsWith('js/access-control.js') ||
+      path.endsWith('/js/ios-viewport-fix.js') ||
+      path.endsWith('js/ios-viewport-fix.js') ||
       path.endsWith('/checkout.js') ||
-      path.endsWith('checkout.js');
+      path.endsWith('checkout.js') ||
+      path.endsWith('/circuit-data.js') ||
+      path.endsWith('circuit-data.js') ||
+      path.endsWith('/circuit.js') ||
+      path.endsWith('circuit.js') ||
+      path.endsWith('/api-base.js') ||
+      path.endsWith('api-base.js');
 
     if (mustNetworkFirst) {
       event.respondWith((async () => {

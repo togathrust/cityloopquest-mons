@@ -344,11 +344,18 @@
               setStatus(translated);
             }
           }
-          // Rediriger vers index.html avec la langue dans l'URL
-          setTimeout(
-            () => location.replace(`index.html?activated=1&lang=${encodeURIComponent(currentLang)}`),
-            800
-          );
+          const fromPwa =
+            new URLSearchParams(window.location.search || '').get('from') === 'pwa' ||
+            (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+            window.navigator.standalone === true;
+
+          setTimeout(() => {
+            if (fromPwa) {
+              location.replace(`parcours.html?lang=${encodeURIComponent(currentLang)}`);
+            } else {
+              location.replace(`index.html?activated=1&lang=${encodeURIComponent(currentLang)}`);
+            }
+          }, 800);
         } catch (e) {
           setStatus('');
           if (!errEl.textContent) {

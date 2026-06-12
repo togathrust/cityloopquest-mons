@@ -357,9 +357,13 @@
         await new Promise(resolve => setTimeout(resolve, 100));
       }
       
+      const isPwaBoot = isLikelyInstalledPwa();
+
       if (storageHelperReady) {
         try {
-          const restored = await window.storageHelper.restorePurchaseData();
+          const restored = await window.storageHelper.restorePurchaseData({
+            forceFromIdb: isPwaBoot,
+          });
           if (restored) {
             if (localStorage.getItem('debug_mode') === 'true') {
               alert('✅ Données restaurées depuis IndexedDB\n\nLe code et le token ont été récupérés.');
@@ -378,8 +382,24 @@
         await restoreFromIndexedDBDirect();
       }
 
-      if (window.clqAuthSession && typeof window.clqAuthSession.ensureValidAuthOrClear === 'function') {
-        await window.clqAuthSession.ensureValidAuthOrClear(resolveApiBase());
+      // PWA installée : restaurer l'activation locale, valider sans purger si réseau indisponible
+      if (isPwaBoot && window.clqAuthSession && window.clqAuthSession.hasStoredCredentials()) {
+        if (typeof window.clqAuthSession.ensureValidAuthOrClear === 'function') {
+          await window.clqAuthSession.ensureValidAuthOrClear(resolveApiBase(), { pwaMode: true });
+        }
+        if (window.clqAuthSession.hasStoredCredentials()) {
+          await routePwaToParcours();
+          return;
+        }
+      }
+
+      // Navigateur web : valider et purger si licence réellement invalide
+      if (
+        !isPwaBoot &&
+        window.clqAuthSession &&
+        typeof window.clqAuthSession.ensureValidAuthOrClear === 'function'
+      ) {
+        await window.clqAuthSession.ensureValidAuthOrClear(resolveApiBase(), { pwaMode: false });
       }
       
       // Fonction de restauration directe depuis IndexedDB
@@ -411,7 +431,7 @@
                 request.onerror = () => resolve(null);
               });
               
-              if (value !== undefined && value !== null && !localStorage.getItem(key)) {
+              if (value !== undefined && value !== null && (isPwaBoot || !localStorage.getItem(key))) {
                 localStorage.setItem(key, value);
                 restored = true;
                 restoredKeys.push(key);

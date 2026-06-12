@@ -24,7 +24,7 @@
 
     function applyTranslations() {
         if (backBtn) {
-            backBtn.textContent = t("maps_bridge_back", "← Retour à CLQ Mons");
+            backBtn.textContent = t("maps_bridge_back", "← Retour à CLQ Murcia");
         }
         if (openBtn) {
             openBtn.textContent = t(

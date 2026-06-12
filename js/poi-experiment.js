@@ -1,34 +1,11 @@
-/* Experimental POI explorer for CLQ city datasets. */
+/* Experimental POI explorer for CLQ Murcia (no production wiring yet). */
 (function () {
   "use strict";
 
-  const CITY_CONFIGS = {
-    mons: {
-      label: "CLQ Mons",
-      datasetUrl: "data/pois_mons_experiment.json",
-      defaultCenter: { lat: 50.4543, lng: 3.9526 },
-      lastPosKey: "mons_lastKnownPosition"
-    },
-    bruxelles: {
-      label: "CLQ Bruxelles",
-      datasetUrl: "data/pois_bruxelles_experiment.json",
-      defaultCenter: { lat: 50.8467, lng: 4.3525 },
-      lastPosKey: "bruxelles_lastKnownPosition"
-    }
-  };
-  const params = new URLSearchParams(window.location.search || "");
-  const requestedCity = (params.get("city") || params.get("dataset") || "mons").toLowerCase();
-  const CITY_CONFIG = CITY_CONFIGS[requestedCity] || CITY_CONFIGS.mons;
-  const DEFAULT_CENTER = CITY_CONFIG.defaultCenter;
+  const DEFAULT_CENTER = { lat: 37.9833, lng: -1.1299 }; // Murcia
   const FALLBACK_LANG = "fr";
-  const LS_LAST_POS = CITY_CONFIG.lastPosKey;
+  const LS_LAST_POS = "murcia_lastKnownPosition";
   const SUPPORTED_LANGS = ["fr", "en", "nl", "de", "it", "es", "pl", "ar", "zh", "ja"];
-  window.CLQ_POI_CITY_CONFIG = {
-    center: { ...CITY_CONFIG.defaultCenter },
-    label: CITY_CONFIG.label,
-    datasetUrl: CITY_CONFIG.datasetUrl,
-    cityKey: CITY_CONFIG === CITY_CONFIGS.bruxelles ? "bruxelles" : "mons"
-  };
   /** Zoom lorsqu'un POI est choisi (liste ou marqueur). */
   const ZOOM_POI_FOCUS = 17;
 
@@ -164,27 +141,24 @@
     markers: [],
     markerPulseInterval: null,
     activePoi: null,
-    defaultCenter: { ...DEFAULT_CENTER },
     /** Évite double init si le callback Google est invoqué deux fois (Safari). */
     mapInitLock: false,
     /** Listeners POI déjà branchés. */
     poiActionsBound: false
   };
 
-  const sectionCenters = {};
-
-  function applyCityLabel() {
-    const title = `${CITY_CONFIG.label} - POI Explorer`;
-    document.title = title;
-    const h1 = document.querySelector("header h1");
-    if (h1) h1.textContent = title;
-    window.CLQ_POI_CITY_CONFIG = {
-      center: { ...CITY_CONFIG.defaultCenter },
-      label: CITY_CONFIG.label,
-      datasetUrl: CITY_CONFIG.datasetUrl,
-      cityKey: CITY_CONFIG === CITY_CONFIGS.bruxelles ? "bruxelles" : "mons"
-    };
-  }
+  const sectionCenters = {
+    A_MURCIA_VILLE: { lat: 37.9833, lng: -1.1299 },
+    B_MURCIA_PERIPHERIE: { lat: 37.96, lng: -1.12 },
+    C_ALCANTARILLA_MOLINA_SANTOMERA: { lat: 38.03, lng: -1.16 },
+    D_VALLE_RICOTE_ARCHENA_BLANCA_ABARAN_CIEZA: { lat: 38.17, lng: -1.37 },
+    E_ABANILLA_FORTUNA_ORIHUELA: { lat: 38.15, lng: -1.04 },
+    F_ALHAMA_LIBRILLA_MULA_PLIEGO_BULLAS_SIERRA_ESPUNA: { lat: 37.92, lng: -1.45 },
+    G_FUENTE_ALAMO_TORRE_PACHECO: { lat: 37.72, lng: -1.18 },
+    H_MAR_MENOR: { lat: 37.82, lng: -0.78 },
+    I_CARTAGENA_LA_UNION_PORTMAN: { lat: 37.62, lng: -0.95 },
+    J_MAZARRON_TOTANA_ALEDO_LORCA: { lat: 37.72, lng: -1.46 }
+  };
 
   function rawStoredLanguage() {
     return (localStorage.getItem("selectedLanguage") || FALLBACK_LANG).toLowerCase();
@@ -211,80 +185,10 @@
     return (dict && (dict[lang] || dict[FALLBACK_LANG])) || "";
   }
 
-  function mapCenter() {
-    return state.defaultCenter || DEFAULT_CENTER;
-  }
-
-  /** Lit un champ monolingue ou un objet { fr, en, cn, ja, ... }. */
-  function localizedField(field, lang) {
-    if (field == null) return "";
-    if (typeof field === "string") return field;
-    if (typeof field !== "object") return String(field);
-    if (lang === "zh") {
-      return field.zh || field.cn || field[FALLBACK_LANG] || field.en || "";
-    }
-    if (lang === "ja") {
-      return field.ja || field.jp || field[FALLBACK_LANG] || field.en || "";
-    }
-    return field[lang] || field[FALLBACK_LANG] || field.en || "";
-  }
-
-  function normalizeDescriptions(raw) {
-    const src = raw.descriptions || raw.description;
-    if (!src) return {};
-    if (typeof src === "string") return { [FALLBACK_LANG]: src };
-    const out = { ...src };
-    if (out.cn && !out.zh) out.zh = out.cn;
-    if (out.jp && !out.ja) out.ja = out.jp;
-    if (out.zh && !out.cn) out.cn = out.zh;
-    if (out.ja && !out.jp) out.jp = out.ja;
-    return out;
-  }
-
-  function isPoiIncluded(raw) {
-    if (raw.verified === false) return false;
-    if (raw.verified === true) return true;
-    return Number.isFinite(raw.lat) && Number.isFinite(raw.lng);
-  }
-
-  function normalizePoiRecord(raw) {
-    const nameLocales = typeof raw.name === "object" && raw.name ? raw.name : null;
-    const categoryLocales =
-      typeof raw.category === "object" && raw.category && !Array.isArray(raw.category)
-        ? raw.category
-        : null;
-    return {
-      ...raw,
-      _nameLocales: nameLocales,
-      _categoryLocales: categoryLocales,
-      descriptions: normalizeDescriptions(raw),
-      category: Array.isArray(raw.category) ? raw.category.slice() : [],
-      verified: isPoiIncluded(raw),
-      needsReview: raw.coordinateStatus === "to_verify" || raw.needsReview === true
-    };
-  }
-
-  function poiDisplayName(poi) {
-    if (!poi) return "";
-    if (poi._nameLocales) return localizedField(poi._nameLocales, currentLang());
-    return String(poi.name || poi.id || "POI");
-  }
-
-  function poiCategoryParts(poi) {
-    if (!poi) return [];
-    if (poi._categoryLocales) {
-      const label = localizedField(poi._categoryLocales, currentLang());
-      return label ? [label] : [];
-    }
-    return Array.isArray(poi.category) ? poi.category.slice() : [];
-  }
-
   function poiDescription(poi) {
     if (!poi || !poi.descriptions) return "";
     const lang = currentLang();
     const d = poi.descriptions;
-    if (lang === "zh") return d.zh || d.cn || d[FALLBACK_LANG] || d.en || "";
-    if (lang === "ja") return d.ja || d.jp || d[FALLBACK_LANG] || d.en || "";
     return d[lang] || d[FALLBACK_LANG] || d.en || "";
   }
 
@@ -354,7 +258,7 @@
       document.body.appendChild(bar);
     }
     bar.textContent =
-      currentLang() === "fr"
+      lang() === "fr"
         ? "✓ Vous êtes de retour sur CLQ. Utilisez la carte pour continuer."
         : "✓ Back on CLQ. Continue with the map.";
     bar.classList.add("clq-maps-return-banner--visible");
@@ -431,7 +335,7 @@
   function isWalkInProgress() {
     return (
       localStorage.getItem("walkInProgress") === "true" ||
-      localStorage.getItem("mons_walkInProgress") === "true" ||
+      localStorage.getItem("murcia_walkInProgress") === "true" ||
       localStorage.getItem("museumMode") === "true"
     );
   }
@@ -619,7 +523,7 @@
         img.src = poiPhotoUrl(candidates[i]);
       };
       setSrc(candIdx);
-      img.alt = poiDisplayName(poi) || "POI photo";
+      img.alt = poi.name || "POI photo";
       img.loading = "lazy";
       img.addEventListener("error", () => {
         candIdx += 1;
@@ -661,12 +565,12 @@
     const ask = document.getElementById("poi-ask");
     const hint = document.getElementById("maps-return-hint");
 
-    title.textContent = poiDisplayName(poi);
+    title.textContent = poi.name;
     desc.textContent = poiDescription(poi);
-    const catParts = poiCategoryParts(poi);
+    const catParts = [...(poi.category || [])];
     if (poi.needsReview) catParts.push("a reviser (geocodage auto)");
     cat.textContent = catParts.join(", ");
-    const origin = state.userPos || mapCenter();
+    const origin = state.userPos || DEFAULT_CENTER;
     const km = haversineKm(origin.lat, origin.lng, poi.lat, poi.lng);
     dist.textContent = `${km.toFixed(1)} km`;
     if (poi.synthetic) {
@@ -727,7 +631,7 @@
       const marker = new google.maps.Marker({
         map: state.map,
         position: { lat: poi.lat, lng: poi.lng },
-        title: poiDisplayName(poi),
+        title: poi.name,
         icon: defaultPoiIcon(7)
       });
       marker.__poiId = poi.id;
@@ -766,7 +670,7 @@
     if (state.filteredPois.length > 0) {
       state.map.fitBounds(bounds);
     } else {
-      state.map.setCenter(state.userPos || mapCenter());
+      state.map.setCenter(state.userPos || DEFAULT_CENTER);
       state.map.setZoom(11);
     }
 
@@ -783,11 +687,11 @@
 
     state.filteredPois
       .slice()
-      .sort((a, b) => poiDisplayName(a).localeCompare(poiDisplayName(b)))
+      .sort((a, b) => a.name.localeCompare(b.name))
       .forEach((poi) => {
         const item = document.createElement("button");
         item.className = "poi-list-item";
-        item.textContent = poiDisplayName(poi);
+        item.textContent = poi.name;
         item.setAttribute("data-poi-id", poi.id);
         item.addEventListener("click", () => {
           selectPoiFromMapOrList(poi);
@@ -800,7 +704,7 @@
   }
 
   function applyRadiusFilter() {
-    const origin = state.userPos || mapCenter();
+    const origin = state.userPos || DEFAULT_CENTER;
     const radius = selectedRadiusKm();
     state.filteredPois = state.allPois.filter((poi) => {
       const km = haversineKm(origin.lat, origin.lng, poi.lat, poi.lng);
@@ -818,32 +722,23 @@
       const res = await fetch("/.netlify/functions/poi-community");
       if (!res.ok) return [];
       const data = await res.json();
-      const cityKey = window.CLQ_POI_CITY_CONFIG?.cityKey || "mons";
-      const expectedCity = cityKey === "bruxelles" ? "bruxelles" : "mons";
-      return (data.pois || []).filter((p) => {
-        const city = String(p.city || "").toLowerCase();
-        return p.verified === true && city.includes(expectedCity);
-      });
+      return (data.pois || []).filter((p) => p.verified === true);
     } catch {
       return [];
     }
   }
 
   async function loadPois() {
-    const res = await fetch(CITY_CONFIG.datasetUrl);
-    if (!res.ok) throw new Error(`Impossible de charger ${CITY_CONFIG.datasetUrl}`);
+    const res = await fetch("data/pois_murcia_experiment.json");
+    if (!res.ok) throw new Error("Impossible de charger pois_murcia_experiment.json");
     const data = await res.json();
-    const center = data.center || data.meta?.center;
-    if (center && Number.isFinite(center.lat) && Number.isFinite(center.lng)) {
-      state.defaultCenter = { lat: center.lat, lng: center.lng };
-    }
     const basePois = Array.isArray(data.pois) ? data.pois : [];
     const community = await loadCommunityPois();
     const byId = new Map();
-    for (const p of basePois.filter(isPoiIncluded).map(normalizePoiRecord)) {
+    for (const p of basePois.filter((x) => x.verified === true)) {
       byId.set(p.id, p);
     }
-    for (const p of community.map(normalizePoiRecord)) {
+    for (const p of community) {
       if (!byId.has(p.id)) byId.set(p.id, p);
     }
     state.allPois = Array.from(byId.values());
@@ -864,7 +759,7 @@
   }
 
   async function loadMasterListPois() {
-    // Les POI confirmes sont fournis par le dataset ville charge plus haut.
+    // Sections C–J : points non encore géoconfirmés — voir data/pois_murcia_masterlist_v1.txt
     return [];
   }
 
@@ -904,8 +799,8 @@
   function updateTourSavedSummary() {
     const el = document.getElementById("tour-saved-summary");
     if (!el) return;
-    const idxRaw = localStorage.getItem("mons_currentIndex");
-    const scoreRaw = localStorage.getItem("mons_score");
+    const idxRaw = localStorage.getItem("murcia_currentIndex");
+    const scoreRaw = localStorage.getItem("murcia_score");
     const idxNum = idxRaw !== null && idxRaw !== "" ? parseInt(idxRaw, 10) : NaN;
     const step = !Number.isNaN(idxNum) ? String(idxNum + 1) : "?";
     const scoreNum = scoreRaw !== null && scoreRaw !== "" ? parseInt(scoreRaw, 10) : NaN;
@@ -988,7 +883,7 @@
       await loadPois();
       state.userPos = await locateUser();
       state.map = new google.maps.Map(mapEl, {
-        center: state.userPos || mapCenter(),
+        center: state.userPos || DEFAULT_CENTER,
         zoom: 12,
         mapTypeControl: false,
         streetViewControl: false,
@@ -1052,8 +947,5 @@
     }
   });
 
-  document.addEventListener("DOMContentLoaded", () => {
-    applyCityLabel();
-    loadGoogleMapsAPI();
-  });
+  document.addEventListener("DOMContentLoaded", loadGoogleMapsAPI);
 })();

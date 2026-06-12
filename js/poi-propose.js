@@ -6,9 +6,7 @@
 
   const FALLBACK = "fr";
   const SUPPORTED = ["fr", "en", "nl", "de", "it", "es", "pl", "ar", "zh", "ja"];
-  const CITY_CONFIG = window.CLQ_POI_CITY_CONFIG || {};
-  const DEFAULT_CENTER = CITY_CONFIG.center || { lat: 50.4543, lng: 3.9526 };
-  const CITY_KEY = CITY_CONFIG.cityKey || "mons";
+  const DEFAULT_CENTER = { lat: 37.9833, lng: -1.1299 };
 
   const texts = {
     proposeBtn: {
@@ -153,8 +151,8 @@
       ja: "座標が無効です。",
     },
     errCoords: {
-      fr: "Coordonnées hors région Mons.",
-      en: "Coordinates outside Mons region.",
+      fr: "Coordonnées hors région Murcia.",
+      en: "Coordinates outside Murcia region.",
       es: "Coordenadas fuera de la región.",
       de: "Koordinaten außerhalb der Region.",
       nl: "Coördinaten buiten de regio.",
@@ -410,7 +408,7 @@
         ? "Stockage serveur indisponible. Réessayez plus tard ou contactez CLQ."
         : t("errGeneric");
     }
-    if (code === "coords_outside_mons") return t("errCoords");
+    if (code === "coords_outside_murcia") return t("errCoords");
     return t("errGeneric");
   }
 
@@ -489,7 +487,6 @@
           name,
           lat,
           lng,
-          cityKey: CITY_KEY,
           description,
           submitterEmail,
           sourceLang: lang(),

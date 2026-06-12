@@ -109,8 +109,9 @@ async function savePurchaseData(data) {
 }
 
 // Restaurer toutes les données importantes au démarrage
-async function restorePurchaseData() {
-  
+async function restorePurchaseData(options) {
+  const forceFromIdb = !!(options && options.forceFromIdb);
+
   const keysToRestore = [
     'clq_token',
     'jwt',
@@ -126,7 +127,8 @@ async function restorePurchaseData() {
   for (const key of keysToRestore) {
     try {
       const value = await getData(key);
-      if (value && !localStorage.getItem(key)) {
+      const current = localStorage.getItem(key);
+      if (value && (forceFromIdb || !current)) {
         localStorage.setItem(key, value);
         restored = true;
         restoredKeys.push(key);

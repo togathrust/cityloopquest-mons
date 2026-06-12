@@ -1,6 +1,6 @@
 /**
  * Session d'accès payant : validation API et nettoyage des données obsolètes.
- * IndexedDB peut conserver un ancien achat même après « vider le cache » Chrome.
+ * IndexedDB conserve l'activation pour l'app installée (PWA).
  */
 (function () {
   'use strict';
@@ -31,6 +31,24 @@
     return 'https://cityloopquest-api.onrender.com';
   }
 
+  function isInstalledPwa() {
+    try {
+      const params = new URLSearchParams(window.location.search || '');
+      if (params.get('pwa') === '1' || params.get('installed') === 'true') {
+        return true;
+      }
+    } catch (_) {}
+    try {
+      if (window.matchMedia('(display-mode: standalone)').matches) return true;
+      if (window.matchMedia('(display-mode: fullscreen)').matches) return true;
+    } catch (_) {}
+    if (window.navigator && window.navigator.standalone === true) return true;
+    try {
+      if (localStorage.getItem('pwa-installed') === 'true') return true;
+    } catch (_) {}
+    return false;
+  }
+
   function normalizeShortCode(input) {
     const raw = String(input || '').toLowerCase().replace(/[^a-z0-9]/g, '');
     if (!raw) return '';
@@ -48,6 +66,25 @@
       );
     } catch (_) {
       return false;
+    }
+  }
+
+  function applyWhoamiSuccess(me) {
+    if (!me) return;
+    try {
+      localStorage.setItem('clq_has_access', '1');
+    } catch (_) {}
+    const plan =
+      me.plan ||
+      me.license_plan ||
+      me.access_type ||
+      (me.entitlements && me.entitlements.plan);
+    if (plan) {
+      const normalized = String(plan).toLowerCase();
+      localStorage.setItem(
+        'user_version',
+        normalized.includes('full') ? 'FULL' : 'LITE',
+      );
     }
   }
 
@@ -78,11 +115,28 @@
     } catch (_) {}
   }
 
+  function isNetworkFailure(status, error) {
+    if (error) return true;
+    if (!status) return true;
+    return status >= 500 || status === 408 || status === 429;
+  }
+
+  function isAuthFailure(status) {
+    return status === 401 || status === 403 || status === 404 || status === 410;
+  }
+
+  /**
+   * @returns {{ valid: boolean, reason: 'ok'|'network'|'invalid'|'missing' }}
+   */
   async function validateAuthWithApi(apiBase) {
     const API_BASE = (apiBase || resolveApiBase()).replace(/\/+$/, '');
     const token = localStorage.getItem('clq_token') || localStorage.getItem('jwt');
     const shortCode = localStorage.getItem('clq_short_code');
     const headers = { 'ngrok-skip-browser-warning': 'true' };
+
+    if (!token && !shortCode) {
+      return { valid: false, reason: 'missing' };
+    }
 
     if (token) {
       try {
@@ -92,32 +146,24 @@
         });
         if (r.ok) {
           const me = await r.json().catch(() => null);
-          if (me) {
-            try {
-              localStorage.setItem('clq_has_access', '1');
-            } catch (_) {}
-            const plan =
-              me.plan ||
-              me.license_plan ||
-              me.access_type ||
-              (me.entitlements && me.entitlements.plan);
-            if (plan) {
-              const normalized = String(plan).toLowerCase();
-              localStorage.setItem(
-                'user_version',
-                normalized.includes('full') ? 'FULL' : 'LITE',
-              );
-            }
-          }
-          return true;
+          applyWhoamiSuccess(me);
+          return { valid: true, reason: 'ok' };
         }
-      } catch (_) {}
+        if (isNetworkFailure(r.status)) {
+          return { valid: false, reason: 'network' };
+        }
+        if (isAuthFailure(r.status)) {
+          // Token rejeté : on tentera le code ci-dessous
+        }
+      } catch (_) {
+        return { valid: false, reason: 'network' };
+      }
     }
 
     if (shortCode) {
       const code = normalizeShortCode(shortCode);
       if (!/^[a-z0-9]{3}-[a-z0-9]{3}-[a-z0-9]{3}$/.test(code)) {
-        return false;
+        return { valid: false, reason: 'invalid' };
       }
       try {
         const r = await fetch(`${API_BASE}/api/auth/activate-code`, {
@@ -136,34 +182,60 @@
                 localStorage.setItem('clq_short_code', data.short_code);
               }
             } catch (_) {}
-            return true;
+            return { valid: true, reason: 'ok' };
           }
+          return { valid: false, reason: 'invalid' };
         }
-      } catch (_) {}
+        if (isNetworkFailure(r.status)) {
+          return { valid: false, reason: 'network' };
+        }
+        return { valid: false, reason: 'invalid' };
+      } catch (_) {
+        return { valid: false, reason: 'network' };
+      }
     }
 
-    return false;
+    return { valid: false, reason: 'invalid' };
   }
 
   /**
-   * Si des identifiants sont présents (localStorage ou IndexedDB), les valide via l'API.
-   * En cas d'échec, purge tout pour forcer le flux paiement / code.
+   * @param {{ pwaMode?: boolean }} [options]
+   * En PWA : ne jamais purger sur erreur réseau ; conserver l'activation locale.
    */
-  async function ensureValidAuthOrClear(apiBase) {
+  async function ensureValidAuthOrClear(apiBase, options) {
+    const pwaMode = !!(options && options.pwaMode) || isInstalledPwa();
+
     if (!hasStoredCredentials()) {
       return false;
     }
-    const valid = await validateAuthWithApi(apiBase);
-    if (!valid) {
+
+    const result = await validateAuthWithApi(apiBase);
+
+    if (result.valid) {
+      return true;
+    }
+
+    if (pwaMode && result.reason === 'network' && hasStoredCredentials()) {
+      return true;
+    }
+
+    if (result.reason === 'invalid') {
       clearAuthStorage();
       return false;
     }
-    return true;
+
+    if (result.reason === 'network') {
+      return false;
+    }
+
+    clearAuthStorage();
+    return false;
   }
 
   window.clqAuthSession = {
     AUTH_KEYS,
     resolveApiBase,
+    isInstalledPwa,
     normalizeShortCode,
     hasStoredCredentials,
     clearAuthStorage,

@@ -89,8 +89,22 @@
     });
   }
 
+  async function restoreAuthForPwa() {
+    if (!window.storageHelper || typeof window.storageHelper.restorePurchaseData !== 'function') {
+      return;
+    }
+    const pwaMode =
+      (window.clqAuthSession && window.clqAuthSession.isInstalledPwa && window.clqAuthSession.isInstalledPwa()) ||
+      false;
+    if (!pwaMode) return;
+    try {
+      await window.storageHelper.restorePurchaseData({ forceFromIdb: true });
+    } catch (_) {}
+  }
+
   async function runGuard() {
     await loadAuthSession();
+    await restoreAuthForPwa();
 
     const auth = window.clqAuthSession;
     if (!auth || typeof auth.ensureValidAuthOrClear !== 'function') {
@@ -98,12 +112,14 @@
       return;
     }
 
+    const pwaMode = auth.isInstalledPwa ? auth.isInstalledPwa() : false;
+
     if (!auth.hasStoredCredentials()) {
       showBlockedPopupAndRedirect();
       return;
     }
 
-    const valid = await auth.ensureValidAuthOrClear();
+    const valid = await auth.ensureValidAuthOrClear(undefined, { pwaMode });
     if (!valid) {
       showBlockedPopupAndRedirect();
     }

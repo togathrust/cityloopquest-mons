@@ -49,7 +49,7 @@ if (window.__APP_JS_DISABLED__) {
     // Code normal de app.js
 }
 
-let nextButton, prevButton, homeButton, cultureButton, audioBtn, poiInterestBtn, doudouBtn, pauseBtn, stopBtn, restartBtn, quizResumeBtn;
+let nextButton, prevButton, homeButton, cultureButton, audioBtn, poiInterestBtn, pauseBtn, stopBtn, restartBtn, quizResumeBtn;
 let quizSessionUiButtons = null;
 const QUIZ_OVERLAY_ID = 'quiz-question-overlay';
 
@@ -768,7 +768,6 @@ function updatePointPhotoForCurrentIndex() {
         return;
     }
     imageElement.style.display = 'block';
-    schedulePointImageFit();
     if (textContainer) {
         textContainer.style.display = 'none';
     }
@@ -1678,7 +1677,6 @@ function stopAllAudio() {
 
     if (imageElement && textContainer) {
         imageElement.style.display = "block";
-        schedulePointImageFit();
         textContainer.style.display = "none";
         textContainer.innerText = "";
     }
@@ -1760,7 +1758,6 @@ function playExclusiveAudio(src, textFile = null, imageElement = null, originalI
             if (imageElement && originalImageSrc) {
                 imageElement.src = originalImageSrc;
                 imageElement.style.display = "block";
-                schedulePointImageFit();
             }
             if (textContainer) {
                 textContainer.style.display = "none";
@@ -1809,7 +1806,6 @@ function playExclusiveAudio(src, textFile = null, imageElement = null, originalI
             const imageElement = document.getElementById('point-image');
             if (imageElement && textContainer) {
                 imageElement.style.display = 'block';
-                schedulePointImageFit();
                 textContainer.style.display = 'none';
             }
             if (
@@ -1871,21 +1867,6 @@ function playExclusiveAudio(src, textFile = null, imageElement = null, originalI
     const pauseBtn = document.getElementById('pause-btn');
     if (pauseBtn) {
         pauseBtn.textContent = '⏸️';
-    }
-
-    if (src === "Chansons/air_doudou.mp3" && textContainer) {
-        isDoudouSongPlaying = true;
-        const activeImageElement = imageElement || document.getElementById("point-image");
-        fetch("data/Texte_chanson_doudou.txt")
-            .then(response => response.text())
-            .then(text => {
-                currentDescriptionText = text;
-                textContainer.innerText = text;
-                textContainer.style.display = "block";
-                textContainer.scrollTop = 0;
-                if (activeImageElement) activeImageElement.style.display = "none";
-            })
-            .catch(err => console.error("Erreur de chargement paroles Doudou :", err));
     }
 
     // Ne pas modifier l'affichage si c'est l'air du doudou
@@ -2275,22 +2256,13 @@ function startMap() {
         mapInitialized = true;
         localStorage.setItem('mapInitialized', 'true');
         initializationInProgress = false;
-
-        if (window.CLQViewportFix && typeof window.CLQViewportFix.bind === 'function') {
-            window.CLQViewportFix.bind({
-                onRecalibrate: function () {
-                    resizeMainMapToLayout();
-                }
-            });
-            window.CLQViewportFix.schedule();
-        }
+        
         scheduleMainMapResize();
         window.addEventListener('resize', scheduleMainMapResize);
         window.addEventListener('orientationchange', scheduleMainMapResize);
         schedulePointImageFit();
         window.addEventListener('resize', schedulePointImageFit);
         window.addEventListener('orientationchange', schedulePointImageFit);
-        
         // Cacher le splash screen maintenant que la carte est prête
         hideSplashScreen();
         
@@ -2930,7 +2902,6 @@ async function validateActivationCode(code) {
         localStorage.setItem('jwt', data.token);
         localStorage.setItem('clq_has_access', '1');
         localStorage.setItem('clq_short_code', normalizedCode);
-
         const userVersion = 'FULL';
         localStorage.setItem('user_version', userVersion);
 
@@ -3375,7 +3346,7 @@ function showQuizForCurrentPoint(callback) {
   updateCurrentDisplay();
   
   // Désactiver tous les boutons sauf quiz
-  const btns = [nextButton, prevButton, homeButton, cultureButton, audioBtn, poiInterestBtn, doudouBtn, pauseBtn, stopBtn, restartBtn];
+  const btns = [nextButton, prevButton, homeButton, cultureButton, audioBtn, poiInterestBtn, pauseBtn, stopBtn, restartBtn];
   quizSessionUiButtons = btns;
   btns.forEach(btn => { if (btn) btn.disabled = true; });
   let questionIndex = 0;
@@ -3548,18 +3519,6 @@ function initializeMainLogic() {
     }
     if (localStorage.getItem('tourCompleted') === 'true') {
         enableTourExplorationMode();
-    }
-    if (
-        localStorage.getItem('museumMode') !== 'true' &&
-        localStorage.getItem('tourCompleted') === 'true' &&
-        localStorage.getItem('mons_endOfTourPopupShown') !== 'true' &&
-        filteredLocations &&
-        filteredLocations.length > 0 &&
-        currentIndex >= filteredLocations.length - 1
-    ) {
-        setTimeout(function () {
-            showEndOfTourPopup();
-        }, 400);
     }
     
     const forceTarget = localStorage.getItem("mons_forceTarget");
@@ -4759,31 +4718,22 @@ function showEndOfTourPopup() {
 
     const title = document.createElement('div');
     title.className = 'end-of-tour-title';
-    const victoryTitle = window.translationManager
+    title.textContent = window.translationManager
         ? window.translationManager.translate('victory')
-        : null;
-    title.textContent = victoryTitle && victoryTitle !== 'victory'
-        ? victoryTitle
         : 'Victoire !';
     box.appendChild(title);
 
     const msg = document.createElement('div');
     msg.className = 'end-of-tour-msg';
-    const victoryMessage = window.translationManager
+    msg.innerHTML = window.translationManager
         ? window.translationManager.translate('victory_message')
-        : null;
-    msg.innerHTML = victoryMessage && victoryMessage !== 'victory_message'
-        ? victoryMessage
-        : "C'est la dernière étape de votre parcours !<br><br>Bravo, vous avez vaincu le Dragon !<br>La bête est terrassée !<br><br>À l'arrivée, si vous le souhaitez, vous pourrez prendre un selfie avec Saint Georges !";
+        : "C'est la dernière étape de votre parcours !<br><br>Bravo, vous avez vaincu la Sardine !<br>La bête est terrassée !<br><br>À l'arrivée, si vous le souhaitez, vous pourrez prendre un selfie avec la Sardine !<br><br>Vous pouvez également voyager à votre guise dans les différents points du parcours si vous voulez vous rendre à un endroit particulier.";
     box.appendChild(msg);
 
     const btnCompris = document.createElement('button');
     btnCompris.className = 'end-of-tour-btn';
-    const understoodText = window.translationManager
+    btnCompris.textContent = window.translationManager
         ? window.translationManager.translate('understood')
-        : null;
-    btnCompris.textContent = understoodText && understoodText !== 'understood'
-        ? understoodText
         : 'COMPRIS';
     btnCompris.addEventListener('click', () => {
         document.body.removeChild(overlay);
@@ -4806,7 +4756,6 @@ document.addEventListener("DOMContentLoaded", () => {
     cultureButton = document.getElementById('culture-btn');
     audioBtn = document.getElementById('audio-btn');
     poiInterestBtn = document.getElementById('poi-interest-btn');
-    doudouBtn = document.getElementById('doudou-btn');
     pauseBtn = document.getElementById('pause-btn');
     stopBtn = document.getElementById('stop-btn');
     restartBtn = document.getElementById('restart-btn');
@@ -5000,18 +4949,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    if (doudouBtn) {
-        doudouBtn.addEventListener('click', () => {
-            stopAllAudio();
-            playExclusiveAudio("Chansons/air_doudou.mp3");
-            if (typeof lastAudioLang === 'undefined' || lastAudioLang === null) {
-                lastAudioLang = window.translationManager
-                    ? window.translationManager.getCurrentLanguage()
-                    : 'fr';
-            }
-        });
-    }
-
     if (pauseBtn) {
     pauseBtn.addEventListener('click', () => {
         const currentLang = window.translationManager ? window.translationManager.getCurrentLanguage() : 'fr';
@@ -5078,7 +5015,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const textContainer = document.getElementById("media-display");
             if (imageElement && textContainer) {
                 imageElement.style.display = "block";
-                schedulePointImageFit();
                 textContainer.style.display = "none";
                 textContainer.innerText = "";
             }
