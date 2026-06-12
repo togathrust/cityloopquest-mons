@@ -1,4 +1,8 @@
 CityLoop Quest Mons - Release notes
+Version 26.06.39
+----------------------------------------
+
+CityLoop Quest Mons - Release notes
 Version 26.06.38
 ----------------------------------------
 
