@@ -31,15 +31,12 @@
   <h2 data-translate="culture_subtitle">Explorez le patrimoine culturel de Mons</h2>
 
   <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; max-width:600px; margin:auto;">
-    <!-- ACCESSIBLES (LITE + FULL) -->
-    <button data-culture-target="chansons.html" data-requires-full="0" data-translate="culture_btn_1">🎵 Chansons</button>
-    <button data-culture-target="musees.html"   data-requires-full="0" data-translate="culture_btn_3">🏛️ Musées</button>
-
-    <!-- RÉSERVÉS FULL -->
-    <button data-culture-target="personnalites.html" data-requires-full="1" data-translate="culture_btn_4">👤 Personnalités</button>
-    <button data-culture-target="histoire-ville.html" data-requires-full="1" data-translate="culture_btn_2">📜 Histoire de la Ville</button>
-    <button data-culture-target="folklore.html" data-requires-full="1" data-translate="culture_btn_5">🎭 Folklore</button>
-    <button data-culture-target="evenements.html" data-requires-full="1" data-translate="culture_btn_6">🎉 Évènements/Photos/Vidéos</button>
+    <button data-culture-target="chansons.html" data-translate="culture_btn_1">🎵 Chansons</button>
+    <button data-culture-target="musees.html" data-translate="culture_btn_3">🏛️ Musées</button>
+    <button data-culture-target="personnalites.html" data-translate="culture_btn_4">👤 Personnalités</button>
+    <button data-culture-target="histoire-ville.html" data-translate="culture_btn_2">📜 Histoire de la Ville</button>
+    <button data-culture-target="folklore.html" data-translate="culture_btn_5">🎭 Folklore</button>
+    <button data-culture-target="evenements.html" data-translate="culture_btn_6">🎉 Évènements/Photos/Vidéos</button>
 
     <!-- Popups internes -->
     <button id="btn-histoire-doudou" data-translate="culture_btn_histoire_doudou">Histoire du doudou</button>
@@ -64,19 +61,12 @@ function initCulturePage() {
 }
 
 // ----------------- NAVIGATION CULTURE -----------------
-function goToCulturePage(target, requiresFull) {
-  const version = window.accessControl?.currentVersion;
-
-  if (requiresFull) {
-    // délégué au contrôleur central
-    if (window.checkPageAccess && !window.checkPageAccess(target)) return;
-  }
+function goToCulturePage(target) {
   window.location.href = target;
 }
 
 // ----------------- POPUPS -----------------
 
-// 🔒 Histoire du doudou (protégé via feature “histoire_doudou”)
 function showHistoireDoudouPopup() {
   if (document.getElementById('popup-histoire-doudou')) return;
 
@@ -282,15 +272,12 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-culture-target]').forEach(btn => {
     btn.addEventListener('click', () => {
       const target = btn.getAttribute('data-culture-target');
-      const requiresFull = btn.getAttribute('data-requires-full') === '1';
-      goToCulturePage(target, requiresFull);
+      goToCulturePage(target);
     });
   });
 
   // Popups
   document.getElementById('btn-histoire-doudou')?.addEventListener('click', () => {
-    // 🔒 protégé via feature
-    if (window.checkFeatureAccess && !window.checkFeatureAccess('histoire_doudou')) return;
     showHistoireDoudouPopup();
   });
 

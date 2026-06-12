@@ -1,4 +1,34 @@
-/* parcours.html — popups, overlays et sélecteur langue (boutons = carte.css) */
+/* parcours.html — structure coins issue de CLQ-MONS\clq-mons */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  position: fixed;
+  inset: 0;
+  max-width: 100vw;
+  max-height: 100vh;
+  box-sizing: border-box;
+}
+
+#map,
+.leaflet-container {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  max-width: 100vw;
+  max-height: 100vh;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
 #orientation-warning {
   position: fixed;
@@ -57,21 +87,84 @@
   pointer-events: auto;
 }
 
+.corner-buttons {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  max-width: 100vw;
+  max-height: 100vh;
+  pointer-events: none;
+  z-index: 5000;
+  box-sizing: border-box;
+}
+
+.corner-buttons button,
+.corner-buttons .popup-confirm {
+  pointer-events: auto;
+}
+
+button.circuit {
+  position: fixed;
+  width: 200px;
+  max-width: calc(50vw - 10px);
+  padding: 14px 24px;
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1.4;
+  text-align: center;
+  white-space: normal;
+  word-wrap: break-word;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
+  touch-action: manipulation;
+  z-index: 5100;
+}
+
+button.circuit.grand {
+  top: 0;
+  left: 0;
+  background-color: blue;
+}
+
+button.circuit.moyen {
+  top: 0;
+  right: 0;
+  background-color: orange;
+}
+
+button.circuit.petit {
+  bottom: 0;
+  left: 0;
+  background-color: green;
+}
+
+button.circuit:hover {
+  opacity: 0.9;
+}
+
 .popup-confirm {
   position: fixed;
-  bottom: 120px;
-  left: 50%;
-  transform: translateX(-50%);
+  right: 0;
+  bottom: 0;
+  left: auto;
+  transform: none;
   background: #fff;
   padding: 15px 20px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
   border-radius: 10px;
   text-align: center;
-  z-index: 2000;
-  display: none;
+  z-index: 5200;
   font-size: 16px;
-  width: min(360px, calc(100vw - 40px));
-  max-width: 90vw;
+  width: min(320px, calc(50vw - 20px));
+  max-width: calc(50vw - 10px);
   box-sizing: border-box;
   border: 2px solid #333;
   touch-action: manipulation;
@@ -128,6 +221,13 @@
   min-width: 140px;
 }
 
+#confirm-popup.popup-confirm,
+#popup.popup-confirm {
+  right: 0;
+  bottom: 0;
+  display: none;
+}
+
 #popup.popup-start .popup-actions {
   flex-direction: column;
   align-items: stretch;
@@ -138,14 +238,30 @@
 }
 
 @media screen and (max-width: 480px) {
+  button.circuit {
+    width: 150px;
+    max-width: calc(50vw - 5px);
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
+
   .popup-confirm {
-    bottom: 100px;
     font-size: 14px;
-    padding: 12px 14px;
+    padding: 10px;
+    width: min(220px, calc(50vw - 10px));
+    max-width: calc(50vw - 10px);
   }
 
   .popup-confirm button {
     font-size: 14px;
     padding: 8px 14px;
+  }
+}
+
+@media screen and (max-width: 320px) {
+  button.circuit {
+    width: 120px;
+    padding: 8px 12px;
+    font-size: 0.8rem;
   }
 }

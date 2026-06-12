@@ -8,15 +8,16 @@
   <meta name="theme-color" content="#ffffff">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 
   <link rel="stylesheet" href="carte.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <link rel="stylesheet" href="circuit.css?v=49">
+  <link rel="stylesheet" href="circuit.css?v=51">
 
   <script src="api-base.js"></script>
-  <script src="js/access-control.js"></script>
+  <script src="js/auth-session.js"></script>
+  <script src="js/access-control.js?v=full-access-2"></script>
   <script src="js/access-guard.js" defer></script>
 
   <script>
@@ -51,7 +52,7 @@
 
   <div id="lang-anchor" class="lang-anchor"></div>
 
-  <div class="buttons">
+  <div class="corner-buttons">
     <button type="button" class="circuit grand"
             data-circuit="grand"
             onclick="return confirmChoice('grand')"
@@ -64,29 +65,29 @@
             data-circuit="petit"
             onclick="return confirmChoice('petit')"
             data-translate-html="short_circuit">Petit Circuit<br>4km - 3h15</button>
-  </div>
 
-  <div id="confirm-popup" class="popup-confirm">
-    <div id="confirm-popup-text" class="popup-title">
-      Êtes-vous sûr ?<br><small>Vous êtes sur le point de lancer ce parcours.</small>
+    <div id="confirm-popup" class="popup-confirm">
+      <div id="confirm-popup-text" class="popup-title">
+        Êtes-vous sûr ?<br><small>Vous êtes sur le point de lancer ce parcours.</small>
+      </div>
+      <div class="popup-actions">
+        <button id="confirm-no" type="button" class="no"
+                onclick="return cancelCircuitSelection()">Non</button>
+        <button id="confirm-yes" type="button" class="yes"
+                onclick="return proceedToStartPointPopup()">Oui</button>
+      </div>
     </div>
-    <div class="popup-actions">
-      <button id="confirm-no" type="button" class="no"
-              onclick="return cancelCircuitSelection()">Non</button>
-      <button id="confirm-yes" type="button" class="yes"
-              onclick="return proceedToStartPointPopup()">Oui</button>
-    </div>
-  </div>
 
-  <div id="popup" class="popup-confirm popup-start">
-    <div id="popup-text" class="popup-title" data-translate="start_point_prompt">Où souhaitez-vous commencer le parcours ?</div>
-    <div class="popup-actions">
-      <button id="start-grand-place" type="button" class="start-option"
-              onclick="chooseStartPoint('grand_place')"
-              data-translate="start_point_grand_place">Grand-Place</button>
-      <button id="start-gare" type="button" class="start-option"
-              onclick="chooseStartPoint('gare')"
-              data-translate="start_point_gare">Gare Calatrava</button>
+    <div id="popup" class="popup-confirm popup-start">
+      <div id="popup-text" class="popup-title" data-translate="start_point_prompt">Où souhaitez-vous commencer le parcours ?</div>
+      <div class="popup-actions">
+        <button id="start-grand-place" type="button" class="start-option"
+                onclick="chooseStartPoint('grand_place')"
+                data-translate="start_point_grand_place">Grand-Place</button>
+        <button id="start-gare" type="button" class="start-option"
+                onclick="chooseStartPoint('gare')"
+                data-translate="start_point_gare">Gare Calatrava</button>
+      </div>
     </div>
   </div>
 
@@ -179,8 +180,71 @@
       if (sel && anchor) anchor.appendChild(sel);
     }
 
+    var parcoursLayoutRecalibrationBound = false;
+
+    function recalibrateParcoursLayout() {
+      try {
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      } catch (e) {}
+
+      var vv = window.visualViewport;
+      var mapEl = document.getElementById('map');
+      if (vv && mapEl) {
+        var height = Math.round(vv.height || window.innerHeight);
+        if (height > 0) {
+          document.documentElement.style.height = height + 'px';
+          document.body.style.height = height + 'px';
+          mapEl.style.height = height + 'px';
+        }
+      }
+
+      if (!map) return;
+
+      var center = map.getCenter();
+      var zoom = map.getZoom();
+
+      map.invalidateSize({ animate: false, pan: false });
+
+      /* Micro-mouvement : reproduit l'effet d'un toucher carte en PWA paysage. */
+      try {
+        map.panBy([1, 1], { animate: false, noMoveStart: true });
+        map.panBy([-1, -1], { animate: false, noMoveStart: true });
+      } catch (e) {}
+
+      map.setView(center, zoom, { animate: false });
+      map.invalidateSize({ animate: false, pan: false });
+    }
+
+    function scheduleParcoursLayoutRecalibration() {
+      [0, 80, 180, 350, 700, 1200].forEach(function(delay) {
+        setTimeout(recalibrateParcoursLayout, delay);
+      });
+    }
+
+    function bindParcoursLayoutRecalibration() {
+      if (parcoursLayoutRecalibrationBound) return;
+      parcoursLayoutRecalibrationBound = true;
+
+      var rerun = function() {
+        scheduleParcoursLayoutRecalibration();
+      };
+
+      window.addEventListener('resize', rerun);
+      window.addEventListener('orientationchange', rerun);
+      window.addEventListener('pageshow', rerun);
+
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', rerun);
+        window.visualViewport.addEventListener('scroll', rerun);
+      }
+    }
+
     function initCircuitMap() {
       if (map || typeof L === 'undefined') return;
+
+      bindParcoursLayoutRecalibration();
 
       map = L.map('map', {
         zoomControl: false,
@@ -198,11 +262,7 @@
       }).addTo(map);
 
       showAllCircuits();
-
-      setTimeout(function() {
-        if (map) map.invalidateSize();
-        document.querySelectorAll('.circuit').forEach(function(btn) { btn.disabled = false; });
-      }, 200);
+      scheduleParcoursLayoutRecalibration();
     }
 
     function clearCircuits() {
@@ -479,6 +539,9 @@
 
       if (group.getLayers().length) {
         map.fitBounds(group.getBounds(), { padding: [20, 20] });
+        map.once('moveend', scheduleParcoursLayoutRecalibration);
+      } else {
+        scheduleParcoursLayoutRecalibration();
       }
 
       document.querySelectorAll('.circuit').forEach(function(btn) { btn.disabled = false; });
@@ -543,6 +606,9 @@
       var isLandscape = window.innerWidth > window.innerHeight;
       if (isLandscape || isInstalledPwaContext()) {
         warning.style.display = 'none';
+        if (typeof scheduleParcoursLayoutRecalibration === 'function') {
+          scheduleParcoursLayoutRecalibration();
+        }
       } else {
         warning.style.display = 'flex';
         if (window.translationManager && typeof window.translationManager.applyTranslations === 'function') {

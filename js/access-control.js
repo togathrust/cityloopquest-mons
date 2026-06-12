@@ -33,125 +33,119 @@ class AccessControl {
     this.currentVersion = this.getCurrentVersion();
     this.restrictedPages = this.getRestrictedPages();
     this.restrictedFeatures = this.getRestrictedFeatures();
+    this.versionSyncPromise = null;
+    this.syncVersionFromWhoami();
   }
 
-  // Obtenir la version actuelle de l'utilisateur
-  getCurrentVersion() {
-    const stored = localStorage.getItem('user_version');
-    let version;
-    if (stored === 'FULL' || stored === 'LITE') {
-      version = stored;
-    } else {
-      // Par défaut : LITE (plus prudent que FULL)
-      version = 'LITE';
+  normalizeVersion(raw) {
+    const value = String(raw || '').trim().toUpperCase();
+    if (value === 'FULL') return 'FULL';
+    if (value === 'LITE') return 'LITE';
+    return null;
+  }
+
+  normalizePlanToVersion(raw) {
+    const value = String(raw || '').trim().toLowerCase();
+    if (!value) return null;
+    if (value.includes('full')) return 'FULL';
+    if (value.includes('lite')) return 'LITE';
+    return null;
+  }
+
+  inferVersionFromStoredEntitlements() {
+    try {
+      const raw = localStorage.getItem('clq_entitlements');
+      if (!raw) return null;
+      const data = JSON.parse(raw);
+      return (
+        this.normalizePlanToVersion(data.plan) ||
+        this.normalizePlanToVersion(data.access_type) ||
+        this.normalizePlanToVersion(data.license_plan) ||
+        this.normalizePlanToVersion(data.license_type) ||
+        (data.is_full === true ? 'FULL' : null)
+      );
+    } catch (_) {
+      return null;
     }
-    return version;
+  }
+
+  inferVersionFromTokenPayload(token) {
+    try {
+      if (!token || typeof token !== 'string' || token.split('.').length < 2) return null;
+      const payload = token.split('.')[1];
+      const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+      const json = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map((c) => `%${(`00${c.charCodeAt(0).toString(16)}`).slice(-2)}`)
+          .join('')
+      );
+      const data = JSON.parse(json);
+      const candidates = [
+        data.plan,
+        data.access_type,
+        data.license_type,
+        data.licence_type,
+        data?.entitlements?.plan,
+        data?.entitlements?.access_type,
+      ];
+      for (const candidate of candidates) {
+        const normalized = this.normalizePlanToVersion(candidate);
+        if (normalized) return normalized;
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  // Obtenir la version actuelle de l'utilisateur (Murcia : pas de LITE en vente, mais pas de FULL forcé sans auth)
+  getCurrentVersion() {
+    const stored = this.normalizeVersion(localStorage.getItem('user_version'));
+    if (stored) return stored;
+
+    const inferred =
+      this.inferVersionFromStoredEntitlements() ||
+      this.inferVersionFromTokenPayload(
+        localStorage.getItem('clq_token') || localStorage.getItem('jwt'),
+      );
+    if (inferred) return inferred;
+
+    // Murcia ne vend que la licence complète ; défaut prudent sans session valide
+    return 'FULL';
   }
 
   // Définir les pages restreintes pour la version LITE
   getRestrictedPages() {
-    return {
-      // Circuits restreints : en LITE → "grand" réservé FULL uniquement (petit accessible à tous)
-      'parcours.html': { type: 'circuit', restricted: ['grand'] },
-
-      // Pages / contenus culturels restreints en LITE
-      // "chansons.html" est volontairement NON restreinte
-      'histoire-ville.html': { type: 'page', restricted: true },
-      'personnalites.html': { type: 'page', restricted: true },
-      'folklore.html': { type: 'page', restricted: true },
-      'evenements.html': { type: 'page', restricted: true },
-
-      // (ne pas lister les popups ici ; ils sont gérés en "features")
-    };
+    return {};
   }
 
   // "Pages" virtuelles / popups à restreindre en LITE
   getRestrictedFeatures() {
-    return {
-      // Popup Histoire du doudou → RESTREINT en LITE
-      histoire_doudou: true,
-      // Note: parler_murcien et infos_contacts sont libres (non listés)
-    };
+    return {};
   }
 
   // Vérifier si une page est accessible
   isPageAccessible(pageName, circuitType = null) {
-    if (this.currentVersion === 'FULL') {
-      return true;
-    }
-
-    if (this.currentVersion === 'LITE') {
-      const restriction = this.restrictedPages[pageName];
-
-      if (!restriction) {
-        return true; // Page non listée = accessible
-      }
-
-      if (restriction.type === 'circuit') {
-        // Sur un circuit, on doit connaître le type demandé (petit/moyen/grand)
-        const type = (circuitType || '').toLowerCase().trim();
-        if (!type) {
-          // Pas de type = on ne bloque pas ici (la page "parcours.html" peut s’ouvrir,
-          // mais les actions internes pourront être protégées au clic)
-          return true;
-        }
-        const isRestricted = restriction.restricted.includes(type);
-        return !isRestricted;
-      }
-
-      if (restriction.type === 'page') {
-        const isRestricted = !!restriction.restricted;
-        return !isRestricted;
-      }
-    }
-
     return true;
   }
 
   // Vérifier si une "feature" (popup) est accessible
   isFeatureAccessible(featureKey) {
-    if (this.currentVersion === 'FULL') return true;
-
-    if (this.currentVersion === 'LITE') {
-      const isRestricted = !!this.restrictedFeatures[featureKey];
-      return !isRestricted;
-    }
     return true;
   }
 
   // Vérifier l'accès avant de naviguer vers une page
   checkAccess(pageName, circuitType = null) {
-    if (this.isPageAccessible(pageName, circuitType)) {
-      return true;
-    }
-
-    // Si c'est un utilisateur LITE, afficher le popup de choix
-    if (this.currentVersion === 'LITE') {
-      this.showLiteChoicePopup(pageName);
-      return false;
-    }
-
-    // Pour les autres cas, afficher le popup d'upgrade standard
-    this.showUpgradePopup();
-    return false;
+    this.currentVersion = this.getCurrentVersion();
+    return true;
   }
 
   // Vérifier l'accès pour une feature (popup)
   checkFeatureAccess(featureKey) {
-    if (this.isFeatureAccessible(featureKey)) {
-      return true;
-    }
-
-    if (this.currentVersion === 'LITE') {
-      this.showLiteChoicePopup(featureKey);
-      return false;
-    }
-
-    this.showUpgradePopup();
-    return false;
+    this.currentVersion = this.getCurrentVersion();
+    return true;
   }
 
-  // Afficher le popup de choix pour les utilisateurs LITE
+  // Conservé comme fallback historique ; les restrictions sont désactivées.
   showLiteChoicePopup(contextKey) {
     const popup = this.createLiteChoicePopup(contextKey);
     document.body.appendChild(popup);
@@ -224,7 +218,7 @@ class AccessControl {
     return overlay;
   }
 
-  // Créer le popup de choix pour les utilisateurs LITE - style unifié
+  // Créer un popup de choix fallback - style unifié
   createLiteChoicePopup(contextKey) {
     const overlay = document.createElement('div');
     overlay.className = 'popup-overlay';
@@ -254,13 +248,9 @@ class AccessControl {
       border: 2px solid #14365c;
     `;
 
-    const title = window.translationManager && window.translationManager.isLoaded
-      ? window.translationManager.translate('lite_access_title')
-      : 'Accès LITE détecté';
+    const title = 'Accès complet';
 
-    const message = window.translationManager && window.translationManager.isLoaded
-      ? window.translationManager.translate('lite_access_message')
-      : 'Ce contenu est réservé aux détenteurs d\'un accès FULL. Voulez-vous passer à FULL ?';
+    const message = 'Votre accès donne droit à toutes les fonctionnalités disponibles.';
 
     const yes = window.translationManager && window.translationManager.isLoaded
       ? window.translationManager.translate('yes')
@@ -345,6 +335,11 @@ class AccessControl {
     localStorage.setItem('upgrade_type', 'UPGRADE_FULL'); // pour savoir qu'on a une upgrade en cours
 
     try {
+      const syncedVersion = await this.syncVersionFromWhoami();
+      if (syncedVersion === 'FULL' || this.getCurrentVersion() === 'FULL') {
+        localStorage.removeItem('upgrade_type');
+        return;
+      }
       await this.startUpgradeToFullFromLite();
     } catch (e) {
       console.error('❌ Erreur lors de l\'upgrade FULL depuis LITE:', e);
@@ -359,7 +354,7 @@ class AccessControl {
   async startUpgradeToFullFromLite() {
     const API_BASE = this.getApiBase();
 
-    const token = localStorage.getItem('clq_token');
+    const token = localStorage.getItem('clq_token') || localStorage.getItem('jwt');
     if (!token) {
       throw new Error('missing_token');
     }
@@ -585,10 +580,14 @@ class AccessControl {
       const me = await r.json();
 
       const hasFull =
-        me.access_type === 'FULL' ||
-        me.plan === 'FULL' ||
-        me.is_full === true ||
-        me.licence_type === 'FULL';
+        this.normalizePlanToVersion(me.access_type) === 'FULL' ||
+        this.normalizePlanToVersion(me.plan) === 'FULL' ||
+        this.normalizePlanToVersion(me.license_plan) === 'FULL' ||
+        this.normalizePlanToVersion(me.license_type) === 'FULL' ||
+        this.normalizePlanToVersion(me.licence_type) === 'FULL' ||
+        this.normalizePlanToVersion(me?.entitlements?.plan) === 'FULL' ||
+        this.normalizePlanToVersion(me?.entitlements?.access_type) === 'FULL' ||
+        me.is_full === true;
 
       if (hasFull) {
         this.upgradeToFull();
@@ -600,6 +599,52 @@ class AccessControl {
     } catch (e) {
       console.error('❌ Erreur checkPostUpgradeOnLoad:', e);
     }
+  }
+
+  async syncVersionFromWhoami() {
+    if (this.versionSyncPromise) return this.versionSyncPromise;
+
+    const token = localStorage.getItem('clq_token') || localStorage.getItem('jwt');
+    if (!token) return null;
+
+    const API_BASE = this.getApiBase();
+    this.versionSyncPromise = (async () => {
+      try {
+        const r = await fetch(`${API_BASE}/api/auth/whoami`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'ngrok-skip-browser-warning': 'true',
+          },
+        });
+        if (!r.ok) return null;
+        const me = await r.json();
+
+        const version =
+          this.normalizePlanToVersion(me.access_type) ||
+          this.normalizePlanToVersion(me.plan) ||
+          this.normalizePlanToVersion(me.license_plan) ||
+          this.normalizePlanToVersion(me.license_type) ||
+          this.normalizePlanToVersion(me.licence_type) ||
+          this.normalizePlanToVersion(me?.entitlements?.plan) ||
+          this.normalizePlanToVersion(me?.entitlements?.access_type) ||
+          (me.is_full === true ? 'FULL' : null);
+
+        if (version) {
+          localStorage.setItem('user_version', version);
+          this.currentVersion = version;
+          if (me.entitlements) {
+            localStorage.setItem('clq_entitlements', JSON.stringify(me.entitlements));
+          }
+        }
+        return version;
+      } catch (_) {
+        return null;
+      } finally {
+        this.versionSyncPromise = null;
+      }
+    })();
+
+    return this.versionSyncPromise;
   }
 
   // Mettre à jour la version après upgrade

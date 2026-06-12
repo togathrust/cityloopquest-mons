@@ -2830,14 +2830,7 @@ async function validateActivationCode(code) {
         localStorage.setItem('clq_has_access', '1');
         localStorage.setItem('clq_short_code', normalizedCode);
 
-        // Déterminer la version
-        let plan = 'lite';
-        if (data.plan) {
-            plan = String(data.plan).toLowerCase();
-        } else if (data.entitlements && data.entitlements.plan) {
-            plan = String(data.entitlements.plan).toLowerCase();
-        }
-        const userVersion = plan === 'lite' ? 'LITE' : 'FULL';
+        const userVersion = 'FULL';
         localStorage.setItem('user_version', userVersion);
 
         return { valid: true, token: data.token };

@@ -188,7 +188,7 @@
           return;
         }
       } else {
-        body.plan = options.plan || 'full'; // 'full' | 'lite'
+        body.plan = 'full';
       }
 
       // Création session Stripe

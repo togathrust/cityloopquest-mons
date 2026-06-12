@@ -1,5 +1,5 @@
-const PRECACHE = 'precache-v46';
-const RUNTIME  = 'runtime-v31';
+const PRECACHE = 'precache-v51';
+const RUNTIME  = 'runtime-v36';
 
 const PRECACHE_URLS = [
   './',                       // ok si tu sers à la racine du dossier
@@ -8,6 +8,8 @@ const PRECACHE_URLS = [
   './parcours.html',
   './style.css',
   './circuit.css',
+  './js/access-control.js',
+  './checkout.js',
   './app.js',
   './secure-content.js',
   './content-loader.js',
@@ -77,7 +79,11 @@ self.addEventListener('fetch', (event) => {
       path.endsWith('/style.css') ||
       path.endsWith('style.css') ||
       path.endsWith('/circuit.css') ||
-      path.endsWith('circuit.css');
+      path.endsWith('circuit.css') ||
+      path.endsWith('/js/access-control.js') ||
+      path.endsWith('js/access-control.js') ||
+      path.endsWith('/checkout.js') ||
+      path.endsWith('checkout.js');
 
     if (mustNetworkFirst) {
       event.respondWith((async () => {

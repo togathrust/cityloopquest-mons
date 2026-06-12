@@ -217,7 +217,7 @@ applyTranslations();
         jwt: data.token,
         clq_has_access: '1',
         selectedLanguage: localStorage.getItem('selectedLanguage') || 'fr',
-        user_version: data.plan === 'lite' ? 'LITE' : 'FULL'
+        user_version: 'FULL'
       });
     } catch (error) {
       console.error('[post-checkout] ❌ Erreur lors de la sauvegarde dans IndexedDB:', error);
@@ -244,7 +244,7 @@ applyTranslations();
         store.put(data.token, 'jwt'),
         store.put('1', 'clq_has_access'),
         store.put(localStorage.getItem('selectedLanguage') || 'fr', 'selectedLanguage'),
-        store.put(data.plan === 'lite' ? 'LITE' : 'FULL', 'user_version')
+        store.put('FULL', 'user_version')
       ]);
     } catch (error) {
       console.error('[post-checkout] ❌ Erreur lors de la sauvegarde directe dans IndexedDB:', error);
@@ -330,15 +330,7 @@ applyTranslations();
   }
   localStorage.setItem('clq_last_checkout', new Date().toISOString());
 
-  // --- Détermination du plan (LITE ou FULL) ---
-  let plan = 'lite'; // défaut safe
-  if (data.plan) {
-    plan = String(data.plan).toLowerCase();
-  } else if (data.entitlements && data.entitlements.plan) {
-    plan = String(data.entitlements.plan).toLowerCase();
-  }
-
-  const userVersion = plan === 'lite' ? 'LITE' : 'FULL';
+  const userVersion = 'FULL';
   localStorage.setItem('user_version', userVersion);
 
   // Rafraîchir le token silencieusement

@@ -313,14 +313,7 @@
             }
           } catch {}
 
-          // Déterminer la version et la sauvegarder
-          let plan = 'lite';
-          if (data.plan) {
-            plan = String(data.plan).toLowerCase();
-          } else if (data.entitlements && data.entitlements.plan) {
-            plan = String(data.entitlements.plan).toLowerCase();
-          }
-          const userVersion = plan === 'lite' ? 'LITE' : 'FULL';
+          const userVersion = 'FULL';
           localStorage.setItem('user_version', userVersion);
 
           // Sauvegarder dans IndexedDB si possible

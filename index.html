@@ -39,6 +39,7 @@
 
   <!-- DOIT venir avant app.js / secure-content.js / content-loader.js, etc. -->
   <script src="/api-base.js"></script>
+  <script src="js/auth-session.js"></script>
   <script src="js/access-control.js"></script>
 
   <!-- Garde d'accès : bloque l'accès si aucun code d'activation valide (clq_short_code) -->
@@ -375,6 +376,10 @@
       } else {
         console.warn('[bootRouteGuard] ⚠️ storageHelper non disponible, tentative de restauration directe...');
         await restoreFromIndexedDBDirect();
+      }
+
+      if (window.clqAuthSession && typeof window.clqAuthSession.ensureValidAuthOrClear === 'function') {
+        await window.clqAuthSession.ensureValidAuthOrClear(resolveApiBase());
       }
       
       // Fonction de restauration directe depuis IndexedDB
@@ -735,11 +740,9 @@
       
       // IMPORTANT : Vérifier si on a un accès valide AVANT de vérifier la langue
       // Si on a un accès, on doit afficher l'écran d'avertissement, pas rediriger vers language-selection
-      const hasAccessBeforeLangCheck = localStorage.getItem('clq_has_access') === '1' || 
-                                       localStorage.getItem('clq_token') || 
-                                       localStorage.getItem('jwt') ||
-                                       localStorage.getItem('clq_short_code') ||
-                                       codeFromCookie;
+      const hasAccessBeforeLangCheck = localStorage.getItem('clq_has_access') === '1' ||
+                                       localStorage.getItem('clq_token') ||
+                                       localStorage.getItem('jwt');
       
       if (hasAccessBeforeLangCheck) {
         const selectedLang = localStorage.getItem('selectedLanguage');
@@ -763,11 +766,9 @@
       
       // Flux normal : vérifier si une langue est sélectionnée (seulement si pas d'accès)
       // NE PAS rediriger si on a un accès - on définira la langue par défaut dans ce cas
-      const finalCheckHasAccess = localStorage.getItem('clq_has_access') === '1' || 
-                                   localStorage.getItem('clq_token') || 
-                                   localStorage.getItem('jwt') ||
-                                   localStorage.getItem('clq_short_code') ||
-                                   codeFromCookie;
+      const finalCheckHasAccess = localStorage.getItem('clq_has_access') === '1' ||
+                                   localStorage.getItem('clq_token') ||
+                                   localStorage.getItem('jwt');
       
       if (!finalCheckHasAccess) {
         // Seulement rediriger vers language-selection si on n'a PAS d'accès
@@ -1673,13 +1674,26 @@
     function handleWebUsageClick(event) {
       event.preventDefault();
       event.stopPropagation();
-      
+
       const selectedLanguage = localStorage.getItem('selectedLanguage');
-      if (selectedLanguage) {
-        window.location.href = 'parcours.html';
-      } else {
+      const hasAccess =
+        localStorage.getItem('clq_has_access') === '1' ||
+        localStorage.getItem('clq_token') ||
+        localStorage.getItem('jwt');
+
+      if (!selectedLanguage) {
         window.location.href = 'language-selection.html';
+        return;
       }
+
+      if (hasAccess) {
+        window.location.href =
+          'parcours.html?lang=' + encodeURIComponent(selectedLanguage);
+        return;
+      }
+
+      window.location.href =
+        'choose-access.html?lang=' + encodeURIComponent(selectedLanguage);
     }
 
     // Variables pour l'installation PWA

@@ -224,8 +224,7 @@
 
         // Récupérer la ville et la version
         const city = 'Mons';
-        const userVersion = localStorage.getItem('user_version') || 'LITE';
-        const versionText = userVersion === 'FULL' ? 'Full' : 'Lite';
+        const versionText = 'Full';
         
         // Ajouter les informations au début du message
         const messageWithContext = `Message concernant CityLoopQuest ${city} version ${versionText}\n\n${body}`;

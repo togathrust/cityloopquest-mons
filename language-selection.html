@@ -113,6 +113,9 @@
   </script>
   <script src="api-base.js"></script>
 
+  <script src="api-base.js"></script>
+  <script src="js/auth-session.js"></script>
+
   <!-- Traductions -->
   <script src="translations/translationManager.js"></script>
   <script src="translations/languageSelector.js"></script>
@@ -221,24 +224,25 @@
       return false;
     }
 
-    (function() {
+    (async function () {
       try {
-        const hasCode =
-          localStorage.getItem('clq_short_code') ||
-          localStorage.getItem('clq_token') ||
-          localStorage.getItem('jwt') ||
-          localStorage.getItem('clq_has_access') === '1';
-        if (hasCode && !isFromClquestPortal()) {
-          if (!localStorage.getItem('selectedLanguage')) {
-            localStorage.setItem('selectedLanguage', 'fr');
-            localStorage.setItem('lang', 'fr');
-            sessionStorage.setItem('webLanguageSelected', 'true');
-          }
-          location.replace('index.html');
+        if (isFromClquestPortal()) return;
+        if (
+          !window.clqAuthSession ||
+          typeof window.clqAuthSession.ensureValidAuthOrClear !== 'function' ||
+          !window.clqAuthSession.hasStoredCredentials()
+        ) {
+          return;
         }
-      } catch (e) {
-        // Ignorer les erreurs pour ne pas bloquer l'affichage
-      }
+        const valid = await window.clqAuthSession.ensureValidAuthOrClear();
+        if (!valid) return;
+        if (!localStorage.getItem('selectedLanguage')) {
+          localStorage.setItem('selectedLanguage', 'fr');
+          localStorage.setItem('lang', 'fr');
+          sessionStorage.setItem('webLanguageSelected', 'true');
+        }
+        location.replace('index.html');
+      } catch (e) {}
     })();
 
     // Choix de langue → redirection directe vers choose-access

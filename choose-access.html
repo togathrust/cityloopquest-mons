@@ -21,9 +21,6 @@
   <script src="translations/translationManager.js"></script>
   <script src="translations/languageSelector.js"></script>
   
-  <!-- ⚙️ Base API côté Netlify : mets à jour le host ngrok ici -->
-  <meta name="api-base" content="https://nonhumorous-ossie-nonintuitively.ngrok-free.dev">
-
   <script>
     // Garde-fou: si pas de langue => retour à la sélection (sauf si lang fournie dans l'URL, ex. from_expired)
     (function () {
@@ -51,8 +48,7 @@
       <h1 data-translate="continue_title">Continuer</h1>
       <div class="stack">
         <button id="btnHaveCode" class="btn" data-translate="have_code_button">J'AI UNE IDENTIFICATION CLIENT RECUE PAR MAIL APRES PAIEMENT (Pas un code promo)</button>
-        <button id="btnBuyFull" class="btn" data-translate="buy_full_button">Acheter version Full</button>
-        <button id="btnBuyLite" class="btn" data-translate="buy_lite_button">Acheter version Lite</button>
+        <button id="btnBuyFull" class="btn" data-translate="buy_full_button">Acheter une licence de 7 jours</button>
       </div>
 
       <!-- Texte d'information sur le code d'activation -->
@@ -70,22 +66,17 @@
       <p id="err"></p>
     </section>
 
-    <!-- Vue UPGRADE (affichée si ?upgrade=1) -->
-    <section id="view-upgrade" class="hidden">
-      <h1 data-translate="upgrade_title">Mise à niveau vers FULL</h1>
-      <button id="btnUpgrade" class="btn" data-translate="upgrade_to_full">Mettre à niveau vers FULL</button>
-      <p id="err-up" class="err"></p>
-    </section>
   </main>
 
   <!-- Config API + logique checkout -->
   <script src="./api-base.js"></script>
+  <script src="./js/auth-session.js"></script>
   <script src="./checkout.js" defer></script>
 
   <script>
-    // Vérifier si l'utilisateur a déjà un code - si oui, rediriger vers index.html pour afficher l'écran d'avertissement
+    // Vérifier si l'utilisateur a déjà un code valide - si oui, rediriger vers index.html pour afficher l'écran d'avertissement
     // Sauf si marqueur (sessionStorage ou URL from_expired=1) : l'utilisateur vient de cliquer OK sur "accès expiré" → rester sur choose-access
-    (function() {
+    (async function() {
       const urlParams = new URLSearchParams(window.location.search || '');
       const fromExpiredPopup =
         sessionStorage.getItem('expired_popup_acknowledged') === '1' ||
@@ -134,25 +125,39 @@
         } catch (_) {}
       }
 
-      const hasCode = localStorage.getItem('clq_short_code') || 
-                     localStorage.getItem('clq_token') || 
-                     localStorage.getItem('jwt') ||
-                     localStorage.getItem('clq_has_access') === '1';
       const fromClquestPortal = urlParams.get('from') === 'clquest' ||
         (document.referrer && /clquest\.netlify\.app/i.test(document.referrer));
-      
-      if (hasCode && !fromExpiredPopup && !fromClquestPortal) {
-        if (localStorage.getItem('debug_mode') === 'true') {
-          alert('Code détecté !\nRedirection vers index.html pour afficher l\'écran d\'avertissement...');
-        }
-        // S'assurer qu'une langue est définie
-        if (!localStorage.getItem('selectedLanguage')) {
-          localStorage.setItem('selectedLanguage', 'fr');
-          sessionStorage.setItem('webLanguageSelected', 'true');
-        }
-        location.replace('index.html');
+
+      if (fromExpiredPopup || fromClquestPortal) {
         return;
       }
+
+      const hasStored =
+        window.clqAuthSession &&
+        typeof window.clqAuthSession.hasStoredCredentials === 'function' &&
+        window.clqAuthSession.hasStoredCredentials();
+
+      if (!hasStored) {
+        return;
+      }
+
+      const valid =
+        window.clqAuthSession &&
+        typeof window.clqAuthSession.ensureValidAuthOrClear === 'function' &&
+        (await window.clqAuthSession.ensureValidAuthOrClear());
+
+      if (!valid) {
+        return;
+      }
+
+      if (localStorage.getItem('debug_mode') === 'true') {
+        alert('Accès valide détecté !\nRedirection vers index.html pour afficher l\'écran d\'avertissement...');
+      }
+      if (!localStorage.getItem('selectedLanguage')) {
+        localStorage.setItem('selectedLanguage', 'fr');
+        sessionStorage.setItem('webLanguageSelected', 'true');
+      }
+      location.replace('index.html');
     })();
 
     // Charger et appliquer les traductions
@@ -175,9 +180,7 @@
     function initButtons() {
       const $ = (s) => document.querySelector(s);
       const errEl = $('#err');
-      const upErrEl = $('#err-up');
       const setErr = (m)=>{ if(errEl) errEl.textContent = m || ''; };
-      const setUpErr = (m)=>{ if(upErrEl) upErrEl.textContent = m || ''; };
 
       function apiReady() {
         const base = window.__API_BASE__ || (window.APP_CONFIG && window.APP_CONFIG.API_BASE);
@@ -207,7 +210,6 @@
 
       const btnHaveCode = $('#btnHaveCode');
       const btnBuyFull  = $('#btnBuyFull');
-      const btnBuyLite  = $('#btnBuyLite');
 
       if (btnHaveCode) {
         btnHaveCode.addEventListener('click', () => {
@@ -217,31 +219,6 @@
 
       if (btnBuyFull) {
         btnBuyFull.addEventListener('click', () => start('full'));
-      }
-
-      if (btnBuyLite) {
-        btnBuyLite.addEventListener('click', () => start('lite'));
-      }
-
-      const params = new URLSearchParams(location.search);
-      if (params.get('upgrade') === '1') {
-        const viewChoose = document.getElementById('view-choose');
-        const viewUpgrade = document.getElementById('view-upgrade');
-        if (viewChoose) viewChoose.classList.add('hidden');
-        if (viewUpgrade) viewUpgrade.classList.remove('hidden');
-
-        const btnUpgrade = document.getElementById('btnUpgrade');
-        if (btnUpgrade) {
-          btnUpgrade.addEventListener('click', async () => {
-            if (!apiReady()) {
-              setUpErr(getTranslation('checkout_api_missing', "Configuration API manquante. Actualise la page."));
-              alert(getTranslation('checkout_api_unreachable', "Impossible de joindre l'API : vérifie l'URL ngrok dans le <meta name='api-base'>."));
-              return;
-            }
-            if (window.startCheckout) window.startCheckout({ is_upgrade: true });
-            else setUpErr(getTranslation('checkout_module_not_loaded', "Le module de paiement ne s'est pas chargé. Rafraîchis la page."));
-          });
-        }
       }
 
       setTimeout(() => {

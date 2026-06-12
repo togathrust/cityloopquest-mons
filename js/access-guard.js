@@ -1,116 +1,69 @@
 /**
  * js/access-guard.js
- * Garde d'accès : bloque l'affichage des pages si aucun code d'activation valide (clq_short_code).
+ * Garde d'accès : bloque l'affichage des pages si aucune licence valide.
  *
- * ⚠️ BYPASS TESTS LOCAUX (désactivation temporaire pour développement) :
- * - Sur localhost / 127.0.0.1 : la garde est automatiquement désactivée
- * - Avec ?dev=1 dans l'URL : désactivation (ex. pour tester depuis mobile sur le réseau)
- * - En production (domaine déployé) : la garde reste ACTIVE, aucune action requise
- *
- * RAPPEL DÉPLOIEMENT : En production (domaine déployé), la garde est automatiquement ACTIVE.
+ * Bypass tests locaux : localhost / 127.0.0.1 ou ?dev=1
  */
 
 (function () {
+  'use strict';
+
   const path = window.location.pathname || '';
   const file = (path.split('/').pop() || '').toLowerCase();
 
-  // Sur Netlify, quand on arrive par la racine, file peut être '' → on considère que c'est index.html
-  if (file === '' || file === 'index.html' || file === 'index.htm') {
+  const PUBLIC_PAGES = new Set([
+    '',
+    'index.html',
+    'index.htm',
+    'language-selection.html',
+    'choose-access.html',
+    'activation.html',
+    'activation-manual.html',
+    'post-checkout.html',
+    'checkout.html',
+    'offline.html',
+    'mail.html',
+  ]);
+
+  if (PUBLIC_PAGES.has(file)) {
     return;
   }
 
-  // Bypass pour tests locaux : localhost OU paramètre ?dev=1
   const isLocalDev =
     /^localhost$|^127\.0\.0\.1$|^\[::1\]$/.test(window.location.hostname) ||
     window.location.search.includes('dev=1');
   if (isLocalDev) {
-    return; // Ne pas bloquer - tests locaux uniquement
-  }
-(function () {
-  const SHORT_CODE_KEY = 'clq_short_code';
-
-  // ⚠ adapte ce chemin à ta vraie page de départ
-  // par ex: '/index.html' si c'est la sélection des langues
-  const LANGUAGE_PAGE = '/language-selection.html';
-
-  // Même logique que ta fonction existante
-  function normalizeShort(input) {
-    const raw = String(input).toLowerCase().replace(/[^a-z0-9]/g, '');
-    if (!raw) return '';
-    const nine = raw.slice(0, 9);
-    return (nine.match(/.{1,3}/g) || [nine]).join('-'); // xxx-xxx-xxx
+    return;
   }
 
-  function hasValidAccess() {
-    try {
-      if (
-        localStorage.getItem('clq_has_access') === '1' ||
-        localStorage.getItem('clq_token') ||
-        localStorage.getItem('jwt')
-      ) {
-        return true;
-      }
-
-      const stored = localStorage.getItem(SHORT_CODE_KEY);
-      if (!stored) return false;
-
-      const normalized = normalizeShort(stored);
-      if (!normalized) return false;
-
-      // Option : remettre en forme correctement si besoin
-      if (normalized !== stored) {
-        localStorage.setItem(SHORT_CODE_KEY, normalized);
-      }
-
-      // Vérification stricte du format xxx-xxx-xxx
-      const isValidFormat = /^[a-z0-9]{3}-[a-z0-9]{3}-[a-z0-9]{3}$/.test(normalized);
-      return isValidFormat;
-    } catch (e) {
-      // Si localStorage est désactivé ou plante, on considère que c'est non valable
-      console.error('Erreur accès clq_short_code:', e);
-      return false;
-    }
-  }
+  const CHOOSE_ACCESS_PAGE = '/choose-access.html';
 
   function showBlockedPopupAndRedirect() {
     const overlay = document.createElement('div');
-    overlay.style.position = 'fixed';
-    overlay.style.inset = '0';
-    overlay.style.background = 'rgba(0, 0, 0, 0.6)';
-    overlay.style.display = 'flex';
-    overlay.style.alignItems = 'center';
-    overlay.style.justifyContent = 'center';
-    overlay.style.zIndex = '9999';
+    overlay.style.cssText =
+      'position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:9999';
 
     const box = document.createElement('div');
-    box.style.background = '#ffffff';
-    box.style.padding = '20px';
-    box.style.borderRadius = '10px';
-    box.style.maxWidth = '420px';
-    box.style.textAlign = 'center';
-    box.style.fontFamily = 'system-ui, sans-serif';
+    box.style.cssText =
+      'background:#fff;padding:20px;border-radius:10px;max-width:420px;text-align:center;font-family:system-ui,sans-serif';
 
-    box.innerHTML = `
-      <p>Cette application touristique est payante.</p>
-      <p>Cliquez sur le lien suivant pour revenir à la page d'enregistrement.</p>
-      <p>
-        <a id="clq_back_to_lang" href="${LANGUAGE_PAGE}">
-          Revenir à la page de sélection des langues
-        </a>
-      </p>
-      <p>Bonne ballade&nbsp;!</p>
-    `;
+    box.innerHTML =
+      '<p>Cette application touristique est payante.</p>' +
+      '<p>Cliquez sur le lien suivant pour accéder à la page d\'achat ou d\'activation.</p>' +
+      '<p><a id="clq_back_to_access" href="' +
+      CHOOSE_ACCESS_PAGE +
+      '">Accéder à la page d\'achat</a></p>' +
+      '<p>Bonne ballade&nbsp;!</p>';
 
     overlay.appendChild(box);
 
     function insertOverlay() {
       document.body.appendChild(overlay);
-
-      const link = document.getElementById('clq_back_to_lang');
+      const link = document.getElementById('clq_back_to_access');
       if (link) {
         link.addEventListener('click', function (e) {
           e.preventDefault();
-          window.location.href = LANGUAGE_PAGE;
+          window.location.href = CHOOSE_ACCESS_PAGE;
         });
       }
     }
@@ -122,9 +75,43 @@
     }
   }
 
-  // Exécution du garde dès le chargement du script
-  if (!hasValidAccess()) {
-    showBlockedPopupAndRedirect();
+  function loadAuthSession() {
+    return new Promise((resolve) => {
+      if (window.clqAuthSession) {
+        resolve();
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = 'js/auth-session.js';
+      script.onload = () => resolve();
+      script.onerror = () => resolve();
+      (document.head || document.documentElement).appendChild(script);
+    });
   }
-})();
+
+  async function runGuard() {
+    await loadAuthSession();
+
+    const auth = window.clqAuthSession;
+    if (!auth || typeof auth.ensureValidAuthOrClear !== 'function') {
+      showBlockedPopupAndRedirect();
+      return;
+    }
+
+    if (!auth.hasStoredCredentials()) {
+      showBlockedPopupAndRedirect();
+      return;
+    }
+
+    const valid = await auth.ensureValidAuthOrClear();
+    if (!valid) {
+      showBlockedPopupAndRedirect();
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', runGuard);
+  } else {
+    runGuard();
+  }
 })();
