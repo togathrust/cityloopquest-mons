@@ -16,7 +16,17 @@ const ROOT = __dirname;
 const DIST = path.join(ROOT, "dist");
 const OBFUSCATOR_CONFIG_PATH = path.join(ROOT, "obfuscator.config.json");
 const VERSION_JS_PATH = path.join(ROOT, "version.js");
+const VERSION_JSON_PATH = path.join(ROOT, "version.json");
 const RELEASE_NOTES_PATH = path.join(ROOT, "release notes.txt");
+const RELEASE_NOTES_TITLE = "CityLoop Quest Mons";
+const RELEASE_NOTES_BODY = [
+  "- Synchronisation des correctifs entre Mons, Murcia et Bruxelles.",
+  "- Correction du décalage viewport iOS et recalibrage après rotation.",
+  "- Rétablissement de l'avertissement mode paysage sur les pages concernées.",
+  "- Mise à jour de l'écran selfie : zone photo pleine, boutons latéraux, texte sur parchemin et zoom tactile.",
+  "- Adaptation Android de la page principale : ligne d'information visible, carte recalibrée et affichage POI stabilisé.",
+  "- Mise à jour du cache PWA et injection automatique du correctif viewport dans les pages générées."
+].join("\r\n");
 const ENV_PATH = path.join(ROOT, ".env");
 const ENV_LOCAL_PATH = path.join(ROOT, ".env.local");
 
@@ -210,11 +220,15 @@ async function bumpVersion() {
   await writeFile(VERSION_JS_PATH, jsContent, "utf8");
   log("version", "updated version.js");
 
+  await writeFile(VERSION_JSON_PATH, JSON.stringify({ version: newVersion }, null, 2) + "\n", "utf8");
+  log("version", "updated version.json");
+
   // ðŸ“ Met Ã  jour release notes.txt (on PREPEND le nouveau header)
   const header =
-    "CityLoop Quest Mons - Release notes\r\n" +
+    `${RELEASE_NOTES_TITLE} - Release notes\r\n` +
     `Version ${newVersion}\r\n` +
-    "----------------------------------------\r\n\r\n";
+    "----------------------------------------\r\n\r\n" +
+    `${RELEASE_NOTES_BODY}\r\n\r\n`;
 
   let previousNotes = "";
   if (await exists(RELEASE_NOTES_PATH)) {
