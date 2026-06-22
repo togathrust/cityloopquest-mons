@@ -7,7 +7,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
-const jsonPath = path.join(root, "data", "pois_mons_experiment.json");
+const jsonPath = path.join(root, "data", "pois_explorer.json");
 const langs = ["fr", "nl", "en", "de", "it", "es", "pl", "ar", "cn", "ja"];
 
 const bannedPatterns = [

@@ -1,4 +1,15 @@
 CityLoop Quest Mons - Release notes
+Version 26.06.68
+----------------------------------------
+
+- Synchronisation des correctifs entre Mons, Murcia et Bruxelles.
+- Correction du décalage viewport iOS et recalibrage après rotation.
+- Rétablissement de l'avertissement mode paysage sur les pages concernées.
+- Mise à jour de l'écran selfie : zone photo pleine, boutons latéraux, texte sur parchemin et zoom tactile.
+- Adaptation Android de la page principale : ligne d'information visible, carte recalibrée et affichage POI stabilisé.
+- Mise à jour du cache PWA et injection automatique du correctif viewport dans les pages générées.
+
+CityLoop Quest Mons - Release notes
 Version 26.06.67
 ----------------------------------------
 

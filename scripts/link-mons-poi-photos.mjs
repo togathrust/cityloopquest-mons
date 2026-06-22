@@ -1,5 +1,5 @@
 /**
- * Lie chaque POI de pois_mons_experiment.json à son image dans images/points interets/.
+ * Lie chaque POI de pois_explorer.json à son image dans images/points interets/.
  * Usage: node scripts/link-mons-poi-photos.mjs
  */
 import fs from "fs";
@@ -8,7 +8,7 @@ import { fileURLToPath } from "url";
 import { imagePathsFromFile } from "./lib/poi-image-resolve.mjs";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
-const jsonPath = path.join(root, "data", "pois_mons_experiment.json");
+const jsonPath = path.join(root, "data", "pois_explorer.json");
 const imgDir = path.join(root, "images", "points interets");
 
 /** Correspondance 1:1 POI id → fichier image (58 POI / 58 photos). */

@@ -7,7 +7,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
-const outPath = path.join(root, "data", "pois_bruxelles_experiment.json");
+const outPath = path.join(root, "data", "pois_explorer.json");
 const langs = ["fr", "nl", "en", "de", "it", "es", "pl", "ar", "cn", "ja"];
 const center = {
   name: "Grand-Place de Bruxelles",

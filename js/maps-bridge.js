@@ -24,7 +24,7 @@
 
     function applyTranslations() {
         if (backBtn) {
-            backBtn.textContent = t("maps_bridge_back", "← Retour à CLQ Murcia");
+            backBtn.textContent = t("maps_bridge_back", "Retour a CLQ Mons");
         }
         if (openBtn) {
             openBtn.textContent = t(
@@ -41,10 +41,10 @@
         if (hintEl) {
             hintEl.textContent = t(
                 "maps_bridge_hint",
-                "Pour revenir à l’application : touche Retour du navigateur après la navigation, puis le bouton rouge en haut."
+                "Pour revenir a l'application : utilisez le bouton Retour du navigateur apres la navigation, puis le bouton rouge en haut."
             );
         }
-        document.title = t("maps_bridge_title", "CLQ — Google Maps");
+        document.title = t("maps_bridge_title", "CLQ - Google Maps");
     }
 
     function buildGoogleUrl() {
@@ -144,3 +144,4 @@
         }
     });
 })();
+

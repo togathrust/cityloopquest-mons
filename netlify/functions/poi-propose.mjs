@@ -74,7 +74,7 @@ export async function handler(event) {
 
     if (!name || name.length < 2) return json(400, { error: "invalid_name" });
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) return json(400, { error: "invalid_coords" });
-    if (!inRegion(lat, lng, region)) return json(400, { error: "coords_outside_mons" });
+    if (!inRegion(lat, lng, region)) return json(400, { error: "coords_outside_city" });
     if (!description || description.length < 10) return json(400, { error: "invalid_description" });
     if (submitterEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(submitterEmail)) {
       return json(400, { error: "invalid_email" });
