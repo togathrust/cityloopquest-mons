@@ -1,4 +1,13 @@
 CityLoop Quest Mons - Release notes
+Version 26.06.72
+----------------------------------------
+
+- Rétablissement du bouton Doudou : lecture de la chanson et affichage des paroles sur la page principale.
+- Correction du défilement sur les pages culture et aide (correctif viewport iOS sans reset intempestif).
+- Nettoyage de l'historique des release notes (suppression des versions 67 à 70).
+- Mise à jour du cache PWA.
+
+CityLoop Quest Mons - Release notes
 Version 26.06.71
 ----------------------------------------
 
