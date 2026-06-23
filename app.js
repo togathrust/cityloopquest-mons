@@ -49,7 +49,7 @@ if (window.__APP_JS_DISABLED__) {
     // Code normal de app.js
 }
 
-let nextButton, prevButton, homeButton, cultureButton, audioBtn, poiInterestBtn, pauseBtn, stopBtn, restartBtn, quizResumeBtn;
+let nextButton, prevButton, homeButton, cultureButton, audioBtn, poiInterestBtn, doudouBtn, pauseBtn, stopBtn, restartBtn, quizResumeBtn;
 let quizSessionUiButtons = null;
 const QUIZ_OVERLAY_ID = 'quiz-question-overlay';
 
@@ -1869,6 +1869,21 @@ function playExclusiveAudio(src, textFile = null, imageElement = null, originalI
         pauseBtn.textContent = '⏸️';
     }
 
+    if (src === "Chansons/air_doudou.mp3" && textContainer) {
+        isDoudouSongPlaying = true;
+        const activeImageElement = imageElement || document.getElementById("point-image");
+        fetch("data/Texte_chanson_doudou.txt")
+            .then(response => response.text())
+            .then(text => {
+                currentDescriptionText = text;
+                textContainer.innerText = text;
+                textContainer.style.display = "block";
+                textContainer.scrollTop = 0;
+                if (activeImageElement) activeImageElement.style.display = "none";
+            })
+            .catch(err => console.error("Erreur de chargement paroles Doudou :", err));
+    }
+
     // Ne pas modifier l'affichage si c'est l'air du doudou
     if (textFile && imageElement && textContainer && src !== "Chansons/air_doudou.mp3") {
         // Essayer d'abord de charger la description depuis le JSON multilingue
@@ -3346,7 +3361,7 @@ function showQuizForCurrentPoint(callback) {
   updateCurrentDisplay();
   
   // Désactiver tous les boutons sauf quiz
-  const btns = [nextButton, prevButton, homeButton, cultureButton, audioBtn, poiInterestBtn, pauseBtn, stopBtn, restartBtn];
+  const btns = [nextButton, prevButton, homeButton, cultureButton, audioBtn, poiInterestBtn, doudouBtn, pauseBtn, stopBtn, restartBtn];
   quizSessionUiButtons = btns;
   btns.forEach(btn => { if (btn) btn.disabled = true; });
   let questionIndex = 0;
@@ -4756,6 +4771,7 @@ document.addEventListener("DOMContentLoaded", () => {
     cultureButton = document.getElementById('culture-btn');
     audioBtn = document.getElementById('audio-btn');
     poiInterestBtn = document.getElementById('poi-interest-btn');
+    doudouBtn = document.getElementById('doudou-btn');
     pauseBtn = document.getElementById('pause-btn');
     stopBtn = document.getElementById('stop-btn');
     restartBtn = document.getElementById('restart-btn');
@@ -4946,6 +4962,18 @@ document.addEventListener("DOMContentLoaded", () => {
             markGuidancePauseForLeave();
             snapshotTourStateForExternalPage();
             window.location.href = "poi-experiment.html";
+        });
+    }
+
+    if (doudouBtn) {
+        doudouBtn.addEventListener('click', () => {
+            stopAllAudio();
+            playExclusiveAudio("Chansons/air_doudou.mp3");
+            if (typeof lastAudioLang === 'undefined' || lastAudioLang === null) {
+                lastAudioLang = window.translationManager
+                    ? window.translationManager.getCurrentLanguage()
+                    : 'fr';
+            }
         });
     }
 

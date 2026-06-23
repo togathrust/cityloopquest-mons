@@ -86,9 +86,6 @@
     if (!overlay) return;
     var landscape = isLandscapeNow();
     overlay.style.display = landscape ? 'none' : 'flex';
-    if (landscape) {
-      resetScroll();
-    }
   }
 
   function resetScroll() {
@@ -106,7 +103,7 @@
 
     var shouldLockViewport = isViewportLockPage();
 
-    if (shouldLockViewport || isLandscapeNow()) {
+    if (shouldLockViewport) {
       resetScroll();
     }
 
@@ -126,8 +123,10 @@
       return { applied: false };
     }
 
-    if (isIOS()) {
+    if (isIOS() && shouldLockViewport) {
       html.classList.add('clq-ios-viewport-lock');
+    } else {
+      html.classList.remove('clq-ios-viewport-lock');
     }
 
     html.style.setProperty('--app-vh', height + 'px');
@@ -246,7 +245,9 @@
 
     if (global.visualViewport) {
       global.visualViewport.addEventListener('resize', rerun, { passive: true });
-      global.visualViewport.addEventListener('scroll', rerun, { passive: true });
+      if (isViewportLockPage()) {
+        global.visualViewport.addEventListener('scroll', rerun, { passive: true });
+      }
     }
 
     if (global.screen && global.screen.orientation && typeof global.screen.orientation.addEventListener === 'function') {

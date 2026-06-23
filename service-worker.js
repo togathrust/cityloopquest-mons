@@ -1,5 +1,5 @@
-const PRECACHE = 'precache-mons260638-cache3-viewport';
-const RUNTIME  = 'runtime-mons260638-cache3-viewport';
+const PRECACHE = 'precache-mons260638-cache3-scrollfix';
+const RUNTIME  = 'runtime-mons260638-cache3-scrollfix';
 
 const PRECACHE_URLS = [
   './',                       // ok si tu sers à la racine du dossier

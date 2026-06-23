@@ -20,12 +20,10 @@ const VERSION_JSON_PATH = path.join(ROOT, "version.json");
 const RELEASE_NOTES_PATH = path.join(ROOT, "release notes.txt");
 const RELEASE_NOTES_TITLE = "CityLoop Quest Mons";
 const RELEASE_NOTES_BODY = [
-  "- Synchronisation des correctifs entre Mons, Murcia et Bruxelles.",
-  "- Correction du décalage viewport iOS et recalibrage après rotation.",
-  "- Rétablissement de l'avertissement mode paysage sur les pages concernées.",
-  "- Mise à jour de l'écran selfie : zone photo pleine, boutons latéraux, texte sur parchemin et zoom tactile.",
-  "- Adaptation Android de la page principale : ligne d'information visible, carte recalibrée et affichage POI stabilisé.",
-  "- Mise à jour du cache PWA et injection automatique du correctif viewport dans les pages générées."
+  "- Rétablissement du bouton Doudou : lecture de la chanson et affichage des paroles sur la page principale.",
+  "- Correction du défilement sur les pages culture et aide (correctif viewport iOS sans reset intempestif).",
+  "- Nettoyage de l'historique des release notes (suppression des versions 67 à 70).",
+  "- Mise à jour du cache PWA."
 ].join("\r\n");
 const ENV_PATH = path.join(ROOT, ".env");
 const ENV_LOCAL_PATH = path.join(ROOT, ".env.local");
