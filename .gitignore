@@ -1,5 +1,6 @@
-# Local Netlify folder
-.netlify
+# Local Netlify folder (state.json versionné pour deploy CLI)
+.netlify/*
+!.netlify/state.json
 
 # Visual Studio
 .vs/
