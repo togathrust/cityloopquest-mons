@@ -1,4 +1,11 @@
 CityLoop Quest Mons - Release notes
+Version 26.06.73
+----------------------------------------
+
+- Mise à jour des instructions d'installation PWA iOS : option « En voir plus », étape 4 et traductions dans toutes les langues.
+- Chargement asynchrone recommandé pour l'API Google Maps (main et POI Explorer).
+
+CityLoop Quest Mons - Release notes
 Version 26.06.72
 ----------------------------------------
 
