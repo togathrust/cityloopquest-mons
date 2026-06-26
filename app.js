@@ -1999,7 +1999,7 @@ function loadGoogleMaps(callback) {
     if (apiKey && apiKey.match(/AIza[A-Za-z0-9_-]+/)) {
         // Clé disponible depuis api-key.js (production)
         const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap&libraries=geometry,places`;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&loading=async&callback=initMap&libraries=geometry,places`;
         script.async = true;
         script.onerror = handleMapError;
         document.head.appendChild(script);
@@ -2011,7 +2011,7 @@ function loadGoogleMaps(callback) {
                 const match = apiKeyText.match(/AIza[A-Za-z0-9_-]+/);
                 if (!match) throw new Error('Clé API invalide');
                 const script = document.createElement('script');
-                script.src = `https://maps.googleapis.com/maps/api/js?key=${match[0]}&callback=initMap&libraries=geometry,places`;
+                script.src = `https://maps.googleapis.com/maps/api/js?key=${match[0]}&loading=async&callback=initMap&libraries=geometry,places`;
                 script.async = true;
                 script.onerror = handleMapError;
                 document.head.appendChild(script);

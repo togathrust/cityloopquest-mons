@@ -579,8 +579,8 @@ class PWAInstaller {
                     <div class="step">
                         <div class="step-icon">🏠</div>
                         <div class="step-text">
-                            <strong>2. <span data-translate="ios_step2">Sélectionnez "Sur l'écran d'accueil"</span></strong><br>
-                            <span class="ios-detail"><span data-translate="ios_step2_detail">Faites défiler dans le menu et appuyez sur cette option</span></span>
+                            <strong>2. <span data-translate="ios_step2_alt">Sélectionnez "Sur l'écran d'accueil"</span></strong><br>
+                            <span class="ios-detail"><span data-translate="ios_step2_detail_alt">Faites défiler dans le menu et appuyez sur cette option. Si l'option n'est pas disponible, sélectionnez "En voir plus", l'option apparaîtra.</span></span>
                         </div>
                     </div>
                     <div class="step">
@@ -590,13 +590,19 @@ class PWAInstaller {
                             <span class="ios-detail"><span data-translate="ios_step3_detail">Confirmez l'ajout de l'application</span></span>
                         </div>
                     </div>
+                    <div class="step">
+                        <div class="step-icon">🚀</div>
+                        <div class="step-text">
+                            <strong>4. <span data-translate="ios_step4">Fermez le navigateur et démarrez l'app à partir de l'icône.</span></strong>
+                        </div>
+                    </div>
                 </div>
                 <div class="ios-tips">
-                    <h4>💡 <span data-translate="ios_tips_title">Conseils pour iOS :</span></h4>
+                    <h4>💡 <span data-translate="ios_tips_title">Conseils :</span></h4>
                     <ul>
                         <li><span data-translate="ios_tip1">L'application apparaîtra sur votre écran d'accueil</span></li>
                         <li><span data-translate="ios_tip2">Vous pouvez la déplacer et organiser comme les autres apps</span></li>
-                        <li><span data-translate="ios_tip3">L'application fonctionnera hors ligne</span></li>
+                        <li><span data-translate="ios_tip3">L'application ne fonctionnera pas hors ligne</span></li>
                     </ul>
                 </div>
             </div>

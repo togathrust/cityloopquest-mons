@@ -20,10 +20,8 @@ const VERSION_JSON_PATH = path.join(ROOT, "version.json");
 const RELEASE_NOTES_PATH = path.join(ROOT, "release notes.txt");
 const RELEASE_NOTES_TITLE = "CityLoop Quest Mons";
 const RELEASE_NOTES_BODY = [
-  "- Rétablissement du bouton Doudou : lecture de la chanson et affichage des paroles sur la page principale.",
-  "- Correction du défilement sur les pages culture et aide (correctif viewport iOS sans reset intempestif).",
-  "- Nettoyage de l'historique des release notes (suppression des versions 67 à 70).",
-  "- Mise à jour du cache PWA."
+  "- Mise à jour des instructions d'installation PWA iOS : option « En voir plus », étape 4 et traductions dans toutes les langues.",
+  "- Chargement asynchrone recommandé pour l'API Google Maps (main et POI Explorer)."
 ].join("\r\n");
 const ENV_PATH = path.join(ROOT, ".env");
 const ENV_LOCAL_PATH = path.join(ROOT, ".env.local");

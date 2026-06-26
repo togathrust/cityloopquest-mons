@@ -1004,7 +1004,7 @@
     const apiKey = window.__GOOGLE_MAPS_API_KEY__;
     if (apiKey && /^AIza[A-Za-z0-9_-]+$/.test(apiKey)) {
       const script = document.createElement("script");
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&v=weekly&callback=initExperimentMap`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&v=weekly&loading=async&callback=initExperimentMap`;
       script.defer = true;
       document.head.appendChild(script);
       return;
@@ -1019,7 +1019,7 @@
         const match = text.match(/AIza[A-Za-z0-9_-]+/);
         if (!match) throw new Error("Format de cle API invalide.");
         const script = document.createElement("script");
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${match[0]}&v=weekly&callback=initExperimentMap`;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${match[0]}&v=weekly&loading=async&callback=initExperimentMap`;
         script.defer = true;
         document.head.appendChild(script);
       })
