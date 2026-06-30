@@ -1,4 +1,11 @@
 CityLoop Quest Mons - Release notes
+Version 26.06.75
+----------------------------------------
+
+- Réordonnancement des parcours : La Toison d'Or visitée après le bloc Grand-Place nord (Ropieur–Doudou), avant le Théâtre Royal.
+- Mise à jour du cache PWA.
+
+CityLoop Quest Mons - Release notes
 Version 26.06.74
 ----------------------------------------
 

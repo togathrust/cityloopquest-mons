@@ -20,8 +20,7 @@ const VERSION_JSON_PATH = path.join(ROOT, "version.json");
 const RELEASE_NOTES_PATH = path.join(ROOT, "release notes.txt");
 const RELEASE_NOTES_TITLE = "CityLoop Quest Mons";
 const RELEASE_NOTES_BODY = [
-  "- Nouveau point d'intérêt parcours : La Toison d'Or (Grand-Place), avec textes, quiz et audios en 10 langues.",
-  "- Pages artistes célèbres : Alice on the Roof et TeddyBear (textes multilingues et photos).",
+  "- Réordonnancement des parcours : La Toison d'Or visitée après le bloc Grand-Place nord (Ropieur–Doudou), avant le Théâtre Royal.",
   "- Mise à jour du cache PWA."
 ].join("\r\n");
 const ENV_PATH = path.join(ROOT, ".env");

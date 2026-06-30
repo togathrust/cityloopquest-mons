@@ -1,5 +1,5 @@
-const PRECACHE = 'precache-mons260674-toison-artists';
-const RUNTIME  = 'runtime-mons260674-toison-artists';
+const PRECACHE = 'precache-mons260675-circuit-order';
+const RUNTIME  = 'runtime-mons260675-circuit-order';
 
 const PRECACHE_URLS = [
   './',                       // ok si tu sers à la racine du dossier
