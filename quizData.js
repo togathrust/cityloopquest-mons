@@ -1738,4 +1738,34 @@ window.quizData = {
   }
 ],
 
+  "La Toison d'Or": [
+    {
+      question: "À quel ordre de chevalerie renvoie le nom de la Maison de la Toison d'Or ?",
+      options: [
+        "L'ordre des Chevaliers du Waffle de Namur",
+        "L'Ordre de la Toison d'Or, fondé au XVe siècle par Philippe le Bon",
+        "La confrérie des fans du Singe du Grand'Garde"
+      ],
+      answer: 1
+    },
+    {
+      question: "De quel style date principalement la façade de la Maison de la Toison d'Or ?",
+      options: [
+        "Du style Renaissance du début du XVIIe siècle, en briques et pierre bleue",
+        "Du néo-baroque flamboyant avec pigeons dorés",
+        "Du gothique civil du XVIe siècle à trois niveaux dégressifs"
+      ],
+      answer: 0
+    },
+    {
+      question: "Quelle anecdote lie la Toison d'Or au Café du Commerce ?",
+      options: [
+        "Les serveurs changeaient de maison selon la couleur des blasons",
+        "Une salle voisine aurait servi d'annexe au débit de boisson lors des jours d'affluence, avant 1892",
+        "Le café servait exclusivement de la bière teinte en or pour la Ducasse"
+      ],
+      answer: 1
+    }
+  ]
+
 };

@@ -20,8 +20,9 @@ const VERSION_JSON_PATH = path.join(ROOT, "version.json");
 const RELEASE_NOTES_PATH = path.join(ROOT, "release notes.txt");
 const RELEASE_NOTES_TITLE = "CityLoop Quest Mons";
 const RELEASE_NOTES_BODY = [
-  "- Mise à jour des instructions d'installation PWA iOS : option « En voir plus », étape 4 et traductions dans toutes les langues.",
-  "- Chargement asynchrone recommandé pour l'API Google Maps (main et POI Explorer)."
+  "- Nouveau point d'intérêt parcours : La Toison d'Or (Grand-Place), avec textes, quiz et audios en 10 langues.",
+  "- Pages artistes célèbres : Alice on the Roof et TeddyBear (textes multilingues et photos).",
+  "- Mise à jour du cache PWA."
 ].join("\r\n");
 const ENV_PATH = path.join(ROOT, ".env");
 const ENV_LOCAL_PATH = path.join(ROOT, ".env.local");

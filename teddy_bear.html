@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Teddy Bear</title>
+<link href="style.css" rel="stylesheet"/>
+<script src="js/access-control.js"></script>
+<script src="translations/translationManager.js"></script>
+<script src="translations/languageSelector.js"></script>
+
+<!-- Garde d'accès : bloque l'accès si aucun code d'activation valide (clq_short_code) -->
+<script src="js/access-guard.js" defer></script>
+
+<style>
+body {
+      font-family: sans-serif !important;
+      font-size: 16px !important;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    .content {
+      font-family: sans-serif !important;
+      font-size: 16px !important;
+    }
+    .content p, .content div, .content span {
+      font-family: sans-serif !important;
+      font-size: 16px !important;
+    }
+    #contentContainer {
+      font-size: 16px !important;
+    }
+    #contentContainer p {
+      font-size: 16px !important;
+      line-height: 1.6 !important;
+    }
+    h1 {
+      font-size: 24px !important;
+      text-align: center;
+    }
+    .content {
+      max-width: 720px;
+      margin: auto;
+      white-space: pre-wrap;
+    }
+.back-button {
+  position: fixed;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  z-index: 1000;
+  padding: 10px 14px;
+  background-color: #c8102e;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px 0 0 8px;
+  cursor: pointer;
+  box-shadow: 0 0 6px rgba(0,0,0,0.2);
+}
+</style>
+</head>
+<body>
+
+<header class="main-header">
+    <div class="header-content">
+        <img src="images/icone titre0.png" alt="Icone 0" class="header-img left">
+        <h1 id="mainTitle">CityLoop Quest Mons - La Chevauchée de Saint Georges</h1>
+        <img src="images/icone titre1.png" alt="Icone 1" class="header-img right">
+    </div>
+</header>
+
+<div class="content">
+<h1 id="pageTitle">TeddyBear<br>Pop francophone et énergie montoise</h1>
+<br><br>
+<img src="images/teddy_bear.jpg" alt="TeddyBear" class="portrait"/>
+<br><br>
+<h1 id="source"></h1>
+<div id="contentContainer"></div>
+</div>
+
+<button class="back-button" id="back-button">BACK</button>
+
+<script>
+let translations = {};
+
+async function loadTranslations() {
+    try {
+        const response = await fetch('translations/translations_teddy_bear.json');
+        translations = await response.json();
+        applyTranslations();
+    } catch (error) {
+        console.error('Erreur lors du chargement des traductions:', error);
+    }
+}
+
+function initLanguageSelector() {
+    const oldSelector = document.querySelector('.language-selector');
+    if (oldSelector) oldSelector.remove();
+    if (window.languageSelector) {
+        window.languageSelector.createSelector();
+        window.languageSelector.updateSelectorValue();
+    }
+}
+
+function generateContent(lang) {
+    const container = document.getElementById('contentContainer');
+    const t = translations[lang] || translations.fr;
+    if (!t.content) return;
+    container.innerHTML = `<p style="font-size: 16px !important; line-height: 1.6 !important; font-family: sans-serif !important; color: #333 !important;">${t.content.intro}</p>`;
+}
+
+function applyTranslations() {
+    const lang = localStorage.getItem('selectedLanguage') || 'fr';
+    const t = translations[lang] || translations.fr;
+    if (window.languageSelector) window.languageSelector.updateSelectorValue();
+    document.getElementById('mainTitle').textContent = t.mainTitle;
+    document.getElementById('pageTitle').innerHTML = t.pageTitle.replace('\n', '<br>');
+    document.getElementById('source').textContent = t.source || '';
+    generateContent(lang);
+    document.getElementById('back-button').textContent = t.backButton;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (!window.checkPageAccess('teddy_bear.html')) return;
+    loadTranslations();
+    initLanguageSelector();
+});
+
+document.addEventListener('languageChanged', function() {
+    applyTranslations();
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const backButton = document.getElementById("back-button");
+  if (backButton) {
+    backButton.addEventListener("click", () => {
+      window.location.href = "artistes_celebres.html";
+    });
+  }
+});
+</script>
+</body>
+</html>

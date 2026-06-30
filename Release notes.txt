@@ -1,4 +1,12 @@
 CityLoop Quest Mons - Release notes
+Version 26.06.74
+----------------------------------------
+
+- Nouveau point d'intérêt parcours : La Toison d'Or (Grand-Place), avec textes, quiz et audios en 10 langues.
+- Pages artistes célèbres : Alice on the Roof et TeddyBear (textes multilingues et photos).
+- Mise à jour du cache PWA.
+
+CityLoop Quest Mons - Release notes
 Version 26.06.73
 ----------------------------------------
 
